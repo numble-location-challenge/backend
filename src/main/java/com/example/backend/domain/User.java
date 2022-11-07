@@ -4,12 +4,14 @@ import com.example.backend.domain.post.Feed;
 import com.example.backend.domain.post.Social;
 import com.example.backend.domain.enumType.UserType;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Getter
 @Entity
 @Table(name = "USERS", uniqueConstraints =
@@ -61,5 +63,9 @@ public class User {
     private List<Like> likes = new ArrayList<>();
 
     private String refreshToken; //JWT
+
+    public void encodePassword(PasswordEncoder passwordEncoder){
+        password = passwordEncoder.encode(password);
+    }
 
 }
