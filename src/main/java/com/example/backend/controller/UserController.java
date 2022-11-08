@@ -20,18 +20,18 @@ public class UserController {
     private final UserService userService;
     private final LoginService loginService;
 
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "회원가입")
     @PostMapping("/join")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "201", description = "CREATED"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
     public ResponseEntity<ResponseDTO> join(@RequestBody final UserJoinDTO userJoinDTO){
         //TODO validation 처리
         userService.create(userJoinDTO);
-        return new ResponseEntity(ResponseDTO.builder().success(true).message("OK").build(), HttpStatus.OK);
+        return new ResponseEntity(ResponseDTO.builder().success(true).message("CREATED").build(), HttpStatus.CREATED);
     }
 
 }
