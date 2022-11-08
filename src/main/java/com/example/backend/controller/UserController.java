@@ -1,7 +1,6 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.*;
-import com.example.backend.service.LoginService;
 import com.example.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,9 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final LoginService loginService;
 
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "회원가입")
     @PostMapping("/join")
     @ApiResponses({
@@ -31,7 +28,7 @@ public class UserController {
     public ResponseEntity<ResponseDTO> join(@RequestBody final UserJoinDTO userJoinDTO){
         //TODO validation 처리
         userService.create(userJoinDTO);
-        return new ResponseEntity(ResponseDTO.builder().success(true).message("CREATED").build(), HttpStatus.CREATED);
+        return new ResponseEntity(ResponseDTO.builder().success(true).message("회원가입 처리되었습니다.").build(), HttpStatus.CREATED);
     }
 
 }
