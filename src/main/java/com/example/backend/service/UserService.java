@@ -10,8 +10,8 @@ public interface UserService {
 
     void delete(Long userId); //회원 탈퇴
 
-    User getUserProfile(Long userId); //내 프로필 조회
+    User getUser(Long userId); //내 프로필 조회
 
-    User modifyUserProfile(UserModifyRequestDTO userModifyDTO); //회원 수정
+    User modifyUser(Long userId, UserModifyRequestDTO userModifyRequestDTO); //회원 수정
 
 }
