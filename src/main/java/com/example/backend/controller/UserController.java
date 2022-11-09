@@ -31,4 +31,22 @@ public class UserController {
         userService.create(userJoinRequestDTO);
         return ResponseDTO.builder().success(true).message("회원가입 처리되었습니다.").build();
     }
+
+    //TODO 서비스 구현, jwt 적용 전
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "회원 탈퇴")
+    @DeleteMapping("/user/delete/{id}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+    })
+    public ResponseDTO<?> deleteUser(@Parameter(required = true) @PathVariable Long id){
+
+        userService.delete(id);
+        return ResponseDTO.builder().success(true).message("정상 탈퇴되었습니다.").build();
+    }
+
 }
