@@ -50,9 +50,6 @@ public abstract class Post extends TimeAuditingEntity {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "post")
-    private List<PostCategory> category;
-
     @NotNull
     protected String contents; //내용
 
@@ -61,11 +58,10 @@ public abstract class Post extends TimeAuditingEntity {
 
     private int likes; //좋아요 수
 
-    public Post(User user, List<PostImage> images, List<Comment> comments, List<PostCategory> category, String contents, Integer region, int likes) {
+    public Post(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes) {
         this.user = user;
         this.images = images;
         this.comments = comments;
-        this.category = category;
         this.contents = contents;
         this.region = region;
         this.likes = likes;
