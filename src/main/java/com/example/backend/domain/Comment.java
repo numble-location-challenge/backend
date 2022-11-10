@@ -1,19 +1,31 @@
 package com.example.backend.domain;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.example.backend.domain.post.Post;
+
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "COMMENT")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Comment extends TimeAuditingEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +48,16 @@ public class Comment extends TimeAuditingEntity{
     private int refOrder; // 같은 그룹 내의 순서
     private Long parentNum; // 부모 댓글의 ID
 
-
-    //postType
-
+    @Builder
+    public Comment(User user, Post post, String contents, int likes, int cGroup, int level, int refOrder,
+        Long parentNum) {
+        this.user = user;
+        this.post = post;
+        this.contents = contents;
+        this.likes = likes;
+        this.cGroup = cGroup;
+        this.level = level;
+        this.refOrder = refOrder;
+        this.parentNum = parentNum;
+    }
 }
