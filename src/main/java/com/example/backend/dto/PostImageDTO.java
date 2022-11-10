@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PostImageDTO {
 
+    @Schema(description = "이미지 경로", defaultValue = "1c0a2b10-30d4-6aaf.jpg")
     private String imagePath;
 
     public PostImageDTO(PostImage postImage) {
