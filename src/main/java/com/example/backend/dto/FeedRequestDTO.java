@@ -11,13 +11,13 @@ import lombok.Data;
 @Data
 public class FeedRequestDTO {
 
-    @Schema(description = "본문")
+    @Schema(description = "피드 본문", defaultValue = "본문입니다.")
     private String contents;
-    @Schema(description = "피드에 연결하는 소셜의 아이디", example = "아이디", nullable = true)
+    @Schema(description = "피드에 연결하는 소셜의 아이디", defaultValue = "3", nullable = true)
     private Long socialId;
-    @Schema(description = "피드에 보여주고 싶은 이미지의 이름", example = "1c0a2b10-30d4-6aaf.jpg")
+    @Schema(description = "피드의 이미지 리스트")
     private List<PostImageDTO> images;
-    @Schema(description = "피드의 지역")
+    @Schema(description = "피드의 지역", defaultValue = "3")
     private Integer region;
 
 }

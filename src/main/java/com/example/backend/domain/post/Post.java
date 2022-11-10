@@ -1,21 +1,32 @@
 package com.example.backend.domain.post;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.PostImage;
 import com.example.backend.domain.TimeAuditingEntity;
 import com.example.backend.domain.User;
 import com.example.backend.domain.tag.PostCategory;
+
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -23,7 +34,6 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "post_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public abstract class Post extends TimeAuditingEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +45,7 @@ public abstract class Post extends TimeAuditingEntity {
     private User user; //작성자
 
     @OneToMany(mappedBy = "post")
-    private List<PostImage> images = new ArrayList<>();
+    protected List<PostImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;
@@ -44,9 +54,10 @@ public abstract class Post extends TimeAuditingEntity {
     private List<PostCategory> category;
 
     @NotNull
-    private String contents; //내용
+    protected String contents; //내용
+
     @NotNull
-    private Integer region; //지역 optional
+    protected Integer region; //지역 optional
 
     private int likes; //좋아요 수
 
