@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.PostImage;
 import com.example.backend.domain.User;
+import com.example.backend.domain.tag.PostCategory;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,10 +31,17 @@ public class Feed extends Post {
     private Social social; //작성자가 참여 중인 모임 연결
 
     @Builder
-    public Feed(User user, List<PostImage> images,
-        List<Comment> comments, String contents, Integer region, int likes,
+    public Feed(User user, List<PostImage> images, List<Comment> comments,
+        List<PostCategory> category, String contents, Integer region, int likes,
         Social social) {
-        super(user, images, comments, contents, region, likes);
+        super(user, images, comments, category, contents, region, likes);
         this.social = social;
+    }
+
+    public void updateFeed(String contents, Social social, List<PostImage> images, Integer region){
+        this.images = images;
+        this.contents = contents;
+        this.social = social;
+        this.region = region;
     }
 }
