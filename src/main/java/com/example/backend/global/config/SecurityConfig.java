@@ -1,23 +1,43 @@
 package com.example.backend.global.config;
 
+import com.example.backend.global.security.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        http.cors()//기본 cors 설정
+                .and()
                 .csrf().disable()
                 .formLogin().disable() //formLogin 인증 비활성화
-                .httpBasic().disable(); //httpBasic 인증 비활성화
+                .httpBasic().disable() //httpBasic 인증 비활성화
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                .and()
+                .authorizeRequests().antMatchers(
+                        "/", "/login", "/kakaologin", "/join", "/kakaojoin", "/swagger-ui/**", "/api-docs/**")
+                .permitAll()
+                .anyRequest().authenticated();
+
+        http.addFilterAfter(
+                jwtAuthenticationFilter,
+                CorsFilter.class
+        );
 
         return http.build();
     }
