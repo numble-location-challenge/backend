@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
 @Getter
 @Entity
 @Table(name = "USERS", uniqueConstraints =
@@ -46,6 +45,7 @@ public class User {
     @NotNull
     private int region;
     private String profile;
+    private String bio;//한마디 소개글
 
     @OneToMany(mappedBy = "user")
     private List<Feed> feeds = new ArrayList<>();
@@ -68,4 +68,15 @@ public class User {
         password = passwordEncoder.encode(password);
     }
 
+    @Builder
+    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int region, String bio) {
+        this.userType = userType;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.nickname = nickname;
+        this.phoneNumber = phoneNumber;
+        this.region = region;
+        this.bio = bio;
+    }
 }
