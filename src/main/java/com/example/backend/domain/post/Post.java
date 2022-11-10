@@ -9,7 +9,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -49,14 +48,4 @@ public abstract class Post extends TimeAuditingEntity {
     private Integer region; //지역 optional
 
     private int likes; //좋아요 수
-
-    public Post(User user, List<PostImage> images, List<Comment> comments, List<PostCategory> category, String contents, Integer region, int likes) {
-        this.user = user;
-        this.images = images;
-        this.comments = comments;
-        this.category = category;
-        this.contents = contents;
-        this.region = region;
-        this.likes = likes;
-    }
 }
