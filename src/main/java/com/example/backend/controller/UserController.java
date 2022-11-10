@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.domain.User;
 import com.example.backend.dto.*;
+import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,6 +32,21 @@ public class UserController {
     public ResponseDTO<?> join(@RequestBody final UserJoinRequestDTO userJoinRequestDTO){
         //TODO validation 처리
         userService.createDefaultUser(userJoinRequestDTO);
+        return ResponseDTO.builder().success(true).message("회원가입 처리되었습니다.").build();
+    }
+
+    //TODO 서비스 구현
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "카카오 회원가입")
+    @PostMapping("/kakaojoin")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND")
+    })
+    public ResponseDTO<?> kakaoJoin(@RequestBody final KaKaoAuthRequestDTO authRequestDTO){
+        //프론트에서 회원정보 동의해주면 AT 가지고 정보요청
+        userService.createKakaoUser(authRequestDTO);
         return ResponseDTO.builder().success(true).message("회원가입 처리되었습니다.").build();
     }
 
