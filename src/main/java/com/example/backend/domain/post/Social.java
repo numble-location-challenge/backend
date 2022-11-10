@@ -49,10 +49,15 @@ public class Social extends Post {
     @Column(name = "limited_nums")
     private Integer limitedNums; //최대 모집 인원수
 
+    @Column(name = "contact")
     private String contact; //연락 방법
 
+    @Column(name = "tag_id")
+    private Long tagId;
+
     @Builder
-    public Social(User user, List<PostImage> images, List<Comment> comments, List<PostCategory> category, String contents, Integer region, int likes, List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact) {
+    public Social(User user, List<PostImage> images, List<Comment> comments, List<PostCategory> category, @NotNull String contents, @NotNull Integer region, int likes,
+                  List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact, Long tagId) {
         super(user, images, comments, category, contents, region, likes);
         this.socialings = socialings;
         this.status = status;
@@ -63,5 +68,6 @@ public class Social extends Post {
         this.currentNums = currentNums;
         this.limitedNums = limitedNums;
         this.contact = contact;
+        this.tagId = tagId;
     }
 }
