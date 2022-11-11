@@ -24,7 +24,7 @@ public class Tag {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "social_tag")
+    @OneToMany(mappedBy = "tag")
     private List<SocialTag> socialTags;
 
     @NotNull

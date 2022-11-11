@@ -31,7 +31,7 @@ public class Social extends Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "social_tag")
+    @OneToMany(mappedBy = "social")
     private List<SocialTag> socialTags;
 
     @NotNull
