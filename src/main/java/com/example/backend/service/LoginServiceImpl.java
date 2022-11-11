@@ -61,7 +61,7 @@ public class LoginServiceImpl implements LoginService{
     public HashMap<String,String> authorize(User user) {
         //토큰 2개 생성
         final String AccessToken = tokenService.create(user); //AT 생성
-        final String RefreshToken = "sdfsdf"; //TODO RT 생성, 두개 한꺼번에 얻어오는게 낫나 음
+        final String RefreshToken = "아직 Refresh Token 로직은 구현 전입니다"; //TODO RT 생성, 두개 한꺼번에 얻어오는게 낫나 음
 
         HashMap<String,String> token = new HashMap<>();
         token.put("AT", AccessToken);
