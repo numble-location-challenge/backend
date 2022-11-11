@@ -79,7 +79,7 @@ public class LoginController {
 
         return ResponseEntity.ok()
                 .header("Authentication", tokenMap.get("AT"))
-//                    .header("Authentication-refresh", tokenMap.get("RT"))
+                    .header("Authentication-refresh", tokenMap.get("RT"))
                 .body(response);
     }
 
