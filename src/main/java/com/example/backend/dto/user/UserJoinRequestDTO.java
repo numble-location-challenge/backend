@@ -1,4 +1,4 @@
-package com.example.backend.dto;
+package com.example.backend.dto.user;
 
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;

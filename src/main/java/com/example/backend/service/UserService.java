@@ -2,8 +2,8 @@ package com.example.backend.service;
 
 import com.example.backend.domain.User;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
-import com.example.backend.dto.UserJoinRequestDTO;
-import com.example.backend.dto.UserModifyRequestDTO;
+import com.example.backend.dto.user.UserJoinRequestDTO;
+import com.example.backend.dto.user.UserModifyRequestDTO;
 
 public interface UserService {
 
