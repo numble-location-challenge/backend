@@ -24,7 +24,7 @@ public class Category {
     @NotNull
     private String name;
 
-    @OneToMany(mappedBy = "social")
+    @OneToMany(mappedBy = "category")
     private List<Social> social;
 
 }
