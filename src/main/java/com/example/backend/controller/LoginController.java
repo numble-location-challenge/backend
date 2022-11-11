@@ -39,7 +39,6 @@ public class LoginController {
     public ResponseEntity<?> login(@RequestBody final DefaultLoginRequestDTO loginDTO){
 
         User loginUser = loginService.defaultLogin(loginDTO.getEmail(),loginDTO.getPassword());
-
         return getLoginSuccessResponseEntity(loginUser);
     }
 
@@ -54,14 +53,6 @@ public class LoginController {
     public ResponseEntity<?> kakaologin(@RequestBody final KaKaoAuthRequestDTO authRequestDTO){
 
         User loginUser = loginService.kakaoLogin(authRequestDTO);
-
-        if(loginUser == null){
-            ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
-                    .success(true).message("회원가입 되지 않은 카카오 계정입니다.")
-                    .build();
-
-            return ResponseEntity.ok().body(response);
-        }
         return getLoginSuccessResponseEntity(loginUser);
     }
 
@@ -79,7 +70,7 @@ public class LoginController {
 
         return ResponseEntity.ok()
                 .header("Authentication", tokenMap.get("AT"))
-                    .header("Authentication-refresh", tokenMap.get("RT"))
+                .header("Authentication-refresh", tokenMap.get("RT"))
                 .body(response);
     }
 

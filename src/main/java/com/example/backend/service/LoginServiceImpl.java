@@ -31,7 +31,7 @@ public class LoginServiceImpl implements LoginService{
     public User defaultLogin(String email, String password) {
         //비밀번호 일치 확인
         User dbUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         if(passwordEncoder.matches(password, dbUser.getPassword())) return dbUser;
         else throw new InvalidInputException(InvalidInputExceptionType.ACCOUNT_NOT_MATCH);
@@ -48,7 +48,7 @@ public class LoginServiceImpl implements LoginService{
             return testUser;
         }
         //2. DB에 없으면 null
-        else return null;
+        else throw new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_KAKAO_USER);
     }
 
     @Override
