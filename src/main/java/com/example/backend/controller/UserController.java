@@ -26,14 +26,14 @@ public class UserController {
     private final UserService userService;
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "회원가입")
+    @Operation(summary = "회원가입",
+            description = "unique field 중복 시 errorCode -101(이메일), -102(닉네임), -103(이메일,닉네임)이 반환됩니다.")
     @PostMapping("/join")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
     })
     public ResponseDTO<?> join(@RequestBody final UserJoinRequestDTO userJoinRequestDTO){
-        //TODO validation 처리
         userService.createDefaultUser(userJoinRequestDTO);
         return ResponseDTO.builder().success(true).message("회원가입 처리되었습니다.").build();
     }
@@ -53,7 +53,7 @@ public class UserController {
         return ResponseDTO.builder().success(true).message("회원가입 처리되었습니다.").build();
     }
 
-    //TODO 서비스 구현, jwt 적용 전
+    //TODO 서비스 구현
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 탈퇴")
     @DeleteMapping("/user/delete")
@@ -69,9 +69,9 @@ public class UserController {
         return ResponseDTO.builder().success(true).message("정상 탈퇴되었습니다.").build();
     }
 
-    //TODO 서비스 구현, jwt 적용 전
+    //TODO 서비스 구현
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "회원 수정")
+    @Operation(summary = "회원 수정", description = "모든 변수 null available")
     @PutMapping("/user/me")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -96,7 +96,7 @@ public class UserController {
                 .data(users).build();
     }
 
-    //TODO 서비스 구현, jwt 적용 전
+    //TODO 서비스 구현
     //내 프로필 조회할 때 피드, 댓글도 같이 들고 와야하는지? 일단 빼고 처리
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 프로필 조회")

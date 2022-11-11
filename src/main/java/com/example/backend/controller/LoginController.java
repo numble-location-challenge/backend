@@ -43,7 +43,7 @@ public class LoginController {
     }
 
     //TODO 서비스 구현
-    @Operation(summary = "카카오 로그인")
+    @Operation(summary = "카카오 로그인", description = "처음 로그인하는 경우 errorCode -112가 반환되며, /kakaojoin으로 재요청하면 됩니다.")
     @PostMapping("/kakaologin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
