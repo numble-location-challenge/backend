@@ -22,7 +22,6 @@ import com.example.backend.domain.Comment;
 import com.example.backend.domain.PostImage;
 import com.example.backend.domain.TimeAuditingEntity;
 import com.example.backend.domain.User;
-import com.example.backend.domain.tag.PostCategory;
 
 import lombok.AccessLevel;
 import lombok.Getter;

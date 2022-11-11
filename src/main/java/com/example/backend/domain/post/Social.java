@@ -5,6 +5,9 @@ import com.example.backend.domain.PostImage;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
+import com.example.backend.domain.tag.Category;
+import com.example.backend.domain.tag.SocialTag;
+
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,6 +26,13 @@ public class Social extends Post {
 
     @OneToMany(mappedBy = "social")
     private List<Socialing> socialings = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @OneToMany(mappedBy = "social_tag")
+    private List<SocialTag> socialTags;
 
     @NotNull
     @Enumerated(value = EnumType.STRING)
@@ -50,14 +60,12 @@ public class Social extends Post {
     @Column(name = "contact")
     private String contact; //연락 방법
 
-    @Column(name = "tag_id")
-    private Long tagId; //소분류 태그
-
     @Builder
     public Social(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes,
-                  List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate,
-                  Integer currentNums, Integer limitedNums, String contact, Long tagId) {
+        Category category, List<SocialTag> socialTags, List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact) {
         super(user, images, comments, contents, region, likes);
+        this.category = category;
+        this.socialTags = socialTags;
         this.socialings = socialings;
         this.status = status;
         this.title = title;
@@ -67,7 +75,6 @@ public class Social extends Post {
         this.currentNums = currentNums;
         this.limitedNums = limitedNums;
         this.contact = contact;
-        this.tagId = tagId;
     }
 
 }

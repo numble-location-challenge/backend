@@ -1,11 +1,9 @@
 package com.example.backend.dto.social;
 
-import com.example.backend.domain.Comment;
 import com.example.backend.domain.PostImage;
 import com.example.backend.domain.Socialing;
-import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
-import com.example.backend.domain.tag.PostCategory;
+import com.example.backend.domain.tag.Category;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,7 +31,7 @@ public class SocialShortDTO {
     private List<PostImage> images;
 
     @Schema(description = "게시글 카테고리")
-    private List<PostCategory> category;
+    private List<Category> category;
 
     @Schema(description = "모임 게시글 내용")
     private String contents;
