@@ -3,15 +3,15 @@ package com.example.backend.global.exception;
 import com.example.backend.global.exception.base.CustomExceptionType;
 
 /**
- * HttpStatus: UNAUTHORIZED
+ * HttpStatus: FORBIDDEN
  */
-public enum UnAuthorizedExceptionType implements CustomExceptionType {
-    USER_UN_AUTHORIZED(-188, "인증되지 않은 유저입니다.");
+public enum ForbiddenExceptionType implements CustomExceptionType {
+    USER_UN_AUTHORIZED(-199, "권한이 없는 페이지입니다.");
 
     private int errorCode;
     private String errorMessage;
 
-    UnAuthorizedExceptionType(int errorCode, String errorMessage) {
+    ForbiddenExceptionType(int errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
