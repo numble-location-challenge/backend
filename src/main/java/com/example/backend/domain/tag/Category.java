@@ -1,5 +1,6 @@
 package com.example.backend.domain.tag;
 
+import com.example.backend.domain.post.Social;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Getter
 @Entity
@@ -21,5 +23,8 @@ public class Category {
 
     @NotNull
     private String name;
+
+    @OneToMany(mappedBy = "social")
+    private List<Social> social;
 
 }
