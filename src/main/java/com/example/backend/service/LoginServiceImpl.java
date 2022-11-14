@@ -57,11 +57,12 @@ public class LoginServiceImpl implements LoginService{
         return null;
     }
 
+    @Transactional
     @Override
     public HashMap<String,String> authorize(User user) {
         //토큰 2개 생성
-        final String AccessToken = tokenService.create(user); //AT 생성
-        final String RefreshToken = "아직 Refresh Token 로직은 구현 전입니다"; //TODO RT 생성, 두개 한꺼번에 얻어오는게 낫나 음
+        final String AccessToken = tokenService.createAccessToken(user); //AT 생성
+        final String RefreshToken = tokenService.createRefreshToken(user); //RT 생성
 
         HashMap<String,String> token = new HashMap<>();
         token.put("AT", AccessToken);
@@ -71,8 +72,9 @@ public class LoginServiceImpl implements LoginService{
     }
 
     @Override
-    public void logout(Long userId) {
-
+    public void logout(String email) {
+        //AT, RT 만료시키기
+        tokenService.destroyToken(email);
     }
 
 }

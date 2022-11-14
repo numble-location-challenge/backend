@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +55,10 @@ public class LoginController {
 
     private ResponseEntity<?> getLoginSuccessResponseEntity(User loginUser) {
         //set data list
-        List<AuthDTO> dataList = List.of(new AuthDTO(loginUser.getId()));
+        List<AuthDTO> dataList = List.of(AuthDTO.builder()
+                .userId(loginUser.getId())
+                .email(loginUser.getEmail())
+                .build());
 
         //set response
         ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
@@ -82,8 +82,8 @@ public class LoginController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> logout(@AuthenticationPrincipal Long id){
-        loginService.logout(id);
+    public ResponseDTO<?> logout(@AuthenticationPrincipal String email){
+        loginService.logout(email);
         return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
     }
 }

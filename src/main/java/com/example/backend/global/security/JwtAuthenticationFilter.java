@@ -1,5 +1,7 @@
 package com.example.backend.global.security;
 
+import com.example.backend.global.exception.UnAuthorizedException;
+import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -19,8 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * /login 제외
- * 인증 필요한 모든 요청 여기로 들어옴
+ * /login 제외 인증 필요한 모든 요청 여기로 들어옴
  * 나중에 리팩토링할 예정
  */
 @Slf4j
@@ -35,13 +36,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try{
             // 요청에서 토큰 가져오기
             String token = parseBearerToken(request);
-            log.info("Filter is running...");
-            // 토큰 검사. jwt이므로 인가 서버에 요청하지 않고도 검증 가능
+            log.info("JWT Filter is running...");
+
             if(token != null && !token.equalsIgnoreCase("null")){
-                //userId 가져옴. 위조된 경우 예외처리됨
-                String userId = tokenService.validateAndGetUserId(token);
-                log.info("Authenticated user ID: {}", userId);
-                //인증 완료; 이 객체에 사용자 인증정보를 저장한다
+                // 토큰 검증
+                String userId = tokenService.validateAndGetUserEmail(token);
+                //사용자 인증정보를 저장
                 AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userId, //인증된 사용자의 정보
                         null,
@@ -55,6 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (Exception e){
             logger.error("Could not set user authentication in security context", e);
+            throw new UnAuthorizedException(UnAuthorizedExceptionType.USER_UN_AUTHORIZED);
         }
 
         filterChain.doFilter(request, response);

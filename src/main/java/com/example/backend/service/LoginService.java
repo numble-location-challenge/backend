@@ -15,6 +15,5 @@ public interface LoginService {
 
     HashMap<String,String> authorize(User user);
 
-    void logout(Long userId);
-
+    void logout(String email);
 }
