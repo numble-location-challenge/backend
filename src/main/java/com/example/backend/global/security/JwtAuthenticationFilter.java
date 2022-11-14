@@ -2,6 +2,7 @@ package com.example.backend.global.security;
 
 import com.example.backend.global.exception.UnAuthorizedException;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -22,7 +23,7 @@ import java.io.IOException;
 
 /**
  * /login 제외 인증 필요한 모든 요청 여기로 들어옴
- * 나중에 리팩토링할 예정
+ * 검증에는 Access Token 만 필요
  */
 @Slf4j
 @Component
@@ -39,11 +40,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("JWT Filter is running...");
 
             if(token != null && !token.equalsIgnoreCase("null")){
-                // 토큰 검증
-                String userId = tokenService.validateAndGetUserEmail(token);
-                //사용자 인증정보를 저장
+                JwtSubject jwtSubject = tokenService.validateAndGetSubject(token);
+                // subject type 검증
+                if(!jwtSubject.getJwtType().equals(JwtType.ACCESS)) throw new JwtException("Access Token type 이 아닙니다");
+                //사용자 인증정보 저장
                 AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userId, //인증된 사용자의 정보
+                        jwtSubject.getEmail(),
                         null,
                         AuthorityUtils.NO_AUTHORITIES
                 );
@@ -53,9 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 securityContext.setAuthentication(authentication);
                 SecurityContextHolder.setContext(securityContext);
             }
-        } catch (Exception e){
+        } catch (JwtException e){
             logger.error("Could not set user authentication in security context", e);
-            throw new UnAuthorizedException(UnAuthorizedExceptionType.USER_UN_AUTHORIZED);
+            throw new UnAuthorizedException(UnAuthorizedExceptionType.ACCESS_TOKEN_UN_AUTHORIZED);
         }
 
         filterChain.doFilter(request, response);
@@ -63,11 +65,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String parseBearerToken(HttpServletRequest request) {
         // http 헤더 파싱해 토큰 얻음
-        String bearerToken = request.getHeader("Authorization");
+        String authorization = request.getHeader("Authorization");
 
-        //토큰 파싱
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
-            return bearerToken.substring(7);
+        //AccessToken인지 검증, 토큰 파싱
+        if(StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")){
+            return authorization.substring(7);
         }
         return null;
     }

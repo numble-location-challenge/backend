@@ -74,7 +74,6 @@ public class LoginController {
                 .body(response);
     }
 
-    //TODO 서비스 구현
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
@@ -88,17 +87,18 @@ public class LoginController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Access Token 재발급")
+    @Operation(summary = "Access Token 재발급", description = "Authorization 및 Authorization-refresh 헤더가 요구됩니다.")
     @PostMapping("/refresh")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED")
     })
     public ResponseEntity<?> refresh(
+            @RequestHeader(value = "Authorization") String accessToken,
             @RequestHeader(value = "Authorization-refresh") String refreshToken){
 
         User loginUser = loginService.getUserByRefreshToken(refreshToken);
-        final String accessToken = loginService.refresh(loginUser, refreshToken);
+        final String reissuedAccessToken = loginService.refresh(loginUser, accessToken, refreshToken);
 
         //set data list
         List<AuthDTO> dataList = List.of(AuthDTO.builder()
@@ -113,7 +113,7 @@ public class LoginController {
                 .build();
 
         return ResponseEntity.ok()
-                .header("Authentication", accessToken)
+                .header("Authentication", reissuedAccessToken)
                 .body(response);
     }
 }

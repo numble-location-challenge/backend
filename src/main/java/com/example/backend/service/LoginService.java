@@ -19,5 +19,5 @@ public interface LoginService {
 
     User getUserByRefreshToken(String refreshToken);
 
-    String refresh(User user, String refreshToken);
+    String refresh(User user, String accessToken, String refreshToken);
 }
