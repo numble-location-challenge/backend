@@ -86,4 +86,34 @@ public class LoginController {
         loginService.logout(email);
         return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Access Token 재발급")
+    @PostMapping("/refresh")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED")
+    })
+    public ResponseEntity<?> refresh(
+            @RequestHeader(value = "Authorization-refresh") String refreshToken){
+
+        User loginUser = loginService.getUserByRefreshToken(refreshToken);
+        final String accessToken = loginService.refresh(loginUser, refreshToken);
+
+        //set data list
+        List<AuthDTO> dataList = List.of(AuthDTO.builder()
+                .userId(loginUser.getId())
+                .email(loginUser.getEmail())
+                .build());
+
+        //set response
+        ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
+                .success(true).message("Access Token이 재발급되었습니다.")
+                .data(dataList)
+                .build();
+
+        return ResponseEntity.ok()
+                .header("Authentication", accessToken)
+                .body(response);
+    }
 }

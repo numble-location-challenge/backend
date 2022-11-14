@@ -3,10 +3,7 @@ package com.example.backend.service;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
-import com.example.backend.global.exception.EntityNotExistsException;
-import com.example.backend.global.exception.EntityNotExistsExceptionType;
-import com.example.backend.global.exception.InvalidInputException;
-import com.example.backend.global.exception.InvalidInputExceptionType;
+import com.example.backend.global.exception.*;
 import com.example.backend.global.security.TokenService;
 import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 
 @Service
@@ -75,6 +73,17 @@ public class LoginServiceImpl implements LoginService{
     public void logout(String email) {
         //AT, RT 만료시키기
         tokenService.destroyToken(email);
+    }
+
+    @Override
+    public User getUserByRefreshToken(String refreshToken) {
+        //토큰에서 email 가져옴
+        return null;
+    }
+
+    @Override
+    public String refresh(User user, String refreshToken) {
+        return null;
     }
 
 }
