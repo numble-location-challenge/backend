@@ -24,20 +24,20 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void createDefaultUser(UserJoinRequestDTO userJoinRequestDTO) {
+    public User createDefaultUser(UserJoinRequestDTO userJoinRequestDTO) {
         User user = userJoinRequestDTO.toEntity();
 
-         if(validateDuplicate(user.getEmail(), user.getNickname())){
-             //중복X -> 회원가입 처리
-             user.encodePassword(passwordEncoder);
-             userRepository.save(user);
-         }
+        validateDuplicate(user.getEmail(), user.getNickname());
+        //중복X -> 회원가입 처리
+        user.encodePassword(passwordEncoder);
+        return userRepository.save(user);
     }
 
     @Transactional
     @Override
-    public void createKakaoUser(KaKaoAuthRequestDTO snsUserDTO) {
+    public User createKakaoUser(KaKaoAuthRequestDTO snsUserDTO) {
         User user = getKakaoUserInfo(snsUserDTO.getKakaoAccessToken());
+        return null;
         //TODO 세팅 및 회원가입 처리
     }
 
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService{
     }
 
     //중복 검증
-    private boolean validateDuplicate(String email, String nickName) {
+    private void validateDuplicate(String email, String nickName) {
         if(userRepository.existsByEmailAndNickname(email, nickName)){
             throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXIST_EMAIL_AND_NICKNAME);
         }
@@ -59,7 +59,6 @@ public class UserServiceImpl implements UserService{
         else if(userRepository.existsByNickname(nickName)){
             throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXISTS_NICKNAME);
         }
-        return true;
     }
 
     @Transactional
