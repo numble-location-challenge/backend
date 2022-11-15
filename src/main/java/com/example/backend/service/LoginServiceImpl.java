@@ -3,10 +3,8 @@ package com.example.backend.service;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
-import com.example.backend.global.exception.EntityNotExistsException;
-import com.example.backend.global.exception.EntityNotExistsExceptionType;
-import com.example.backend.global.exception.InvalidInputException;
-import com.example.backend.global.exception.InvalidInputExceptionType;
+import com.example.backend.global.exception.*;
+import com.example.backend.global.security.JwtSubject;
 import com.example.backend.global.security.TokenService;
 import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -57,11 +55,14 @@ public class LoginServiceImpl implements LoginService{
         return null;
     }
 
+    @Transactional
     @Override
     public HashMap<String,String> authorize(User user) {
         //토큰 2개 생성
-        final String AccessToken = tokenService.create(user); //AT 생성
-        final String RefreshToken = "아직 Refresh Token 로직은 구현 전입니다"; //TODO RT 생성, 두개 한꺼번에 얻어오는게 낫나 음
+        final String AccessToken = tokenService.issueAccessToken(user); //AT 생성
+        final String RefreshToken = tokenService.issueRefreshToken(user); //RT 생성
+
+        //TODO RT 저장 또는 업데이트
 
         HashMap<String,String> token = new HashMap<>();
         token.put("AT", AccessToken);
@@ -71,8 +72,28 @@ public class LoginServiceImpl implements LoginService{
     }
 
     @Override
-    public void logout(Long userId) {
+    public void logout(String email) {
+        tokenService.destroyToken(email);
+    }
 
+    @Override
+    public User getUserByRefreshToken(String refreshToken) {
+        //토큰에서 email 가져옴
+        JwtSubject jwtSubject = tokenService.validateAndGetSubject(refreshToken);
+        return userRepository.findByEmail(jwtSubject.getEmail())
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    }
+
+    @Override
+    public String refresh(User user, String accessToken, String refreshToken) {
+        //DB에 있는 RT랑 비교
+        if(refreshToken.equals(user.getRefreshToken())) throw new InvalidInputException(InvalidInputExceptionType.NOT_EXISTS_REFRESH_TOKEN);
+        //RT 만료 : 로그인 유도 401
+        if(tokenService.isExpired(refreshToken)) throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_IS_EXPIRED);
+        //RT 유효, AT 유효 : 비정상적인 요청, 403
+        if(tokenService.isExpired(accessToken)) throw new ForbiddenException(ForbiddenExceptionType.TOKEN_NOT_EXPIRED);
+        //RT 유효, AT 만료 : AT 재발급
+        return tokenService.issueAccessToken(user);
     }
 
 }

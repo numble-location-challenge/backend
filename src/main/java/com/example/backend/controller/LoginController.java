@@ -11,13 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +24,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
+
+    @Value("${jwt.access.header}")
+    private String ACCESS_HEADER;
+
+    @Value("${jwt.refresh.header}")
+    private String REFRESH_HEADER;
 
     private final LoginService loginService;
 
@@ -58,7 +62,10 @@ public class LoginController {
 
     private ResponseEntity<?> getLoginSuccessResponseEntity(User loginUser) {
         //set data list
-        List<AuthDTO> dataList = List.of(new AuthDTO(loginUser.getId()));
+        List<AuthDTO> dataList = List.of(AuthDTO.builder()
+                .userId(loginUser.getId())
+                .email(loginUser.getEmail())
+                .build());
 
         //set response
         ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
@@ -69,12 +76,11 @@ public class LoginController {
         HashMap<String, String> tokenMap = loginService.authorize(loginUser);
 
         return ResponseEntity.ok()
-                .header("Authentication", tokenMap.get("AT"))
-                .header("Authentication-refresh", tokenMap.get("RT"))
+                .header(ACCESS_HEADER, tokenMap.get("AT"))
+                .header(REFRESH_HEADER, tokenMap.get("RT"))
                 .body(response);
     }
 
-    //TODO 서비스 구현
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
@@ -82,8 +88,39 @@ public class LoginController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> logout(@AuthenticationPrincipal Long id){
-        loginService.logout(id);
+    public ResponseDTO<?> logout(@AuthenticationPrincipal String email){
+        loginService.logout(email);
         return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Access Token 재발급", description = "Authorization 및 Authorization-refresh 헤더가 요구됩니다.")
+    @PostMapping("/refresh")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED")
+    })
+    public ResponseEntity<?> refresh(
+            @RequestHeader(value = "Authorization") String accessToken,
+            @RequestHeader(value = "Authorization-refresh") String refreshToken){
+
+        User loginUser = loginService.getUserByRefreshToken(refreshToken);
+        final String reissuedAccessToken = loginService.refresh(loginUser, accessToken, refreshToken);
+
+        //set data list
+        List<AuthDTO> dataList = List.of(AuthDTO.builder()
+                .userId(loginUser.getId())
+                .email(loginUser.getEmail())
+                .build());
+
+        //set response
+        ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
+                .success(true).message("Access Token이 재발급되었습니다.")
+                .data(dataList)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(ACCESS_HEADER, reissuedAccessToken)
+                .body(response);
     }
 }

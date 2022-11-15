@@ -7,9 +7,9 @@ import com.example.backend.dto.user.UserModifyRequestDTO;
 
 public interface UserService {
 
-    void createDefaultUser(UserJoinRequestDTO userDTO); //회원가입
+    User createDefaultUser(UserJoinRequestDTO userDTO); //회원가입
 
-    void createKakaoUser(KaKaoAuthRequestDTO authRequestDTO);
+    User createKakaoUser(KaKaoAuthRequestDTO authRequestDTO);
 
     void delete(Long userId); //회원 탈퇴
 
