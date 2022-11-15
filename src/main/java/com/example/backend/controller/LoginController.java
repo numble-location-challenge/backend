@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +24,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
+
+    @Value("${jwt.access.header}")
+    private String ACCESS_HEADER;
+
+    @Value("${jwt.refresh.header}")
+    private String REFRESH_HEADER;
 
     private final LoginService loginService;
 
@@ -69,8 +76,8 @@ public class LoginController {
         HashMap<String, String> tokenMap = loginService.authorize(loginUser);
 
         return ResponseEntity.ok()
-                .header("Authentication", tokenMap.get("AT"))
-                .header("Authentication-refresh", tokenMap.get("RT"))
+                .header(ACCESS_HEADER, tokenMap.get("AT"))
+                .header(REFRESH_HEADER, tokenMap.get("RT"))
                 .body(response);
     }
 
@@ -113,7 +120,7 @@ public class LoginController {
                 .build();
 
         return ResponseEntity.ok()
-                .header("Authentication", reissuedAccessToken)
+                .header(ACCESS_HEADER, reissuedAccessToken)
                 .body(response);
     }
 }

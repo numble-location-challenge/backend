@@ -11,38 +11,46 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-//TODO: 리팩토링 예정
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenService {
-    private static final String SECRET_KEY = "NMA8JPctFuna59f5NMA8JPctFuna59f5NMA8JPctFuna59f5NMA8JPctFuna59f5NMA8JPctFuna59f5NMA8JPctFuna59f5";
-    private static final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
+
+    @Value("${jwt.access.expiration}")
+    private Long ACCESS_EXP;
+
+    @Value("${jwt.refresh.expiration}")
+    private Long REFRESH_EXP;
+
     private final ObjectMapper objectmapper;
+
+    public Key getKeyForSign(){
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String issueAccessToken(User user) {
         String subject = getTokenSubjectStr(user, JwtType.ACCESS);
-
-        // 기한 1시간으로 설정
         Date expiryDate = Date.from(
-                Instant.now().plus(1, ChronoUnit.HOURS));
+                Instant.now().plusSeconds(ACCESS_EXP));
+
         return createToken(subject, expiryDate);
     }
 
     public String issueRefreshToken(User user) {
         String subject = getTokenSubjectStr(user, JwtType.REFRESH);
-
-        // 기한 한 달로 설정
         Date expiryDate = Date.from(
-                Instant.now().plus(1, ChronoUnit.MONTHS));
+                Instant.now().plusSeconds(REFRESH_EXP));
 
         return createToken(subject, expiryDate);
     }
@@ -51,7 +59,7 @@ public class TokenService {
         // JWT Token 생성
         return Jwts.builder()
                 // header 내용 및 SECRET_KEY 세팅
-                .signWith(key, SignatureAlgorithm.HS512) //알고리즘
+                .signWith(getKeyForSign(), SignatureAlgorithm.HS512) //알고리즘
                 // payload
                 .setClaims(Jwts.claims().setSubject(subject)) // sub
                 .setIssuer("Numble backend") // iss
@@ -72,7 +80,7 @@ public class TokenService {
     //jwt 검증 후 아이디(이메일) 추출
     public JwtSubject validateAndGetSubject(String token){ //getSubjects
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(getKeyForSign())
                 .build()
                 .parseClaimsJws(token)// token을 Base 64로 디코딩 및 파싱
                 .getBody(); // get userId(payload(Claims))
@@ -86,7 +94,7 @@ public class TokenService {
     }
 
     public void destroyToken(String email) {
-        //TODO
+        //TODO RT 파기 (AT는 불가능)
 
     }
 

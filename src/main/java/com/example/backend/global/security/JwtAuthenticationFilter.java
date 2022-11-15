@@ -3,8 +3,10 @@ package com.example.backend.global.security;
 import com.example.backend.global.exception.UnAuthorizedException;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import io.jsonwebtoken.JwtException;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -29,6 +31,9 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    @Value("${jwt.access.header}")
+    private String ACCESS_HEADER;
 
     private final TokenService tokenService;
 
@@ -65,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String parseBearerToken(HttpServletRequest request) {
         // http 헤더 파싱해 토큰 얻음
-        String authorization = request.getHeader("Authorization");
+        String authorization = request.getHeader(ACCESS_HEADER);
 
         //AccessToken인지 검증, 토큰 파싱
         if(StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")){
