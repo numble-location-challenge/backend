@@ -8,8 +8,6 @@ import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
 import com.example.backend.global.exception.ForbiddenException;
 import com.example.backend.global.exception.ForbiddenExceptionType;
-import com.example.backend.global.exception.UnAuthorizedException;
-import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import com.example.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -104,7 +102,9 @@ public class UserController {
 
         if(userId.equals(id)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
 
-        User user = userService.modifyUser(userId, userModifyRequestDTO);
+        User user = userService.getUser(userId);
+        //TODO 유저 수정
+
         //set data list
         List<UserProfileDTO> users = List.of(UserProfileDTO.builder()
                 .nickname(user.getNickname())

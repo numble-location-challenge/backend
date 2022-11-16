@@ -15,7 +15,5 @@ public interface UserService {
 
     User getUser(Long userId); //내 프로필 조회
 
-    User modifyUser(Long userId, UserModifyRequestDTO userModifyRequestDTO); //회원 수정
-
     User getKakaoUserInfo(String KakaoAccessToken);
 }

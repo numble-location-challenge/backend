@@ -3,7 +3,6 @@ package com.example.backend.service;
 import com.example.backend.domain.User;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.dto.user.UserJoinRequestDTO;
-import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.InvalidInputException;
 import com.example.backend.global.exception.InvalidInputExceptionType;
 import com.example.backend.repository.UserRepository;
@@ -69,13 +68,6 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUser(Long userId) {
-        return null;
-    }
-
-    @Transactional
-    @Override
-    public User modifyUser(Long userId, UserModifyRequestDTO userModifyRequestDTO) {
-        //null인지 체크할 것. null이면 값 안바꿈
         return null;
     }
 
