@@ -69,7 +69,6 @@ public class UserController {
                         .build());
     }
 
-    //TODO 서비스 구현
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 탈퇴")
     @DeleteMapping("/user/delete")
@@ -79,16 +78,15 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> deleteUser(@AuthenticationPrincipal Long id){
-
-        userService.delete(id);
+    public ResponseDTO<?> deleteUser(@AuthenticationPrincipal String email){
+        userService.delete(email);
         return ResponseDTO.builder().success(true).message("정상 탈퇴되었습니다.").build();
     }
 
     //TODO 서비스 구현
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 수정", description = "모든 변수 null available")
-    @PutMapping("/user/{id}")
+    @PutMapping("/user")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
@@ -96,17 +94,13 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<UserProfileDTO> modifyUser(
-            @AuthenticationPrincipal Long userId,
-            @PathVariable Long id,
+            @AuthenticationPrincipal String email,
             @RequestBody final UserModifyRequestDTO userModifyRequestDTO){
 
-        if(userId.equals(id)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
-
-        User user = userService.getUser(userId);
-        //TODO 유저 수정
+        User user = userService.modify(userModifyRequestDTO, email);
 
         //set data list
-        List<UserProfileDTO> users = List.of(UserProfileDTO.builder()
+        List<UserProfileDTO> dataList = List.of(UserProfileDTO.builder()
                 .nickname(user.getNickname())
                 .profile(user.getProfile())
                 .region(user.getRegion())
@@ -114,10 +108,9 @@ public class UserController {
                 .build());
 
         return ResponseDTO.<UserProfileDTO>builder().success(true).message("정상 수정 처리 되었습니다.")
-                .data(users).build();
+                .data(dataList).build();
     }
 
-    //TODO 서비스 구현
     //내 프로필 조회할 때 피드, 댓글도 같이 들고 와야하는지? 일단 빼고 처리
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 프로필 조회")
@@ -128,13 +121,12 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<UserProfileDTO> getUserInfo(@AuthenticationPrincipal Long userId, @PathVariable Long id){
+    public ResponseDTO<UserProfileDTO> getUserInfo(@AuthenticationPrincipal String email, @PathVariable Long id){
 
-        if(userId.equals(id)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
+        User user = userService.getUser(email, id);
 
-        User user = userService.getUser(id);
         //set data list
-        List<UserProfileDTO> users = List.of(UserProfileDTO.builder()
+        List<UserProfileDTO> dataList = List.of(UserProfileDTO.builder()
                 .nickname(user.getNickname())
                 .profile(user.getProfile())
                 .region(user.getRegion())
@@ -142,6 +134,6 @@ public class UserController {
                 .build());
 
         return ResponseDTO.<UserProfileDTO>builder().success(true).message("프로필 조회 결과")
-                .data(users).build();
+                .data(dataList).build();
     }
 }

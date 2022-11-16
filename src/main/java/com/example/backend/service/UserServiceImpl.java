@@ -3,10 +3,8 @@ package com.example.backend.service;
 import com.example.backend.domain.User;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.dto.user.UserJoinRequestDTO;
-import com.example.backend.global.exception.EntityNotExistsException;
-import com.example.backend.global.exception.EntityNotExistsExceptionType;
-import com.example.backend.global.exception.InvalidInputException;
-import com.example.backend.global.exception.InvalidInputExceptionType;
+import com.example.backend.dto.user.UserModifyRequestDTO;
+import com.example.backend.global.exception.*;
 import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +47,12 @@ public class UserServiceImpl implements UserService{
         return null;
     }
 
+    @Override
+    public User modify(UserModifyRequestDTO userModifyRequestDTO, String email) {
+        //TODO
+        return null;
+    }
+
     //중복 검증
     private void validateDuplicate(String email, String nickName) {
         if(userRepository.existsByEmailAndNickname(email, nickName)){
@@ -64,14 +68,17 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void delete(Long userId) {
-        userRepository.deleteById(userId);
+    public void delete(String email) {
+        userRepository.deleteByEmail(email);
     }
 
     @Override
-    public User getUser(Long userId) {
-        return userRepository.findById(userId)
+    public User getUser(String email, Long id) {
+        User findUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        if(findUser.getId().equals(id)) return findUser;
+        else throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
     }
 
 

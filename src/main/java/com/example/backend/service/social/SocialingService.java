@@ -1,9 +1,9 @@
 package com.example.backend.service.social;
 
 public interface SocialingService {
-    void addParticipants(Long userId, Long socialId);
+    void addParticipants(String userId, Long socialId);
 
-    void deleteParticipants(Long userId, Long socialId);
+    void deleteParticipants(String userId, Long socialId);
 
-    void kickOutParticipants(Long userId, Long socialId, Long droppedUserId);
+    void kickOutParticipants(String userId, Long socialId, Long droppedUserId);
 }

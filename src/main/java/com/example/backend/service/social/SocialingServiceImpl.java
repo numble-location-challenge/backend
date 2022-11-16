@@ -6,17 +6,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class SocialingServiceImpl implements SocialingService {
     @Override
-    public void addParticipants(Long userId, Long socialId) {
+    public void addParticipants(String userId, Long socialId) {
 
     }
 
     @Override
-    public void deleteParticipants(Long userId, Long socialId) {
+    public void deleteParticipants(String userId, Long socialId) {
 
     }
 
     @Override
-    public void kickOutParticipants(Long userId, Long socialId, Long droppedUserId) {
+    public void kickOutParticipants(String userId, Long socialId, Long droppedUserId) {
 
     }
 }

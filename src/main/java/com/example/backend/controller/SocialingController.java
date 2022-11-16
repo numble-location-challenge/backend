@@ -27,8 +27,8 @@ public class SocialingController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> apply(@AuthenticationPrincipal Long userId, @PathVariable Long socialId) {
-        socialingService.addParticipants(userId, socialId);
+    public ResponseDTO<?> apply(@AuthenticationPrincipal String email, @PathVariable Long socialId) {
+        socialingService.addParticipants(email, socialId);
         return ResponseDTO.builder().success(true).message("모임 신청 처리되었습니다.").build();
     }
 
@@ -41,8 +41,8 @@ public class SocialingController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> cancel(@AuthenticationPrincipal Long userId, @PathVariable Long socialId) {
-        socialingService.deleteParticipants(userId, socialId);
+    public ResponseDTO<?> cancel(@AuthenticationPrincipal String email, @PathVariable Long socialId) {
+        socialingService.deleteParticipants(email, socialId);
         return ResponseDTO.builder().success(true).message("모임 신청이 취소되었습니다.").build();
     }
 
@@ -55,8 +55,8 @@ public class SocialingController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> kickOutUser(@AuthenticationPrincipal Long userId, @PathVariable Long socialId, @PathVariable Long kickedUserId) {
-        socialingService.kickOutParticipants(userId, socialId, kickedUserId);
+    public ResponseDTO<?> kickOutUser(@AuthenticationPrincipal String email, @PathVariable Long socialId, @PathVariable Long kickedUserId) {
+        socialingService.kickOutParticipants(email, socialId, kickedUserId);
         return ResponseDTO.builder().success(true).message("해당 유저가 강퇴처리되었습니다.").build();
     }
 }
