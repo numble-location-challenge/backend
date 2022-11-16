@@ -7,16 +7,15 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @Schema
 public class SocialTagDTO {
     private Long id;
-    private SocialShortDTO social;
-    private TagDTO tag;
+    private Long social;
+    private Long tag;
 
     public SocialTagDTO(SocialTag socialTag){
-//        this.id = socialTag.id;
-//        this.social = socialTag.getSocial;
-//        this.tag = socialTag.getTag;
+        this.id = socialTag.getId();
+        this.social = socialTag.getId();
+        this.tag = socialTag.getId();
     }
 }
