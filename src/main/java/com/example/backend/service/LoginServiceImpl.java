@@ -62,7 +62,7 @@ public class LoginServiceImpl implements LoginService{
         final String accessToken = tokenService.issueAccessToken(user); //AT 생성
         final String refreshToken = tokenService.issueRefreshToken(user); //RT 생성
 
-//        user.updateRefreshToken(refreshToken); //DB의 RT 갈아끼우기
+        user.updateRefreshToken(refreshToken); //DB의 RT 갈아끼우기
 
         HashMap<String,String> token = new HashMap<>();
         token.put("AT", accessToken);
@@ -75,7 +75,7 @@ public class LoginServiceImpl implements LoginService{
     public void logout(String email, String accessToken, String refreshToken) {
         tokenService.destroyToken(email, refreshToken);
         User findUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-//        findUser.deleteRefreshToken();
+        findUser.deleteRefreshToken(); //DB의 RT 삭제
     }
 
     @Override

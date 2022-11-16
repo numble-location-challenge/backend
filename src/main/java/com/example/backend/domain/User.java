@@ -79,4 +79,16 @@ public class User {
         this.region = region;
         this.bio = bio;
     }
+
+
+    /** 수정 메서드 */
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void deleteRefreshToken() {
+        this.refreshToken = null;
+    }
+
 }
