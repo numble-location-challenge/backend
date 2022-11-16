@@ -3,11 +3,14 @@ package com.example.backend.dto;
 import com.example.backend.domain.User;
 import com.example.backend.domain.post.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
+@Schema
+@Getter
+@Builder
 public class LikesDTO {
 
     @Schema(description = "좋아요 아이디")

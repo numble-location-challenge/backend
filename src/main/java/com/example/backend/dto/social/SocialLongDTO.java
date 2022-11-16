@@ -1,13 +1,11 @@
 package com.example.backend.dto.social;
 
-import com.example.backend.domain.Comment;
-import com.example.backend.domain.PostImage;
+import com.example.backend.domain.Like;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
-import com.example.backend.dto.CommentDTO;
-import com.example.backend.dto.PostImageDTO;
-import com.example.backend.dto.SocialingDTO;
+import com.example.backend.domain.tag.Category;
+import com.example.backend.dto.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -29,35 +28,32 @@ public class SocialLongDTO{
     @Schema(description = "모임에 참여한 사용자")
     private List<SocialingDTO> socialings = new ArrayList<>();
 
-    @Schema(description = "모임 게시글 아이디")
+    @Schema(description = "모임 게시글 아이디", defaultValue = "12")
     @NotNull
     private Long id;
 
     @Schema(description =  "모임 게시글 작성한 사용자")
     @NotNull
-    private User user;
+    private SocialUserDTO user;
 
     @Schema(description = "모임 게시글에 첨부한 사진")
-    private List<PostImageDTO> images;
+    private List<PostImageDTO> images = new ArrayList<>();
 
     @Schema(description = "모임 게시글에 달린 댓글")
-    private List<CommentDTO> comments;
+    private List<CommentResponseDTO> comments = new ArrayList<>();
 
-    @Schema(description = "모임 게시글 내용")
+    @Schema(description = "모임 게시글 내용", defaultValue = "바로 같이, 가슴이 어디 하는 갑 우는 칼이다.")
     private String contents;
 
-    @Schema(description = "작성자의 지역")
+    @Schema(description = "작성자의 지역", defaultValue = "1")
     private int region;
 
-    @Schema(description = "해당 게시글 좋아요 수")
-    private int likes;
+    @Schema(description = "해당 게시글 좋아요 여부")
+    private LikesDTO likes;
 
-    @Schema(description = "모임 게시글 제목")
+    @Schema(description = "모임 게시글 제목",defaultValue = "모임 제목")
     @NotNull
     private String title; //모임 제목
-
-    @Schema(description = "조회수")
-    private int hits; //조회수
 
     @Schema(description = "모임 시작 날짜")
     @NotNull
@@ -67,21 +63,67 @@ public class SocialLongDTO{
     @NotNull
     private LocalDateTime endDate; //모임 끝나는 날짜
 
-    @Schema(description = "현재 모임에 신청한 인원")
+    @Schema(description = "현재 모임에 신청한 인원",defaultValue = "4")
     private int currentNums; //현재 신청한 인원수
 
-    @Schema(description = "최대 모집 인원")
+    @Schema(description = "최대 모집 인원",defaultValue = "8")
     @NotNull
     private int limitedNums; //최대 모집 인원수
 
-    @Schema(description = "모임 신청 가능 유무")
+    @Schema(description = "모임 신청 가능 유무",defaultValue = "AVAILABLE")
     @NotNull
     private SocialStatus status; //신청 가능 유무
 
     @Schema(description = "모임 주최자 연락 방법")
     private String contact; //연락 방법
 
-    @Schema(description = "소분류")
-    private Long tagId;
+    @Schema(description = "대분류")
+    private CategoryDTO category;
 
+    @Schema(description = "소분류")
+    private List<SocialTagDTO> tags;
+
+    public SocialLongDTO(Social social) {
+        this.socialings = social.getSocialings().stream().map(socialings -> new SocialingDTO(socialings)).collect(Collectors.toList());
+        this.id = social.getId();
+        this.user = toSocialUserDTO(social.getUser());
+        this.images = social.getImages().stream().map(postImage -> new PostImageDTO(postImage)).collect(Collectors.toList());
+        this.comments = social.getComments().stream().map(comment -> new CommentResponseDTO(comment)).collect(Collectors.toList());
+        this.contents = social.getContents();
+        this.region = social.getRegion();
+        //TODO : 수정해야할 부분
+        this.likes = toLikesDTO(social.getLikes());
+        this.title = social.getTitle();
+        this.startDate = social.getStartDate();
+        this.endDate = social.getEndDate();
+        this.currentNums = social.getCurrentNums();
+        this.limitedNums = social.getLimitedNums();
+        this.status = social.getStatus();
+        this.contact = social.getContact();
+        this.category = toCategoryDTO(social.getCategory());
+        this.tags = social.getSocialTags().stream().map(tag -> new SocialTagDTO(tags)).collect(Collectors.toList());
+    }
+
+    public CategoryDTO toCategoryDTO(Category category){
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .build();
+    }
+
+    //TODO : 수정해야할 부분
+    public LikesDTO toLikesDTO(Like like){
+        return LikesDTO.builder()
+                .id(like.getId())
+                .user(like.getUser())
+                .post(like.getPost())
+                .build();
+    }
+
+    public SocialUserDTO toSocialUserDTO(User user){
+        return SocialUserDTO.builder()
+                .id(user.getId())
+                .name(user.getNickname())
+                .build();
+    }
 }
