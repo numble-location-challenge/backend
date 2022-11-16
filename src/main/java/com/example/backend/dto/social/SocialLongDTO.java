@@ -92,7 +92,7 @@ public class SocialLongDTO{
         this.contents = social.getContents();
         this.region = social.getRegion();
         //TODO : 수정해야할 부분
-        this.likes = toLikesDTO(social.getLikes());
+//        this.likes = toLikesDTO(social.getLikes());
         this.title = social.getTitle();
         this.startDate = social.getStartDate();
         this.endDate = social.getEndDate();
@@ -101,7 +101,7 @@ public class SocialLongDTO{
         this.status = social.getStatus();
         this.contact = social.getContact();
         this.category = toCategoryDTO(social.getCategory());
-        this.tags = social.getSocialTags().stream().map(tag -> new SocialTagDTO(tags)).collect(Collectors.toList());
+        this.tags = social.getSocialTags().stream().map(tag -> new SocialTagDTO(tag)).collect(Collectors.toList());
     }
 
     public CategoryDTO toCategoryDTO(Category category){

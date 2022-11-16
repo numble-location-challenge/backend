@@ -1,6 +1,8 @@
 package com.example.backend.dto.social;
 
 import com.example.backend.domain.enumType.SocialStatus;
+import com.example.backend.domain.post.Social;
+import com.example.backend.domain.tag.Category;
 import com.example.backend.dto.CategoryDTO;
 import com.example.backend.dto.LikesDTO;
 import com.example.backend.dto.PostImageDTO;
@@ -13,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -32,9 +35,6 @@ public class SocialShortDTO {
 
     @Schema(description = "작성자의 지역")
     private int region;
-
-    @Schema(description = "좋아요")
-    private LikesDTO likes;
 
     @Schema(description = "모임 게시글 제목")
     @NotNull
@@ -59,7 +59,26 @@ public class SocialShortDTO {
     private CategoryDTO category;
 
     @Schema(description = "소분류")
-    private SocialTagDTO tag;
+    private List<SocialTagDTO> tags;
 
+    public SocialShortDTO(Social social) {
+        this.socialings = social.getSocialings().stream().map(socialing -> new SocialingDTO(socialing)).collect(Collectors.toList());
+        this.id = social.getId();
+        this.images = social.getImages().stream().map(postImage -> new PostImageDTO(postImage)).collect(Collectors.toList());
+        this.region = social.getRegion();
+        this.title = social.getTitle();
+        this.endDate = social.getEndDate();
+        this.currentNums = social.getCurrentNums();
+        this.limitedNums = social.getLimitedNums();
+        this.status = social.getStatus();
+        this.category = toCategoryDTO(social.getCategory());
+        this.tags = social.getSocialTags().stream().map(socialTag -> new SocialTagDTO(socialTag)).collect(Collectors.toList());
+    }
 
+    public CategoryDTO toCategoryDTO(Category category){
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .build();
+    }
 }
