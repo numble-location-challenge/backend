@@ -80,8 +80,18 @@ public class User {
         this.bio = bio;
     }
 
+    //==연관관계 메서드==/
+    public void addSocialing(Socialing socialing){
+        socialings.add(socialing);
+        socialing.setUser(this);
+    }
 
-    /** 수정 메서드 */
+    public void deleteSocialing(Socialing socialing){
+        socialings.remove(socialing);
+    }
+
+
+    //==수정 메서드==/
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;

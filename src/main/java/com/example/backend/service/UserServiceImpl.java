@@ -92,7 +92,16 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public void participateSocial(String email, Long socialId) {
-        //TODO
+        User findUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        Social findSocial = socialRepository.findById(socialId)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+
+        Socialing socialing = Socialing.createSocialing(findUser, findSocial);
+
+        findUser.addSocialing(socialing); //연관관계 설정
+        socilaingRepository.save(socialing);
     }
 
     //모임 취소
@@ -103,7 +112,8 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         //user pk 랑 socialId로 소셜링 찾아옴
-        //TODO
+//        Socialing findSocialing = socilaingRepository.deleteByUserIdAndSocialId(findUser.getId(), socialId);
+//        findUser.deleteSocialing(findSocialing); //연관관계 해제
 
     }
 
