@@ -1,10 +1,14 @@
 package com.example.backend.service;
 
+import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
+import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.dto.user.UserJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
+import com.example.backend.repository.SocialRepository;
+import com.example.backend.repository.SocialingRepository;
 import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final SocialRepository socialRepository;
+    private final SocialingRepository socilaingRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -79,6 +86,32 @@ public class UserServiceImpl implements UserService{
 
         if(findUser.getId().equals(id)) return findUser;
         else throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
+    }
+
+    //모임신청
+    @Transactional
+    @Override
+    public void participateSocial(String email, Long socialId) {
+        //TODO
+    }
+
+    //모임 취소
+    @Transactional
+    @Override
+    public void cancelSocialParticipation(String email, Long socialId) {
+        User findUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        //user pk 랑 socialId로 소셜링 찾아옴
+        //TODO
+
+    }
+
+    //모임 강퇴
+    @Transactional
+    @Override
+    public void kickOutUserFromSocial(String email, Long socialId, Long droppedUserId) {
+        //TODO
     }
 
 

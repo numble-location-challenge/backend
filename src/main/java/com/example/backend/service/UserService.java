@@ -18,4 +18,13 @@ public interface UserService {
     User getKakaoUserInfo(String KakaoAccessToken);
 
     User modify(UserModifyRequestDTO userModifyRequestDTO, String email);
+
+    //모임신청
+    void participateSocial(String email, Long socialId);
+
+    //취소
+    void cancelSocialParticipation(String email, Long socialId);
+
+    //강퇴
+    void kickOutUserFromSocial(String email, Long socialId, Long droppedUserId);
 }
