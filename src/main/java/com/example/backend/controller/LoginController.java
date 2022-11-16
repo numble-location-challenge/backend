@@ -43,7 +43,8 @@ public class LoginController {
     public ResponseEntity<?> login(@RequestBody final DefaultLoginRequestDTO loginDTO){
 
         User loginUser = loginService.defaultLogin(loginDTO.getEmail(),loginDTO.getPassword());
-        return getLoginSuccessResponseEntity(loginUser);
+        HashMap<String, String> jwtMap = loginService.authorize(loginUser);
+        return getLoginSuccessResponseEntity(loginUser, jwtMap);
     }
 
     //TODO 서비스 구현
@@ -57,10 +58,11 @@ public class LoginController {
     public ResponseEntity<?> kakaologin(@RequestBody final KaKaoAuthRequestDTO authRequestDTO){
 
         User loginUser = loginService.kakaoLogin(authRequestDTO);
-        return getLoginSuccessResponseEntity(loginUser);
+        HashMap<String, String> jwtMap = loginService.authorize(loginUser);
+        return getLoginSuccessResponseEntity(loginUser, jwtMap);
     }
 
-    private ResponseEntity<?> getLoginSuccessResponseEntity(User loginUser) {
+    private ResponseEntity<?> getLoginSuccessResponseEntity(User loginUser, HashMap<String, String> tokenMap) {
         //set data list
         List<AuthDTO> dataList = List.of(AuthDTO.builder()
                 .userId(loginUser.getId())
@@ -72,8 +74,6 @@ public class LoginController {
                 .success(true).message("로그인에 성공했습니다.")
                 .data(dataList)
                 .build();
-
-        HashMap<String, String> tokenMap = loginService.authorize(loginUser);
 
         return ResponseEntity.ok()
                 .header(ACCESS_HEADER, tokenMap.get("AT"))
