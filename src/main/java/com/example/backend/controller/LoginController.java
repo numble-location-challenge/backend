@@ -88,8 +88,11 @@ public class LoginController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> logout(@AuthenticationPrincipal String email){
-        loginService.logout(email);
+    public ResponseDTO<?> logout(
+            @AuthenticationPrincipal String email,
+            @RequestHeader(value = "Authorization") String accessToken,
+            @RequestHeader(value = "Authorization-refresh") String refreshToken){
+        loginService.logout(email, accessToken, refreshToken);
         return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
     }
 

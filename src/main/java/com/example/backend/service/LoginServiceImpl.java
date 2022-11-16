@@ -59,21 +59,23 @@ public class LoginServiceImpl implements LoginService{
     @Override
     public HashMap<String,String> authorize(User user) {
         //토큰 2개 생성
-        final String AccessToken = tokenService.issueAccessToken(user); //AT 생성
-        final String RefreshToken = tokenService.issueRefreshToken(user); //RT 생성
+        final String accessToken = tokenService.issueAccessToken(user); //AT 생성
+        final String refreshToken = tokenService.issueRefreshToken(user); //RT 생성
 
-        //TODO RT 저장 또는 업데이트
+//        user.updateRefreshToken(refreshToken); //DB의 RT 갈아끼우기
 
         HashMap<String,String> token = new HashMap<>();
-        token.put("AT", AccessToken);
-        token.put("RT", RefreshToken);
+        token.put("AT", accessToken);
+        token.put("RT", refreshToken);
 
         return token;
     }
 
     @Override
-    public void logout(String email) {
-        tokenService.destroyToken(email);
+    public void logout(String email, String accessToken, String refreshToken) {
+        tokenService.destroyToken(email, refreshToken);
+        User findUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+//        findUser.deleteRefreshToken();
     }
 
     @Override
