@@ -28,5 +28,18 @@ public interface SocialService {
     //본인이 참여한 모임 게시글만 출력
     List<SocialShortDTO> getJoinSocialList();
 
+    //카테고리 필터링
+    List<SocialShortDTO> filteringByCategory();
 
+    //태그 필터링
+    List<SocialShortDTO> filteringByTag();
+
+    //최신순 정렬
+    List<SocialShortDTO> sortByLatest();
+
+    //마감순 정렬
+    List<SocialShortDTO> sortByClosing();
+
+    //인기순 정렬
+    List<SocialShortDTO> SortByPopularity();
 }
