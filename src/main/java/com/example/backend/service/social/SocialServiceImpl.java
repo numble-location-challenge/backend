@@ -1,8 +1,9 @@
-package com.example.backend.service;
+package com.example.backend.service.social;
 
 import com.example.backend.dto.social.SocialLongDTO;
 import com.example.backend.dto.social.SocialShortDTO;
 import com.example.backend.repository.SocialRepository;
+import com.example.backend.service.social.SocialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class SocialServiceImpl implements SocialService{
+public class SocialServiceImpl implements SocialService {
 
     private final SocialRepository socialRepository;
 
@@ -32,7 +33,7 @@ public class SocialServiceImpl implements SocialService{
     }
 
     @Override
-    public SocialLongDTO getSocial(Long socialId) {
+    public SocialLongDTO getSocialDetail(Long socialId) {
         return null;
     }
 

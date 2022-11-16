@@ -1,5 +1,6 @@
-package com.example.backend.service;
+package com.example.backend.service.social;
 
+import com.example.backend.service.social.SocialingService;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.social;
 
 public interface SocialingService {
     void addParticipants(Long userId, Long socialId);
