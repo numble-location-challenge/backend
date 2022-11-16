@@ -3,6 +3,8 @@ package com.example.backend.service;
 import com.example.backend.domain.User;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.dto.user.UserJoinRequestDTO;
+import com.example.backend.global.exception.EntityNotExistsException;
+import com.example.backend.global.exception.EntityNotExistsExceptionType;
 import com.example.backend.global.exception.InvalidInputException;
 import com.example.backend.global.exception.InvalidInputExceptionType;
 import com.example.backend.repository.UserRepository;
@@ -34,8 +36,8 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User createKakaoUser(KaKaoAuthRequestDTO snsUserDTO) {
-        User user = getKakaoUserInfo(snsUserDTO.getKakaoAccessToken());
+    public User createKakaoUser(KaKaoAuthRequestDTO kaKaoAuthRequestDTO) {
+        User user = getKakaoUserInfo(kaKaoAuthRequestDTO.getKakaoAccessToken());
         return null;
         //TODO 세팅 및 회원가입 처리
     }
@@ -68,7 +70,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUser(Long userId) {
-        return null;
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
     }
 
 
