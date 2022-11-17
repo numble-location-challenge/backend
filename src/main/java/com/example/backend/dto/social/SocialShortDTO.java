@@ -1,9 +1,11 @@
 package com.example.backend.dto.social;
 
-import com.example.backend.domain.PostImage;
-import com.example.backend.domain.Socialing;
 import com.example.backend.domain.enumType.SocialStatus;
+import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
+import com.example.backend.dto.CategoryDTO;
+import com.example.backend.dto.LikesDTO;
+import com.example.backend.dto.PostImageDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -21,37 +24,21 @@ import java.util.List;
 public class SocialShortDTO {
 
     @Schema(description = "모임에 참여한 사용자")
-    private List<Socialing> socialings = new ArrayList<>();
+    private List<SocialingDTO> socialings = new ArrayList<>();
 
     @Schema(description = "모임 게시글 아이디")
     @NotNull
     private Long id;
 
-    @Schema(description = "모임 게시글에 첨부한 사진")
-    private List<PostImage> images;
-
-    @Schema(description = "게시글 카테고리")
-    private List<Category> category;
-
-    @Schema(description = "모임 게시글 내용")
-    private String contents;
+    @Schema(description = "모임 게시글에 첨부한 사진 (1장)")
+    private List<PostImageDTO> images;
 
     @Schema(description = "작성자의 지역")
     private int region;
 
-    @Schema(description = "해당 게시글 좋아요 수")
-    private int likes;
-
     @Schema(description = "모임 게시글 제목")
     @NotNull
     private String title; //모임 제목
-
-    @Schema(description = "조회수")
-    private int hits; //조회수
-
-    @Schema(description = "모임 시작 날짜")
-    @NotNull
-    private LocalDateTime startDate; //모임 시작날짜
 
     @Schema(description = "모임 종료 날짜")
     @NotNull
@@ -68,6 +55,30 @@ public class SocialShortDTO {
     @NotNull
     private SocialStatus status; //신청 가능 유무
 
-    @Schema(description = "모임 주최자 연락 방법")
-    private String contact; //연락 방법
+    @Schema(description = "대분류")
+    private CategoryDTO category;
+
+    @Schema(description = "소분류")
+    private List<SocialTagDTO> tags;
+
+    public SocialShortDTO(Social social) {
+        this.socialings = social.getSocialings().stream().map(socialing -> new SocialingDTO(socialing)).collect(Collectors.toList());
+        this.id = social.getId();
+        this.images = social.getImages().stream().map(postImage -> new PostImageDTO(postImage)).collect(Collectors.toList());
+        this.region = social.getRegion();
+        this.title = social.getTitle();
+        this.endDate = social.getEndDate();
+        this.currentNums = social.getCurrentNums();
+        this.limitedNums = social.getLimitedNums();
+        this.status = social.getStatus();
+        this.category = toCategoryDTO(social.getCategory());
+        this.tags = social.getSocialTags().stream().map(socialTag -> new SocialTagDTO(socialTag)).collect(Collectors.toList());
+    }
+
+    public CategoryDTO toCategoryDTO(Category category){
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .build();
+    }
 }

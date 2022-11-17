@@ -3,14 +3,13 @@ package com.example.backend.controller;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.social.SocialLongDTO;
 import com.example.backend.dto.social.SocialShortDTO;
-import com.example.backend.service.SocialService;
+import com.example.backend.service.social.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,24 +49,8 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<SocialLongDTO> getSocial(@Parameter(required = true) @PathVariable Long socialId){
-        SocialLongDTO socialLongDTO = socialService.getSocial(socialId);
-        List<SocialLongDTO> socialLongDTOList = List.of(SocialLongDTO.builder()
-                        .id(socialLongDTO.getId())
-                        .user(socialLongDTO.getUser())
-                        .region(socialLongDTO.getRegion())
-                        .comments(socialLongDTO.getComments())
-                        .images(socialLongDTO.getImages())
-                        .contents(socialLongDTO.getContents())
-                        .socialings(socialLongDTO.getSocialings())
-                        .title(socialLongDTO.getTitle())
-                        .startDate(socialLongDTO.getStartDate())
-                        .endDate(socialLongDTO.getEndDate())
-                        .hits(socialLongDTO.getHits())
-                        .contact(socialLongDTO.getContact())
-                        .tagId(socialLongDTO.getTagId())
-                        .build());
-        return ResponseDTO.<SocialLongDTO>builder().success(true).message("모임 단건 조회").data(socialLongDTOList).build();
+    public ResponseDTO<SocialLongDTO> getSocialDetail(@Parameter(required = true) @PathVariable Long socialId){
+        return null;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -114,4 +97,7 @@ public class SocialController {
         socialService.deleteSocial(socialId);
         return ResponseDTO.builder().success(true).message("모임 삭제 완료").build();
     }
+
+
 }
+
