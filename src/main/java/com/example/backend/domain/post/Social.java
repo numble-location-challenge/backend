@@ -61,9 +61,9 @@ public class Social extends Post {
     private String contact; //연락 방법
 
     @Builder
-    public Social(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes,
+    public Social(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes, LocalDateTime createDate,
         Category category, List<SocialTag> socialTags, List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact) {
-        super(user, images, comments, contents, region, likes);
+        super(user, images, comments, contents, region, likes, createDate);
         this.category = category;
         this.socialTags = socialTags;
         this.socialings = socialings;
