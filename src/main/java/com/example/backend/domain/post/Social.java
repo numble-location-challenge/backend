@@ -89,11 +89,7 @@ public class Social extends Post {
         this.contact = contact;
     }
 
-    //==연관관계 메서드==//
-    public void setUser(User user){ //social ---- user 서로 설정
-        super.setUserAndRegion(user);
-        user.getSocials().add(this);
-    }
+    //==연관관계 메서드==// user, region은 post 메서드 사용
 
     public void setSocialTags(List<SocialTag> socialTags){
         this.socialTags = socialTags;
