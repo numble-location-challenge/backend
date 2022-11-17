@@ -1,7 +1,9 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.ResponseDTO;
+import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.dto.social.SocialLongDTO;
+import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
 import com.example.backend.service.social.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,14 +66,16 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> createSocial(@RequestBody final SocialLongDTO socialLongDTO){
-        socialService.createSocial(socialLongDTO);
+    public ResponseDTO<?> createSocial(
+            @AuthenticationPrincipal String email,
+            @RequestBody final SocialCreateRequestDTO socialCreateRequestDTO){
+        socialService.createSocial(email, socialCreateRequestDTO);
         return ResponseDTO.builder().success(true).message("모임 생성 완료").build();
     }
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "모임 게시글 수정")
-    @PutMapping("/social")
+    @PutMapping("/social/{socialId}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
@@ -78,8 +83,11 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> updateSocial(@RequestBody final SocialLongDTO socialLongDTO){
-        socialService.updateSocial(socialLongDTO);
+    public ResponseDTO<?> updateSocial(
+            @AuthenticationPrincipal String email,
+            @PathVariable Long socialId,
+            @RequestBody final SocialModifyRequestDTO socialModifyRequestDTO){
+        socialService.updateSocial(email, socialId, socialModifyRequestDTO);
         return ResponseDTO.builder().success(true).message("모임 수정 완료").build();
     }
 
