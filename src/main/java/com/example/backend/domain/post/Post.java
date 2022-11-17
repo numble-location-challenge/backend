@@ -58,16 +58,13 @@ public abstract class Post extends TimeAuditingEntity {
 
     private int likes; //좋아요 수
 
-    @Column(name ="create_time")
-    protected LocalDateTime createDate; //작성 시간
 
-    public Post(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes, LocalDateTime createDate) {
+    public Post(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes) {
         this.user = user;
         this.images = images;
         this.comments = comments;
         this.contents = contents;
         this.region = region;
         this.likes = likes;
-        this.createDate = createDate;
     }
 }
