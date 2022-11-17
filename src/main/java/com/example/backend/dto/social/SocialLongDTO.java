@@ -1,6 +1,5 @@
 package com.example.backend.dto.social;
 
-import com.example.backend.domain.Like;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
@@ -48,9 +47,6 @@ public class SocialLongDTO{
     @Schema(description = "작성자의 지역", defaultValue = "1")
     private int region;
 
-    @Schema(description = "해당 게시글 좋아요 여부")
-    private LikesDTO likes;
-
     @Schema(description = "모임 게시글 제목",defaultValue = "모임 제목")
     @NotNull
     private String title; //모임 제목
@@ -91,8 +87,6 @@ public class SocialLongDTO{
         this.comments = social.getComments().stream().map(comment -> new CommentResponseDTO(comment)).collect(Collectors.toList());
         this.contents = social.getContents();
         this.region = social.getRegion();
-        //TODO : 수정해야할 부분
-//        this.likes = toLikesDTO(social.getLikes());
         this.title = social.getTitle();
         this.startDate = social.getStartDate();
         this.endDate = social.getEndDate();
@@ -108,15 +102,6 @@ public class SocialLongDTO{
         return CategoryDTO.builder()
                 .id(category.getId())
                 .name(category.getName())
-                .build();
-    }
-
-    //TODO : 수정해야할 부분
-    public LikesDTO toLikesDTO(Like like){
-        return LikesDTO.builder()
-                .id(like.getId())
-                .user(like.getUser())
-                .post(like.getPost())
                 .build();
     }
 
