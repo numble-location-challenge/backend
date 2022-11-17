@@ -93,8 +93,8 @@ public class TokenService {
         }
     }
 
-    public void destroyToken(String email) {
-        //TODO RT 파기 (AT는 불가능)
+    public void destroyToken(String email, String refreshToken) {
+        //TODO Redis?
 
     }
 

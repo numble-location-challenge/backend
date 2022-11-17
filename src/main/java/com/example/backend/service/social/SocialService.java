@@ -1,6 +1,8 @@
 package com.example.backend.service.social;
 
+import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.dto.social.SocialLongDTO;
+import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
 import org.springframework.stereotype.Service;
 
@@ -8,13 +10,13 @@ import java.util.List;
 
 public interface SocialService {
     //모임 게시글 생성
-    void createSocial(SocialLongDTO socialLongDTO);
+    void createSocial(String email, SocialCreateRequestDTO socialDTO);
 
     //모임 게시글 삭제
     void deleteSocial(Long postId);
 
     //모임 게시글 수정
-    void updateSocial(SocialLongDTO socialLongDTO);
+    void updateSocial(String email, Long socialId, SocialModifyRequestDTO socialDTO);
 
     //모임 게시글 1개 출력 (상세보기)
     SocialLongDTO getSocialDetail(Long socialId);

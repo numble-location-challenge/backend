@@ -1,11 +1,14 @@
 package com.example.backend.service;
 
+import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
+import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.dto.user.UserJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
-import com.example.backend.global.exception.InvalidInputException;
-import com.example.backend.global.exception.InvalidInputExceptionType;
+import com.example.backend.global.exception.*;
+import com.example.backend.repository.SocialRepository;
+import com.example.backend.repository.SocialingRepository;
 import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final SocialRepository socialRepository;
+    private final SocialingRepository socilaingRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -35,8 +41,8 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User createKakaoUser(KaKaoAuthRequestDTO snsUserDTO) {
-        User user = getKakaoUserInfo(snsUserDTO.getKakaoAccessToken());
+    public User createKakaoUser(KaKaoAuthRequestDTO kaKaoAuthRequestDTO) {
+        User user = getKakaoUserInfo(kaKaoAuthRequestDTO.getKakaoAccessToken());
         return null;
         //TODO 세팅 및 회원가입 처리
     }
@@ -45,6 +51,12 @@ public class UserServiceImpl implements UserService{
     public User getKakaoUserInfo(String KakaoAccessToken) {
         //TODO 카카오 사용자 정보 API에서 [id, 이메일, 핸드폰 번호, 이름, 프사(?)] 를 받아옴
 
+        return null;
+    }
+
+    @Override
+    public User modify(UserModifyRequestDTO userModifyRequestDTO, String email) {
+        //TODO
         return null;
     }
 
@@ -63,20 +75,53 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void delete(Long userId) {
-        userRepository.deleteById(userId);
+    public void delete(String email) {
+        userRepository.deleteByEmail(email);
     }
 
     @Override
-    public User getUser(Long userId) {
-        return null;
+    public User getUser(String email, Long id) {
+        User findUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        if(findUser.getId().equals(id)) return findUser;
+        else throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
     }
 
+    //모임신청
     @Transactional
     @Override
-    public User modifyUser(Long userId, UserModifyRequestDTO userModifyRequestDTO) {
-        //null인지 체크할 것. null이면 값 안바꿈
-        return null;
+    public void participateSocial(String email, Long socialId) {
+        User findUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        Social findSocial = socialRepository.findById(socialId)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+
+        Socialing socialing = Socialing.createSocialing(findUser, findSocial);
+
+        findUser.addSocialing(socialing); //연관관계 설정
+        socilaingRepository.save(socialing);
+    }
+
+    //모임 취소
+    @Transactional
+    @Override
+    public void cancelSocialParticipation(String email, Long socialId) {
+        User findUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        //user pk 랑 socialId로 소셜링 찾아옴
+//        Socialing findSocialing = socilaingRepository.deleteByUserIdAndSocialId(findUser.getId(), socialId);
+//        findUser.deleteSocialing(findSocialing); //연관관계 해제
+
+    }
+
+    //모임 강퇴
+    @Transactional
+    @Override
+    public void kickOutUserFromSocial(String email, Long socialId, Long droppedUserId) {
+        //TODO
     }
 
 

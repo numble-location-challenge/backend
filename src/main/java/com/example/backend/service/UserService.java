@@ -11,11 +11,20 @@ public interface UserService {
 
     User createKakaoUser(KaKaoAuthRequestDTO authRequestDTO);
 
-    void delete(Long userId); //회원 탈퇴
+    void delete(String email); //회원 탈퇴
 
-    User getUser(Long userId); //내 프로필 조회
-
-    User modifyUser(Long userId, UserModifyRequestDTO userModifyRequestDTO); //회원 수정
+    User getUser(String email, Long id); //내 프로필 조회
 
     User getKakaoUserInfo(String KakaoAccessToken);
+
+    User modify(UserModifyRequestDTO userModifyRequestDTO, String email);
+
+    //모임신청
+    void participateSocial(String email, Long socialId);
+
+    //취소
+    void cancelSocialParticipation(String email, Long socialId);
+
+    //강퇴
+    void kickOutUserFromSocial(String email, Long socialId, Long droppedUserId);
 }

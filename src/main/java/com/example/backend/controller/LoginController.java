@@ -43,7 +43,8 @@ public class LoginController {
     public ResponseEntity<?> login(@RequestBody final DefaultLoginRequestDTO loginDTO){
 
         User loginUser = loginService.defaultLogin(loginDTO.getEmail(),loginDTO.getPassword());
-        return getLoginSuccessResponseEntity(loginUser);
+        HashMap<String, String> jwtMap = loginService.authorize(loginUser);
+        return getLoginSuccessResponseEntity(loginUser, jwtMap);
     }
 
     //TODO 서비스 구현
@@ -57,10 +58,11 @@ public class LoginController {
     public ResponseEntity<?> kakaologin(@RequestBody final KaKaoAuthRequestDTO authRequestDTO){
 
         User loginUser = loginService.kakaoLogin(authRequestDTO);
-        return getLoginSuccessResponseEntity(loginUser);
+        HashMap<String, String> jwtMap = loginService.authorize(loginUser);
+        return getLoginSuccessResponseEntity(loginUser, jwtMap);
     }
 
-    private ResponseEntity<?> getLoginSuccessResponseEntity(User loginUser) {
+    private ResponseEntity<?> getLoginSuccessResponseEntity(User loginUser, HashMap<String, String> tokenMap) {
         //set data list
         List<AuthDTO> dataList = List.of(AuthDTO.builder()
                 .userId(loginUser.getId())
@@ -73,14 +75,13 @@ public class LoginController {
                 .data(dataList)
                 .build();
 
-        HashMap<String, String> tokenMap = loginService.authorize(loginUser);
-
         return ResponseEntity.ok()
                 .header(ACCESS_HEADER, tokenMap.get("AT"))
                 .header(REFRESH_HEADER, tokenMap.get("RT"))
                 .body(response);
     }
 
+    //TODO AccessToken은 파괴가 안됨! 나중에 구현...
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
@@ -88,8 +89,11 @@ public class LoginController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> logout(@AuthenticationPrincipal String email){
-        loginService.logout(email);
+    public ResponseDTO<?> logout(
+            @AuthenticationPrincipal String email,
+            @RequestHeader(value = "Authorization") String accessToken,
+            @RequestHeader(value = "Authorization-refresh") String refreshToken){
+        loginService.logout(email, accessToken, refreshToken);
         return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
     }
 

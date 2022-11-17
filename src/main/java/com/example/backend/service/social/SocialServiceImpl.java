@@ -1,43 +1,111 @@
 package com.example.backend.service.social;
 
+import com.example.backend.domain.PostImage;
 import com.example.backend.domain.Socialing;
+import com.example.backend.domain.User;
+
 import com.example.backend.domain.post.Social;
+import com.example.backend.domain.tag.Category;
+import com.example.backend.domain.tag.SocialTag;
+import com.example.backend.domain.tag.Tag;
+import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.dto.social.SocialLongDTO;
+import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
+import com.example.backend.global.exception.EntityNotExistsException;
+import com.example.backend.global.exception.EntityNotExistsExceptionType;
+import com.example.backend.repository.PostImageRepository;
 import com.example.backend.repository.SocialRepository;
+import com.example.backend.repository.TagRepository;
+import com.example.backend.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SocialServiceImpl implements SocialService {
 
+    private final UserRepository userRepository;
     private final SocialRepository socialRepository;
+    private final TagRepository tagRePository;
+    private final PostImageRepository postImageRepository;
 
     //모임 게시글 생성
+    @Transactional
     @Override
-    public void createSocial(SocialLongDTO socialLongDTO) {
+    public void createSocial(String email, SocialCreateRequestDTO socialDTO) {
+        //엔티티 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        List<Tag> tags = tagRePository.findAllByNames(socialDTO.getTags());
+        //TODO tags 안의 카테고리 id가 모두 같아야함. 하나라도 다르면 예외처리
+        Category category = tags.get(0).getCategory(); //LAZY 로딩
 
+        //소셜 생성과 동시에 연관관계 설정
+        Social social = Social.createSocial(
+                user,
+                socialDTO.getRegion(),
+                socialDTO.getTitle(),
+                socialDTO.getContact(),
+                socialDTO.getStartDate(),
+                socialDTO.getEndDate(),
+                socialDTO.getLimitedNums(),
+                socialDTO.getContact(),
+                category,
+                tags,
+                socialDTO.getImages()
+        );
+
+        //생성과 동시에 참여
+        Socialing.createSocialing(user, social);
+
+        socialRepository.save(social);
     }
 
     //모임 게시글 삭제
+    @Transactional
     @Override
     public void deleteSocial(Long postId) {
         socialRepository.deleteById(postId);
     }
 
-
     //모임 게시글 수정
+    @Transactional
     @Override
-    public void updateSocial(SocialLongDTO socialLongDTO) {
+    public void updateSocial(String email, Long socialId, SocialModifyRequestDTO socialDTO) {
+        //엔티티 조회
+        Social social = socialRepository.findById(socialId)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+
+        // null일 경우에는 수정X
+        if(socialDTO.getTitle() != null) social.updateTitle(socialDTO.getTitle());
+        if(socialDTO.getContents() != null) social.updateContents(socialDTO.getContents());
+        if(socialDTO.getStartDate() != null) social.updateStartDate(socialDTO.getStartDate());
+        if(socialDTO.getEndDate() != null) social.updateEndDate(socialDTO.getEndDate());
+        if(socialDTO.getLimitedNums() != null) social.updateLimitedNums(socialDTO.getLimitedNums());
+        if(socialDTO.getContact() != null) social.updateContact(socialDTO.getContact());
+
+        //이미지
+        if(!CollectionUtils.isEmpty(socialDTO.getImages())){
+            //DB에서 PostImage 삭제
+            postImageRepository.deleteAllByPostId(social.getId());
+            //갈아끼움
+            List<PostImage> postImages = socialDTO.getImages().stream()
+                    .map(imagePath -> new PostImage(imagePath, social))
+                    .collect(toList());
+            social.setImages(postImages);
+        }
 
     }
 

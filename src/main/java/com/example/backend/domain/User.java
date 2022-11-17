@@ -79,4 +79,26 @@ public class User {
         this.region = region;
         this.bio = bio;
     }
+
+    //==연관관계 메서드==/
+    public void addSocialing(Socialing socialing){
+        socialings.add(socialing);
+        socialing.setUser(this);
+    }
+
+    public void deleteSocialing(Socialing socialing){
+        socialings.remove(socialing);
+    }
+
+
+    //==수정 메서드==/
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void deleteRefreshToken() {
+        this.refreshToken = null;
+    }
+
 }
