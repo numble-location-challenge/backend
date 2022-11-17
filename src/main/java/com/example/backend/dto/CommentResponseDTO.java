@@ -29,7 +29,6 @@ public class CommentResponseDTO {
     public CommentResponseDTO(Comment comment) {
         this.user = toUserDTO(comment.getUser());
         this.contents = comment.getContents();
-        this.likes = comment.getLikes();
         this.cGroup = comment.getCGroup();
         this.level = comment.getLevel();
         this.refOrder = comment.getRefOrder();
