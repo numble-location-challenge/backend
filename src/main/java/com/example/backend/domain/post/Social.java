@@ -6,7 +6,7 @@ import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.tag.Category;
-import com.example.backend.domain.tag.Tag;
+import com.example.backend.domain.tag.SocialTag;
 
 import lombok.*;
 
@@ -31,9 +31,8 @@ public class Social extends Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany
-    @JoinColumn(name = "tag_id")
-    private List<Tag> tags;
+    @OneToMany(mappedBy = "social")
+    private List<SocialTag> socialTags;
 
     @NotNull
     @Enumerated(value = EnumType.STRING)
@@ -63,10 +62,10 @@ public class Social extends Post {
 
     @Builder
     public Social(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes,
-        Category category, List<Tag> tags, List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact) {
+        Category category, List<SocialTag> socialTags, List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact) {
         super(user, images, comments, contents, region, likes);
         this.category = category;
-        this.tags = tags;
+        this.socialTags = socialTags;
         this.socialings = socialings;
         this.status = status;
         this.title = title;

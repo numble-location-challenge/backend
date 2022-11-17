@@ -6,7 +6,6 @@ import com.example.backend.domain.tag.Category;
 import com.example.backend.dto.CategoryDTO;
 import com.example.backend.dto.LikesDTO;
 import com.example.backend.dto.PostImageDTO;
-import com.example.backend.dto.TagDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,7 +59,7 @@ public class SocialShortDTO {
     private CategoryDTO category;
 
     @Schema(description = "소분류")
-    private List<TagDTO> tags;
+    private List<SocialTagDTO> tags;
 
     @Schema(name = "좋아요 개수", description = "인기순 정렬에 사용")
     private int likeCnt;
@@ -79,7 +78,7 @@ public class SocialShortDTO {
         this.limitedNums = social.getLimitedNums();
         this.status = social.getStatus();
         this.category = toCategoryDTO(social.getCategory());
-        this.tags = social.getTags().stream().map(tag -> new TagDTO(tag)).collect(Collectors.toList());
+        this.tags = social.getSocialTags().stream().map(socialTag -> new SocialTagDTO(socialTag)).collect(Collectors.toList());
         this.likeCnt = social.getLikes();
         this.createDate = social.getCreateDate();
     }
