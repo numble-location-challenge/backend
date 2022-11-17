@@ -48,21 +48,22 @@ public class User {
     private String bio;//한마디 소개글
 
     @OneToMany(mappedBy = "user")
-    private List<Feed> feeds = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<Social> socials = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
     private List<Socialing> socialings = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<Like> likes = new ArrayList<>();
-
     private String refreshToken; //JWT
+
+//    @OneToMany(mappedBy = "user")
+//    private List<Feed> feeds = new ArrayList<>();
+
+//    @OneToMany(mappedBy = "user")
+//    private List<Social> socials = new ArrayList<>();
+
+//    @OneToMany(mappedBy = "user")
+//    private List<Comment> comments = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "user")
+//    private List<Like> likes = new ArrayList<>();
+
 
     public void encodePassword(PasswordEncoder passwordEncoder){
         password = passwordEncoder.encode(password);
