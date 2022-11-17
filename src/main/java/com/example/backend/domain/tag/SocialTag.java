@@ -26,4 +26,22 @@ public class SocialTag {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
+
+    //==생성 메서드==/
+    public static SocialTag createSocialTag(Social social, Tag tag) {
+        SocialTag socialTag = new SocialTag();
+        socialTag.setSocial(social);
+        socialTag.setTag(tag);
+        return socialTag;
+    }
+
+    //==연관관계 메서드==//
+    public void setSocial(Social social){
+        this.social = social;
+    }
+
+    public void setTag(Tag tag){
+        this.tag = tag;
+    }
+
 }

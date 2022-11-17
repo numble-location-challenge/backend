@@ -28,6 +28,8 @@ public class Socialing {
         Socialing socialing = new Socialing();
         socialing.setUser(user);
         socialing.setSocial(social);
+        //모임장도 참가한 사람 +1
+        social.addCurrentNums();
         return socialing;
     }
 

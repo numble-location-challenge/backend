@@ -1,6 +1,5 @@
 package com.example.backend.domain.post;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +23,7 @@ import com.example.backend.domain.PostImage;
 import com.example.backend.domain.TimeAuditingEntity;
 import com.example.backend.domain.User;
 
+import com.example.backend.domain.enumType.SocialStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,7 +48,7 @@ public abstract class Post extends TimeAuditingEntity {
     protected List<PostImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @NotNull
     protected String contents; //내용
@@ -58,6 +58,10 @@ public abstract class Post extends TimeAuditingEntity {
 
     private int likes; //좋아요 수
 
+    protected void setUserAndRegion(User user){
+        this.user = user;
+        region = user.getRegion();
+    }
 
     public Post(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes) {
         this.user = user;
