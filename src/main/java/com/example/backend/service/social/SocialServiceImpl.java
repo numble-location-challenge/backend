@@ -120,8 +120,7 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public SocialLongDTO getSocialDetail(Long postId) {
         Social social = socialRepository.findById(postId).orElseThrow();
-        SocialLongDTO socialLongDTO = new SocialLongDTO(social);
-        return socialLongDTO;
+        return new SocialLongDTO(social);
     }
 
     /**
@@ -164,7 +163,7 @@ public class SocialServiceImpl implements SocialService {
         while(socialRepository.findByUserId(userId).stream().iterator().hasNext()){
             Social social = socialRepository.findByUserId(userId).stream().iterator().next();
             Optional<Socialing> socialing = social.getSocialings().stream().filter(s -> Objects.equals(s.getUser().getId(), userId)).findFirst();
-            if(socialing != null){
+            if(socialing.isPresent()){
                 socialShortDTOList.add(new SocialShortDTO(social));
             }
         }
@@ -196,7 +195,7 @@ public class SocialServiceImpl implements SocialService {
         while(socialRepository.findAll().iterator().hasNext()){
             Social social = socialRepository.findAll().iterator().next();
             Optional<SocialTag> socialTag = social.getSocialTags().stream().filter(tag -> Objects.equals(tag.getId(),tagId)).findFirst();
-            if(socialTag != null){
+            if(socialTag.isPresent()){
                 socialShortDTOList.add(new SocialShortDTO(social));
             }
         }
@@ -204,45 +203,18 @@ public class SocialServiceImpl implements SocialService {
     }
 
     /**
-     * 최신순 정렬
-     * @return List<SocialShortDTO> : 최신순으로 정렬된 미리보기 형식의 리스트
+     * 리스트 정렬
+     * @param properties 정렬할 기준
+     * @return List<SocialShortDTO> : 정렬된 미리보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> sortByLatest() {
+    public List<SocialShortDTO> sortByList(String properties){
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        socialRepository.findAll(Sort.by(Sort.Direction.DESC,"createDate"));
-        while(socialRepository.findAll().iterator().hasNext()){
-            Social social = socialRepository.findAll().iterator().next();
+        List<Social> socialList = socialRepository.findAll(Sort.by(Sort.Direction.DESC,properties));
+        for(Social social : socialList){
             socialShortDTOList.add(new SocialShortDTO(social));
         }
         return socialShortDTOList;
     }
 
-    /**
-     * 마감 임박 순 정렬
-     * @return List<SocialShortDTO> : 마감임박순으로 정렬된 미리보기 형식의 리스트
-     */
-    @Override
-    public List<SocialShortDTO> sortByClosing() {
-        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-//        while(socialRepository.findAllOrderByEndDate().iterator().hasNext()){
-//            Social social = socialRepository.findAllOrderByEndDate().iterator().next();
-//            socialShortDTOList.add(new SocialShortDTO(social));
-//        }
-        return socialShortDTOList;
-    }
-
-    /**
-     * 인기순 정렬
-     * @return List<SocialShortDTO> : 인기순으로 정렬된 미리보기 형식의 리스트
-     */
-    @Override
-    public List<SocialShortDTO> SortByPopularity() {
-        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-//        while(socialRepository.findAllOrderByLikes().iterator().hasNext()){
-//            Social social = socialRepository.findAllOrderByLikes().iterator().next();
-//            socialShortDTOList.add(new SocialShortDTO(social));
-//        }
-        return socialShortDTOList;
-    }
 }

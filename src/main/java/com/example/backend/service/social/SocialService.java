@@ -37,11 +37,5 @@ public interface SocialService {
     List<SocialShortDTO> filteringByTag(Long TagId);
 
     //최신순 정렬
-    List<SocialShortDTO> sortByLatest();
-
-    //마감순 정렬
-    List<SocialShortDTO> sortByClosing();
-
-    //인기순 정렬
-    List<SocialShortDTO> SortByPopularity();
+    List<SocialShortDTO> sortByList(String properties);
 }

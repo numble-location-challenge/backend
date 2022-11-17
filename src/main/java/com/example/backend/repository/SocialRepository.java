@@ -7,7 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface SocialRepository extends CrudRepository<Social, Long>, JpaRepository<Social,Long> {
+public interface SocialRepository extends JpaRepository<Social,Long> {
 
     //게시글 아이디로 찾기
     Optional<Social> findById(Long postId);
