@@ -45,10 +45,10 @@ public class Social extends Post {
 
     @NotNull
     @Column(name = "start_date")
-    private LocalDateTime startDate; //모임 시작날짜
+    private LocalDateTime startDate; //모임 모집 시작 날짜
     @NotNull
     @Column(name = "end_date")
-    private LocalDateTime endDate; //모임 끝나는 날짜
+    private LocalDateTime endDate; //모임 모집 마감 날짜
 
     @NotNull
     @Column(name = "current_nums")
@@ -61,9 +61,9 @@ public class Social extends Post {
     private String contact; //연락 방법
 
     @Builder
-    public Social(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes, LocalDateTime createDate,
+    public Social(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes,
         Category category, List<SocialTag> socialTags, List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact) {
-        super(user, images, comments, contents, region, likes, createDate);
+        super(user, images, comments, contents, region, likes);
         this.category = category;
         this.socialTags = socialTags;
         this.socialings = socialings;
