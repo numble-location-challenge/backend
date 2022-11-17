@@ -32,7 +32,7 @@ public interface SocialService {
     List<SocialShortDTO> filteringByCategory(Long CategoryId);
 
     //태그 필터링
-    List<SocialShortDTO> filteringByTag(Long TagId);
+    List<SocialShortDTO> filteringByTag(List<Long> TagId);
 
     //최신순 정렬
     List<SocialShortDTO> sortByLatest();
