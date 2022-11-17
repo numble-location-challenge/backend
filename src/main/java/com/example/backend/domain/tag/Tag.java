@@ -25,8 +25,9 @@ public class Tag {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "social")
-    private List<SocialTag> socialTags = new ArrayList<>();
+
+//    @OneToMany(mappedBy = "social")
+//    private List<SocialTag> socialTags = new ArrayList<>();
 
     @NotNull
     private String name;
