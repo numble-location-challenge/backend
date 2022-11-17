@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -24,8 +25,9 @@ public class Tag {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "tag")
-    private List<SocialTag> socialTags;
+
+//    @OneToMany(mappedBy = "social")
+//    private List<SocialTag> socialTags = new ArrayList<>();
 
     @NotNull
     private String name;

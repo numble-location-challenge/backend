@@ -61,6 +61,12 @@ public class SocialShortDTO {
     @Schema(description = "소분류")
     private List<SocialTagDTO> tags;
 
+    @Schema(name = "좋아요 개수", description = "인기순 정렬에 사용")
+    private int likeCnt;
+
+    @Schema(name = "게시글 생성 시간", description = "최신순 정렬에 사용")
+    private LocalDateTime createDate;
+
     public SocialShortDTO(Social social) {
         this.socialings = social.getSocialings().stream().map(socialing -> new SocialingDTO(socialing)).collect(Collectors.toList());
         this.id = social.getId();
@@ -73,6 +79,8 @@ public class SocialShortDTO {
         this.status = social.getStatus();
         this.category = toCategoryDTO(social.getCategory());
         this.tags = social.getSocialTags().stream().map(socialTag -> new SocialTagDTO(socialTag)).collect(Collectors.toList());
+        this.likeCnt = social.getLikes();
+        this.createDate = social.getCreateDate();
     }
 
     public CategoryDTO toCategoryDTO(Category category){

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -25,6 +26,6 @@ public class Category {
     private String name;
 
     @OneToMany(mappedBy = "category")
-    private List<Social> social;
+    private List<Social> socials = new ArrayList<>();
 
 }

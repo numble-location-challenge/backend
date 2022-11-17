@@ -45,10 +45,10 @@ public class Social extends Post {
 
     @NotNull
     @Column(name = "start_date")
-    private LocalDateTime startDate; //모임 시작날짜
+    private LocalDateTime startDate; //모임 모집 시작 날짜
     @NotNull
     @Column(name = "end_date")
-    private LocalDateTime endDate; //모임 끝나는 날짜
+    private LocalDateTime endDate; //모임 모집 마감 날짜
 
     @NotNull
     @Column(name = "current_nums")
