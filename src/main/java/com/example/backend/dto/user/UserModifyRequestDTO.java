@@ -16,7 +16,7 @@ public class UserModifyRequestDTO {
     String profile;
 
     @Schema(description = "닉네임", defaultValue = "부챠라티222")
-    String username;
+    String nickname;
 
     @Schema(description = "짧은 소개글", defaultValue = "y o u j i n\n지금은 #INTP\n인생의 특별한 퍼즐 조각을 맞춰가는 중🧩")
     String bio;

@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User modify(UserModifyRequestDTO userModifyRequestDTO, String email) {
+    public User modify(String email, UserModifyRequestDTO userModifyRequestDTO) {
         //TODO
         return null;
     }

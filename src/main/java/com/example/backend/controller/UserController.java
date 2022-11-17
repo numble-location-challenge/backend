@@ -6,8 +6,6 @@ import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.dto.user.UserJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
-import com.example.backend.global.exception.ForbiddenException;
-import com.example.backend.global.exception.ForbiddenExceptionType;
 import com.example.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -97,7 +94,7 @@ public class UserController {
             @AuthenticationPrincipal String email,
             @RequestBody final UserModifyRequestDTO userModifyRequestDTO){
 
-        User user = userService.modify(userModifyRequestDTO, email);
+        final User user = userService.modify(email, userModifyRequestDTO);
 
         //set data list
         List<UserProfileDTO> dataList = List.of(UserProfileDTO.builder()
@@ -123,7 +120,7 @@ public class UserController {
     })
     public ResponseDTO<UserProfileDTO> getUserInfo(@AuthenticationPrincipal String email, @PathVariable Long id){
 
-        User user = userService.getUser(email, id);
+        final User user = userService.getUser(email, id);
 
         //set data list
         List<UserProfileDTO> dataList = List.of(UserProfileDTO.builder()

@@ -17,7 +17,7 @@ public interface UserService {
 
     User getKakaoUserInfo(String KakaoAccessToken);
 
-    User modify(UserModifyRequestDTO userModifyRequestDTO, String email);
+    User modify(String email, UserModifyRequestDTO userModifyRequestDTO);
 
     //모임신청
     void participateSocial(String email, Long socialId);
