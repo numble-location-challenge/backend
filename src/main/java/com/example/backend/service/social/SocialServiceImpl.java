@@ -9,6 +9,7 @@ import com.example.backend.domain.tag.Category;
 import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.domain.tag.Tag;
 import com.example.backend.dto.social.SocialCreateRequestDTO;
+import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.dto.social.SocialLongDTO;
 import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
@@ -20,6 +21,8 @@ import com.example.backend.repository.TagRepository;
 import com.example.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -143,10 +146,10 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> getMySocialList(Long userId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-//        while(socialRepository.findByUserId(userId).stream().iterator().hasNext()){
-//            Social social = socialRepository.findByUserId(userId).stream().iterator().next();
-//            socialShortDTOList.add(new SocialShortDTO(social));
-//        }
+        while(socialRepository.findByUserId(userId).stream().iterator().hasNext()){
+            Social social = socialRepository.findByUserId(userId).stream().iterator().next();
+            socialShortDTOList.add(new SocialShortDTO(social));
+        }
         return socialShortDTOList;
     }
 
@@ -158,13 +161,13 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> getJoinSocialList(Long userId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-//        while(socialRepository.findByUserId(userId).stream().iterator().hasNext()){
-//            Social social = socialRepository.findByUserId(userId).stream().iterator().next();
-//            Optional<Socialing> socialing = social.getSocialings().stream().filter(s -> Objects.equals(s.getUser().getId(), userId)).findFirst();
-//            if(socialing != null){
-//                socialShortDTOList.add(new SocialShortDTO(social));
-//            }
-//        }
+        while(socialRepository.findByUserId(userId).stream().iterator().hasNext()){
+            Social social = socialRepository.findByUserId(userId).stream().iterator().next();
+            Optional<Socialing> socialing = social.getSocialings().stream().filter(s -> Objects.equals(s.getUser().getId(), userId)).findFirst();
+            if(socialing != null){
+                socialShortDTOList.add(new SocialShortDTO(social));
+            }
+        }
         return socialShortDTOList;
     }
 
@@ -175,10 +178,10 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> filteringByCategory(Long categoryId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-//        while(socialRepository.findByCategoryId(categoryId).stream().iterator().hasNext()){
-//            Social social = socialRepository.findByCategoryId(categoryId).stream().iterator().next();
-//            socialShortDTOList.add(new SocialShortDTO(social));
-//        }
+        while(socialRepository.findByCategoryId(categoryId).stream().iterator().hasNext()){
+            Social social = socialRepository.findByCategoryId(categoryId).stream().iterator().next();
+            socialShortDTOList.add(new SocialShortDTO(social));
+        }
         return socialShortDTOList;
     }
 
@@ -188,12 +191,15 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 태그로 필터링된 미리보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> filteringByTag(List<Long> tagId) {
+    public List<SocialShortDTO> filteringByTag(Long tagId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-//        while(socialRepository.findBySocialTags(tagId).stream().iterator().hasNext()){
-//            Social social = socialRepository.findBySocialTags(tagId).stream().iterator().next();
-//            socialShortDTOList.add(new SocialShortDTO(social));
-//        }
+        while(socialRepository.findAll().iterator().hasNext()){
+            Social social = socialRepository.findAll().iterator().next();
+            Optional<SocialTag> socialTag = social.getSocialTags().stream().filter(tag -> Objects.equals(tag.getId(),tagId)).findFirst();
+            if(socialTag != null){
+                socialShortDTOList.add(new SocialShortDTO(social));
+            }
+        }
         return socialShortDTOList;
     }
 
@@ -204,10 +210,11 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> sortByLatest() {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-//        while(socialRepository.findAllOrderByCreateDate().iterator().hasNext()){
-//            Social social = socialRepository.findAllOrderByCreateDate().iterator().next();
-//            socialShortDTOList.add(new SocialShortDTO(social));
-//        }
+        socialRepository.findAll(Sort.by(Sort.Direction.DESC,"createDate"));
+        while(socialRepository.findAll().iterator().hasNext()){
+            Social social = socialRepository.findAll().iterator().next();
+            socialShortDTOList.add(new SocialShortDTO(social));
+        }
         return socialShortDTOList;
     }
 
