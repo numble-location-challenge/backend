@@ -28,14 +28,14 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 public class Social extends Post {
 
-    @OneToMany(mappedBy = "social")
+    @OneToMany(mappedBy = "social", cascade = CascadeType.ALL)
     private List<Socialing> socialings = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "social")
+    @OneToMany(mappedBy = "social", cascade = CascadeType.ALL)
     private List<SocialTag> socialTags = new ArrayList<>();
 
     @Enumerated(value = EnumType.STRING)
@@ -91,6 +91,11 @@ public class Social extends Post {
 
     //==연관관계 메서드==// user, region은 post 메서드 사용
 
+    public void addSocialing(Socialing socialing){
+        socialings.add(socialing);
+        socialing.setSocial(this);
+    }
+
     public void setSocialTags(List<SocialTag> socialTags){
         this.socialTags = socialTags;
     }
@@ -110,7 +115,7 @@ public class Social extends Post {
     public static Social createSocial(
             User user, String title, String contents, String contact,
             LocalDateTime startDate, LocalDateTime endDate, Integer limitedNums,
-            List<PostImage> postImages, Category category, List<Tag> tags){
+            List<PostImage> postImages, Category category, List<Tag> tags, Socialing socialing){
 
         Social social = Social.builder()
                 .user(user).region(user.getRegion())
@@ -118,10 +123,12 @@ public class Social extends Post {
                 .startDate(startDate).endDate(endDate).limitedNums(limitedNums)
                 .likes(0).currentNums(0).hits(0) //currentNums는 Socialing 생성 시 따로 설정
                 .status(SocialStatus.AVAILABLE)
+                .socialings(new ArrayList<>())
                 .build();
 
         social.setCategory(category);
         social.setImages(postImages);
+        social.addSocialing(socialing);
 
         //Tag 3개 -> SocialTag 생성 및 세팅
         List<SocialTag> socialTags = tags.stream()

@@ -99,10 +99,10 @@ public class UserServiceImpl implements UserService{
         Social findSocial = socialRepository.findById(socialId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
 
-        Socialing socialing = Socialing.createSocialing(findUser, findSocial);
+//        Socialing socialing = Socialing.createSocialing(findUser, findSocial);
 
-        findUser.addSocialing(socialing); //연관관계 설정
-        socilaingRepository.save(socialing);
+//        findUser.addSocialing(socialing); //연관관계 설정
+//        socilaingRepository.save(socialing);
     }
 
     //모임 취소

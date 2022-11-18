@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema
 public class TagDTO {
-    @Schema(description = "태그", defaultValue = "등산")
+    @Schema(description = "태그", defaultValue = "헬스")
     private String tag;
+
+    public TagDTO(String tag) {
+        this.tag = tag;
+    }
 }
