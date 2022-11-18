@@ -52,6 +52,7 @@ public class SocialServiceImpl implements SocialService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         List<Tag> tags = tagRePository.findAllByNames(socialDTO.getTags());
+        if(!CollectionUtils.isEmpty(tags)) throw new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_TAG);
         //TODO tags 안의 카테고리 id가 모두 같아야함. 하나라도 다르면 예외처리
         Category category = tags.get(0).getCategory(); //LAZY 로딩
 
