@@ -60,4 +60,30 @@ public class Comment extends TimeAuditingEntity{
         this.refOrder = refOrder;
         this.parentNum = parentNum;
     }
+
+    public static Comment createComment(String contents, int cGroup, int level, int refOrder,
+        Long parentNum, Post post, User user){
+
+        Comment comment = Comment.builder()
+            .contents(contents)
+            .cGroup(cGroup)
+            .level(level)
+            .refOrder(refOrder)
+            .parentNum(parentNum)
+            .build();
+        comment.setPost(post);
+        comment.setUser(user);
+        return comment;
+    }
+    public void setPost(Post post){
+        this.post = post;
+        post.getComments().add(this);
+    }
+    public void setUser(User user){
+        this.user = user;
+    }
+
+    public void updateComment(String contents){
+        this.contents = contents;
+    }
 }
