@@ -209,10 +209,18 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> sortByList(String properties){
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        List<Social> socialList = socialRepository.findAll(Sort.by(Sort.Direction.DESC,properties));
-        for(Social social : socialList){
-            socialShortDTOList.add(new SocialShortDTO(social));
+        if(properties.equals("")){
+            while(socialRepository.findAll().iterator().hasNext()){
+                Social social = socialRepository.findAll().iterator().next();
+                socialShortDTOList.add(new SocialShortDTO(social));
+            }
+        }else{
+            List<Social> socialList = socialRepository.findAll(Sort.by(Sort.Direction.DESC,properties));
+            for(Social social : socialList){
+                socialShortDTOList.add(new SocialShortDTO(social));
+            }
         }
+
         return socialShortDTOList;
     }
 

@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "모임 단건 조회에 출력할 데이터 DTO (모든 데이터 출력)")
-@Builder
 public class SocialLongDTO{
 
     @Schema(description = "모임에 참여한 사용자")

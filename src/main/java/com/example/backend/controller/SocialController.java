@@ -16,18 +16,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Tag(name = "social", description = "모임 게시글 API")
 @RestController
 @RequiredArgsConstructor
 public class SocialController {
-
     private final SocialService socialService;
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모임 리스트 출력 (미리보기)")
-    @GetMapping("/socials")
+    @Operation(summary = "모임 리스트 출력", description = "간략한 정보만 제공")
+    @GetMapping("/social")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
@@ -43,7 +43,7 @@ public class SocialController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모임 상세 정보 출력 (자세히)")
+    @Operation(summary = "모임 상세 정보 출력 (자세히)", description = "모임 게시글 한 개 클릭시")
     @GetMapping("/social/{socialId}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -53,7 +53,11 @@ public class SocialController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
     public ResponseDTO<SocialLongDTO> getSocialDetail(@Parameter(required = true) @PathVariable Long socialId){
-        return null;
+        List<SocialLongDTO> socialLongDTOList = new LinkedList<>();
+        socialLongDTOList.add(socialService.getSocialDetail(socialId));
+
+        return ResponseDTO.<SocialLongDTO>builder().success(true).message("모임 상세 정보 출력")
+                .data(socialLongDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -106,6 +110,85 @@ public class SocialController {
         return ResponseDTO.builder().success(true).message("모임 삭제 완료").build();
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "내가 쓴 글 보기", description = "본인이 작성한 모임 게시글만 출력")
+    @GetMapping("/social/me/{userId}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+    })
+    public ResponseDTO<SocialShortDTO> getMySocialList(@Parameter(required = true) @PathVariable Long userId){
+        List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(userId);
+
+        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
+                .data(socialShortDTOList).build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "내가 참여한 모임 보기", description = "본인이 참여한 모임 게시글만 출력")
+    @GetMapping("/social/join/{userId}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+    })
+    public ResponseDTO<SocialShortDTO> getJoinSocialList(@Parameter(required = true) @PathVariable Long userId){
+        List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(userId);
+
+        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
+                .data(socialShortDTOList).build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "모임 게시글 태그로 검색하기", description = "")
+    @GetMapping("/social/search/{tagNum}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+    })
+    public ResponseDTO<SocialShortDTO> getFilteringList(@Parameter(required = true) @PathVariable Long tagNum){
+        List<SocialShortDTO> socialShortDTOList = socialService.filteringByTag(tagNum);
+
+        return ResponseDTO.<SocialShortDTO>builder().success(true).message("필터링된 리스트 출력")
+                .data(socialShortDTOList).build();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "모임 게시글 정렬하기", description = "sortNum = 1:최신순, 2:마감임박순, 3:인기순")
+    @GetMapping("/social/sort/{sortNum}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+    })
+    public ResponseDTO<SocialShortDTO> getSortList(@Parameter(required = true) @PathVariable int sortNum){
+        String properties = "";
+        switch (sortNum){
+            case 1:
+                properties = "createDate";
+                break;
+            case 2:
+                properties = "endDate";
+                break;
+            case 3:
+                properties = "likes";
+                break;
+        }
+        List<SocialShortDTO> socialShortDTOList = socialService.sortByList(properties);
+
+        return ResponseDTO.<SocialShortDTO>builder().success(true).message("정렬된 리스트 출력")
+                .data(socialShortDTOList).build();
+    }
 
 }
 
