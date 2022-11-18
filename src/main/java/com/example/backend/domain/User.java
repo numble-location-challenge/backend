@@ -47,7 +47,7 @@ public class User {
     private String profile;
     private String bio;//한마디 소개글
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Socialing> socialings = new ArrayList<>();
 
     @Column(length = 500)

@@ -69,6 +69,9 @@ public class SocialServiceImpl implements SocialService {
                 .map(dto -> new PostImage(dto.getImagePath()))
                 .collect(toList());
 
+        //생성과 동시에 참여
+        Socialing socialing = Socialing.createSocialing(user);
+
         //소셜 생성과 동시에 연관관계 설정
         Social social = Social.createSocial(
                 user,
@@ -80,11 +83,9 @@ public class SocialServiceImpl implements SocialService {
                 socialDTO.getLimitedNums(),
                 postImages,
                 category,
-                tags
+                tags,
+                socialing
         );
-
-        //생성과 동시에 참여
-        Socialing.createSocialing(user, social);
 
         socialRepository.save(social);
     }

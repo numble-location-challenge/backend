@@ -24,12 +24,9 @@ public class Socialing {
     private User user;
 
     //==생성 메서드==/
-    public static Socialing createSocialing(User user, Social social){
+    public static Socialing createSocialing(User user){
         Socialing socialing = new Socialing();
         socialing.setUser(user);
-        socialing.setSocial(social);
-        //모임장도 참가한 사람 +1
-        social.addCurrentNums();
         return socialing;
     }
 
