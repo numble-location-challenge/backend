@@ -3,7 +3,10 @@ package com.example.backend.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,10 +17,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.domain.Comment;
-import com.example.backend.dto.CommentRequestDTO;
-import com.example.backend.dto.CommentResponseDTO;
 import com.example.backend.dto.ResponseDTO;
-import com.example.backend.service.CommentService;
+import com.example.backend.dto.comment.CommentRequestDTO;
+import com.example.backend.dto.comment.CommentResponseDTO;
+import com.example.backend.dto.comment.CommentUpdateDTO;
+import com.example.backend.service.comment.CommentService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentService commentServiceImpl;
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "댓글 조회", description = "게시물의 ID를 이용하여 해당 게시물의 댓글을 조회합니다.")
@@ -39,7 +43,7 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     @GetMapping("/comment/{postId}")
     public ResponseDTO<CommentResponseDTO> getComments(@PathVariable Long postId) {
-        List<Comment> comments = commentService.getComments(postId);
+        List<Comment> comments = commentServiceImpl.getComments(postId);
 
         List<CommentResponseDTO> result = comments.stream()
             .map(comment -> new CommentResponseDTO(comment))
@@ -54,7 +58,12 @@ public class CommentController {
         {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     @PostMapping("/comment/{postId}")
-    public ResponseDTO createComment(@PathVariable Long postId, @RequestBody CommentRequestDTO commentRequestDTO) {
+    public ResponseDTO createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal String userEmail) {
+        if (isReply(commentRequestDTO.getCommentId())){
+            commentServiceImpl.createReply(postId, "hello@numble.com", commentRequestDTO);
+        } else {
+            commentServiceImpl.createComment(postId, "hello@numble.com", commentRequestDTO);
+        }
 
         return ResponseDTO.builder().success(true).message("정상 생성되었습니다.").build();
     }
@@ -66,8 +75,8 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
             , @ApiResponse(responseCode = "403", description = "Forbidden")})
     @DeleteMapping("/comment/{commentId}")
-    public ResponseDTO deleteComment(@PathVariable Long commentId) {
-
+    public ResponseDTO deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal String userEmail) {
+        commentServiceImpl.deleteComment(commentId,"hello@numble.com");
         return ResponseDTO.builder().success(true).message("정상 삭제되었습니다.").build();
     }
 
@@ -78,9 +87,16 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
             , @ApiResponse(responseCode = "403", description = "Forbidden")})
     @PutMapping("/comment/{commentId}")
-    public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO) {
-        CommentResponseDTO result = new CommentResponseDTO();
+    public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentUpdateDTO commentUpdateDTO) {
+        CommentResponseDTO result = commentServiceImpl.updateComment(commentId,"hello@numble.com",commentUpdateDTO);
         return ResponseDTO.builder().success(true).message("정상 수정되었습니다").data(List.of(result)).build();
     }
 
+    private boolean isReply(Long commentId){
+        if (commentId !=null){
+            return true;
+        } else{
+            return false;
+        }
+    }
 }
