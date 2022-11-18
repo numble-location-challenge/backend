@@ -81,6 +81,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUser(String email, Long id) {
+        //url로 들어온 id와 principal의 유저가 같은지 확인
         User findUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
