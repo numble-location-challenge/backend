@@ -42,22 +42,46 @@ public class Comment extends TimeAuditingEntity{
 
     @NotNull
     private String contents;
-    private int likes;
     private int cGroup; // group
     private int level; // 계층
     private int refOrder; // 같은 그룹 내의 순서
     private Long parentNum; // 부모 댓글의 ID
 
     @Builder
-    public Comment(User user, Post post, String contents, int likes, int cGroup, int level, int refOrder,
+    public Comment(User user, Post post, String contents, int cGroup, int level, int refOrder,
         Long parentNum) {
         this.user = user;
         this.post = post;
         this.contents = contents;
-        this.likes = likes;
         this.cGroup = cGroup;
         this.level = level;
         this.refOrder = refOrder;
         this.parentNum = parentNum;
+    }
+
+    public static Comment createComment(String contents, int cGroup, int level, int refOrder,
+        Long parentNum, Post post, User user){
+
+        Comment comment = Comment.builder()
+            .contents(contents)
+            .cGroup(cGroup)
+            .level(level)
+            .refOrder(refOrder)
+            .parentNum(parentNum)
+            .build();
+        comment.setPost(post);
+        comment.setUser(user);
+        return comment;
+    }
+    public void setPost(Post post){
+        this.post = post;
+        post.getComments().add(this);
+    }
+    public void setUser(User user){
+        this.user = user;
+    }
+
+    public void updateComment(String contents){
+        this.contents = contents;
     }
 }

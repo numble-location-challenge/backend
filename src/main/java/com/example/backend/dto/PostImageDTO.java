@@ -1,5 +1,7 @@
 package com.example.backend.dto;
 
+import java.util.List;
+
 import com.example.backend.domain.PostImage;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,5 +18,12 @@ public class PostImageDTO {
 
     public PostImageDTO(PostImage postImage) {
         this.imagePath = postImage.getImagePath();
+    }
+
+    public static PostImageDTO getThumbnail(List<PostImage> images){
+        if (images.isEmpty()){
+            return null;
+        }
+        return new PostImageDTO(images.get(0));
     }
 }

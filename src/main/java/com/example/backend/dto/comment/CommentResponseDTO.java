@@ -1,4 +1,4 @@
-package com.example.backend.dto;
+package com.example.backend.dto.comment;
 
 import com.example.backend.domain.Comment;
 import com.example.backend.dto.feed.FeedUserDTO;
@@ -32,6 +32,4 @@ public class CommentResponseDTO {
         this.refOrder = comment.getRefOrder();
         this.parentNum = comment.getParentNum();
     }
-
-
 }

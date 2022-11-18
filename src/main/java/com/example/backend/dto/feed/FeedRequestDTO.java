@@ -1,6 +1,8 @@
-package com.example.backend.dto;
+package com.example.backend.dto.feed;
 
 import java.util.List;
+
+import com.example.backend.dto.PostImageDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -19,5 +21,4 @@ public class FeedRequestDTO {
     private List<PostImageDTO> images;
     @Schema(description = "피드의 지역", defaultValue = "3")
     private Integer region;
-
 }

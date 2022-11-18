@@ -1,4 +1,6 @@
-package com.example.backend.dto;
+package com.example.backend.dto.feed;
+
+import com.example.backend.domain.User;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -15,4 +17,12 @@ public class FeedUserDTO {
     private String profile;
     @Schema(description = "유저의 닉네임", defaultValue = "닉네임1")
     private String nickname;
+
+    public static FeedUserDTO toUserDTO(User user){
+        return FeedUserDTO.builder()
+            .profile(user.getProfile())
+            .id(user.getId())
+            .nickname(user.getNickname())
+            .build();
+    }
 }

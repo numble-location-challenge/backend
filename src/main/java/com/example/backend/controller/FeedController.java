@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.domain.post.Feed;
-import com.example.backend.dto.FeedListResponseDTO;
-import com.example.backend.dto.FeedRequestDTO;
-import com.example.backend.dto.FeedResponseDTO;
 import com.example.backend.dto.ResponseDTO;
-import com.example.backend.service.FeedService;
+import com.example.backend.dto.feed.FeedListResponseDTO;
+import com.example.backend.dto.feed.FeedRequestDTO;
+import com.example.backend.dto.feed.FeedResponseDTO;
+import com.example.backend.service.feed.FeedService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

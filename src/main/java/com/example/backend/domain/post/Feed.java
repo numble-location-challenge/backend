@@ -37,6 +37,26 @@ public class Feed extends Post {
         this.social = social;
     }
 
+    public static Feed createFeed(User user, List<PostImage> feedImages,
+        String contents, Integer region,
+        Social social){
+
+        Feed feed = Feed.builder()
+            .contents(contents)
+            .user(user)
+            .likes(0)
+            .social(social)
+            .region(region)
+            .build();
+        feed.setImages(feedImages);
+
+        return feed;
+    }
+
+    public void setImages(List<PostImage> postImages){
+        this.images = postImages;
+    }
+
     public void updateFeed(String contents, Social social, List<PostImage> images, Integer region){
         this.images = images;
         this.contents = contents;
