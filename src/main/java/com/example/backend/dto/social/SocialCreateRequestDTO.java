@@ -41,11 +41,11 @@ public class SocialCreateRequestDTO {
     @Schema(description = "모임 주최자 연락 방법", defaultValue = "https://openkakao/~")
     private String contact; //연락 방법
 
-    @Schema(description = "List<String> 소분류 태그 1~3개", defaultValue = "헬스")
+    @Schema(description = "소분류 태그 1~3개")
     @NotNull
     private List<TagDTO> tags;
 
-    @Schema(description = "List<String> 배경 이미지 리스트 1~3개", defaultValue = "/social/files/?.jpeg")
+    @Schema(description = "배경 이미지 리스트 1~3개")
     @NotNull
     private List<PostImageDTO> images;
 

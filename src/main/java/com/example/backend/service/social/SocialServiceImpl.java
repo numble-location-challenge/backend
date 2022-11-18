@@ -8,6 +8,8 @@ import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
 import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.domain.tag.Tag;
+import com.example.backend.dto.PostImageDTO;
+import com.example.backend.dto.TagDTO;
 import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.dto.social.SocialLongDTO;
@@ -21,22 +23,22 @@ import com.example.backend.repository.TagRepository;
 import com.example.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class SocialServiceImpl implements SocialService {
 
     private final UserRepository userRepository;
@@ -51,9 +53,15 @@ public class SocialServiceImpl implements SocialService {
         //엔티티 조회
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        List<Tag> tags = tagRePository.findAllByNames(socialDTO.getTags());
-        if(!CollectionUtils.isEmpty(tags)) throw new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_TAG);
-        //TODO tags 안의 카테고리 id가 모두 같아야함. 하나라도 다르면 예외처리
+
+        //TagDTO -> String
+        List<String> stringTags = socialDTO.getTags().stream()
+                .map(TagDTO::getTag)
+                .collect(toList());
+        log.info(stringTags.toString());
+        List<Tag> tags = tagRePository.findAllByNames(stringTags);
+
+        if(tags == null) throw new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_TAG);
         Category category = tags.get(0).getCategory(); //LAZY 로딩
 
         //이미지 경로 String 1~3개 -> PostImage 생성 및 세팅
