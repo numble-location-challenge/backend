@@ -61,14 +61,13 @@ public class SocialController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모임 게시글 생성")
+    @Operation(summary = "모임 게시글 생성", description = "contact 제외한 나머지 변수 모두 not null, tags와 images는 1개~3개 가능")
     @PostMapping("/social")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+            @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> createSocial(
             @AuthenticationPrincipal String email,
@@ -78,14 +77,13 @@ public class SocialController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모임 게시글 수정")
+    @Operation(summary = "모임 게시글 수정", description = "모든 변수 null available")
     @PutMapping("/social/{socialId}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+            @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> updateSocial(
             @AuthenticationPrincipal String email,
@@ -102,8 +100,7 @@ public class SocialController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+            @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteSocial(@Parameter(required = true) @PathVariable Long socialId){
         socialService.deleteSocial(socialId);
