@@ -42,6 +42,7 @@ public abstract class Post extends TimeAuditingEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @NotNull
     private User user; //작성자
 
     @OneToMany(mappedBy = "post")
@@ -56,12 +57,8 @@ public abstract class Post extends TimeAuditingEntity {
     @NotNull
     protected Integer region; //지역 optional
 
+    @NotNull
     private int likes; //좋아요 수
-
-    protected void setUserAndRegion(User user){
-        this.user = user;
-        region = user.getRegion();
-    }
 
     public Post(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes) {
         this.user = user;

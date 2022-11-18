@@ -58,16 +58,15 @@ public class SocialServiceImpl implements SocialService {
         //소셜 생성과 동시에 연관관계 설정
         Social social = Social.createSocial(
                 user,
-                socialDTO.getRegion(),
                 socialDTO.getTitle(),
+                socialDTO.getContents(),
                 socialDTO.getContact(),
                 socialDTO.getStartDate(),
                 socialDTO.getEndDate(),
                 socialDTO.getLimitedNums(),
-                socialDTO.getContact(),
+                socialDTO.getImages(),
                 category,
-                tags,
-                socialDTO.getImages()
+                tags
         );
 
         //생성과 동시에 참여

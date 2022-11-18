@@ -13,7 +13,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +37,14 @@ public class Social extends Post {
     @OneToMany(mappedBy = "social")
     private List<SocialTag> socialTags = new ArrayList<>();
 
-    @NotNull
     @Enumerated(value = EnumType.STRING)
     private SocialStatus status;
 
     @NotNull
     private String title; //모임 제목
+
     @NotNull
-    private Integer hits = 0; //조회수
+    private Integer hits; //조회수
 
     @NotNull
     @Column(name = "start_date")
@@ -104,20 +103,20 @@ public class Social extends Post {
     }
 
     //==소셜 생성 메서드==/
-    @Builder
     public static Social createSocial(
-            User user, int region, String title, String contents,
-            LocalDateTime startDate, LocalDateTime endDate, Integer limitedNums, String contact,
-            Category category, List<Tag> tags, List<String> image){
+            User user, String title, String contents, String contact,
+            LocalDateTime startDate, LocalDateTime endDate, Integer limitedNums,
+            List<String> image, Category category, List<Tag> tags){
+
         Social social = Social.builder()
-                .region(region).title(title).contents(contents)
-                .startDate(startDate).endDate(endDate).limitedNums(limitedNums).contact(contact)
+                .user(user).region(user.getRegion())
+                .title(title).contents(contents).contact(contact)
+                .startDate(startDate).endDate(endDate).limitedNums(limitedNums)
+                .likes(0).currentNums(0).hits(0) //currentNums는 Socialing 생성 시 따로 설정
+                .status(SocialStatus.AVAILABLE)
                 .build();
 
-        social.setUserAndRegion(user); //user의 region을 부모클래스 필드에 저장
         social.setCategory(category);
-        social.status=SocialStatus.AVAILABLE;
-        social.currentNums=0; //Socialing 생성 시 따로 설정
 
         //Tag 3개 -> SocialTag 생성 및 세팅
         List<SocialTag> socialTags = tags.stream()

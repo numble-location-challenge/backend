@@ -50,6 +50,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Socialing> socialings = new ArrayList<>();
 
+    @Column(length = 500)
     private String refreshToken; //JWT
 
 //    @OneToMany(mappedBy = "user")

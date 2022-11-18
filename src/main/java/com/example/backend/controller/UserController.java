@@ -6,6 +6,8 @@ import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.dto.user.UserJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
+import com.example.backend.global.exception.ForbiddenException;
+import com.example.backend.global.exception.ForbiddenExceptionType;
 import com.example.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -83,7 +85,7 @@ public class UserController {
     //TODO 서비스 구현
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 수정", description = "모든 변수 null available")
-    @PutMapping("/user")
+    @PutMapping("/user/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
@@ -92,8 +94,10 @@ public class UserController {
     })
     public ResponseDTO<UserProfileDTO> modifyUser(
             @AuthenticationPrincipal String email,
+            @PathVariable Long id,
             @RequestBody final UserModifyRequestDTO userModifyRequestDTO){
 
+        //TODO id 검증.. principal 객체로 변경 후 고민
         final User user = userService.modify(email, userModifyRequestDTO);
 
         //set data list
@@ -118,7 +122,9 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<UserProfileDTO> getUserInfo(@AuthenticationPrincipal String email, @PathVariable Long id){
+    public ResponseDTO<UserProfileDTO> getUserInfo(
+            @AuthenticationPrincipal String email,
+            @PathVariable Long id){
 
         final User user = userService.getUser(email, id);
 
