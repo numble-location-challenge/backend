@@ -1,7 +1,7 @@
 package com.example.backend.dto;
 
 import com.example.backend.domain.Comment;
-import com.example.backend.domain.User;
+import com.example.backend.dto.feed.FeedUserDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -15,8 +15,6 @@ public class CommentResponseDTO {
     private FeedUserDTO user;
     @Schema(description = "댓글의 본문", defaultValue = "댓글 본문입니다.")
     private String contents;
-    @Schema(description = "댓글의 좋아요 수", defaultValue = "63")
-    private int likes;
     @Schema(description = "댓글의 그룹",defaultValue = "1")
     private int cGroup;
     @Schema(description = "댓글 그룹 내에서의 레벨 (댓글 : 0 / 대댓글 : 1", defaultValue = "1")
@@ -27,7 +25,7 @@ public class CommentResponseDTO {
     private Long parentNum;
 
     public CommentResponseDTO(Comment comment) {
-        this.user = toUserDTO(comment.getUser());
+        this.user = FeedUserDTO.toUserDTO(comment.getUser());
         this.contents = comment.getContents();
         this.cGroup = comment.getCGroup();
         this.level = comment.getLevel();
@@ -35,11 +33,5 @@ public class CommentResponseDTO {
         this.parentNum = comment.getParentNum();
     }
 
-    public FeedUserDTO toUserDTO(User user){
-        return FeedUserDTO.builder()
-            .profile(user.getProfile())
-            .id(user.getId())
-            .nickname(user.getNickname())
-            .build();
-    }
+
 }
