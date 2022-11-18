@@ -55,6 +55,11 @@ public class SocialServiceImpl implements SocialService {
         //TODO tags 안의 카테고리 id가 모두 같아야함. 하나라도 다르면 예외처리
         Category category = tags.get(0).getCategory(); //LAZY 로딩
 
+        //이미지 경로 String 1~3개 -> PostImage 생성 및 세팅
+        List<PostImage> postImages = socialDTO.getImages().stream()
+                .map(dto -> new PostImage(dto.getImagePath()))
+                .collect(toList());
+
         //소셜 생성과 동시에 연관관계 설정
         Social social = Social.createSocial(
                 user,
@@ -64,7 +69,7 @@ public class SocialServiceImpl implements SocialService {
                 socialDTO.getStartDate(),
                 socialDTO.getEndDate(),
                 socialDTO.getLimitedNums(),
-                socialDTO.getImages(),
+                postImages,
                 category,
                 tags
         );
@@ -104,7 +109,7 @@ public class SocialServiceImpl implements SocialService {
             postImageRepository.deleteAllByPostId(social.getId());
             //갈아끼움
             List<PostImage> postImages = socialDTO.getImages().stream()
-                    .map(imagePath -> new PostImage(imagePath, social))
+                    .map(PostImage::new)
                     .collect(toList());
             social.setImages(postImages);
         }
