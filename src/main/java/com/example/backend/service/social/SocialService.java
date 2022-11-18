@@ -16,7 +16,7 @@ public interface SocialService {
     void deleteSocial(Long postId);
 
     //모임 게시글 수정
-    void updateSocial(String email, Long socialId, SocialModifyRequestDTO socialDTO);
+    void modifySocial(String email, Long socialId, SocialModifyRequestDTO socialDTO);
 
     //모임 게시글 1개 출력 (상세보기)
     SocialLongDTO getSocialDetail(Long socialId);

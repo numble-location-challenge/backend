@@ -100,7 +100,7 @@ public class SocialServiceImpl implements SocialService {
     //모임 게시글 수정
     @Transactional
     @Override
-    public void updateSocial(String email, Long socialId, SocialModifyRequestDTO socialDTO) {
+    public void modifySocial(String email, Long socialId, SocialModifyRequestDTO socialDTO) {
         //엔티티 조회
         Social social = socialRepository.findById(socialId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
@@ -119,7 +119,7 @@ public class SocialServiceImpl implements SocialService {
             postImageRepository.deleteAllByPostId(social.getId());
             //갈아끼움
             List<PostImage> postImages = socialDTO.getImages().stream()
-                    .map(PostImage::new)
+                    .map(dto -> new PostImage(dto.getImagePath()))
                     .collect(toList());
             social.setImages(postImages);
         }
