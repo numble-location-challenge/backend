@@ -14,9 +14,7 @@ import java.util.List;
 @Schema
 public class SocialCreateRequestDTO {
 
-    @Schema(description = "지역 번호", defaultValue = "175")
-    @NotNull
-    int region;
+    //지역번호는 user에서 가져옴
 
     @Schema(description = "모임 제목", defaultValue = "헬스해서 지구뿌수자")
     @NotNull
@@ -41,11 +39,11 @@ public class SocialCreateRequestDTO {
     @Schema(description = "모임 주최자 연락 방법", defaultValue = "https://openkakao/~")
     private String contact; //연락 방법
 
-    @Schema(description = "소분류 태그 1~3개", defaultValue = "헬스")
+    @Schema(description = "List<String> 소분류 태그 1~3개", defaultValue = "헬스")
     @NotNull
-    private List<String> tags;
+    private List<String> tags = new ArrayList<>();
 
-    @Schema(description = "배경 이미지 리스트 1~3개", defaultValue = "/social/files/?.jpeg")
+    @Schema(description = "List<String> 배경 이미지 리스트 1~3개", defaultValue = "/social/files/?.jpeg")
     @NotNull
     private List<String> images = new ArrayList<>();
 
