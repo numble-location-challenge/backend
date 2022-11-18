@@ -15,25 +15,25 @@ public class CustomErrorController implements ErrorController {
     @ResponseStatus(HttpStatus.BAD_REQUEST) //400
     @ExceptionHandler(InvalidInputException.class)
     public ResponseDTO<?> handleBadRequest(InvalidInputException ex){
-        return ResponseDTO.builder().success(false).message(ex.getMessage()).build();
+        return ResponseDTO.builder().success(false).message(ex.getExceptionType().getMessage()).build();
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED) //401
     @ExceptionHandler(UnAuthorizedException.class)
     public ResponseDTO<?> handleUnAuthorized(UnAuthorizedException ex){
-        return ResponseDTO.builder().success(false).message(ex.getMessage()).build();
+        return ResponseDTO.builder().success(false).message(ex.getExceptionType().getMessage()).build();
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN) //403
     @ExceptionHandler(ForbiddenException.class) //TODO
     public ResponseDTO<?> handleForbidden(ForbiddenException ex){
-        return ResponseDTO.builder().success(false).message(ex.getMessage()).build();
+        return ResponseDTO.builder().success(false).message(ex.getExceptionType().getMessage()).build();
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND) //404
     @ExceptionHandler(EntityNotExistsException.class)
     public ResponseDTO<?> handleNotFound(EntityNotExistsException ex){
-        return ResponseDTO.builder().success(false).message(ex.getMessage()).build();
+        return ResponseDTO.builder().success(false).message(ex.getExceptionType().getMessage()).build();
     }
 
     //그 외에 놓친 예외들
