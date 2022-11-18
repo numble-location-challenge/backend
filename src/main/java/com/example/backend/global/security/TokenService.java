@@ -89,6 +89,7 @@ public class TokenService {
             return objectmapper.readValue(claims.getSubject(), JwtSubject.class);
         } catch (JsonProcessingException e) {
             log.debug(e.getMessage());
+            e.printStackTrace();
             throw new UnAuthorizedException(UnAuthorizedExceptionType.ACCESS_TOKEN_UN_AUTHORIZED);
         }
     }
