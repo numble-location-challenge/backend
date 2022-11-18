@@ -37,8 +37,7 @@ public class PostImage {
         this.imagePath = imagePath;
     }
 
-    public PostImage (String imagePath, Post post){
-        this.imagePath = imagePath;
+    public void setPost(Post post){
         this.post = post;
     }
 

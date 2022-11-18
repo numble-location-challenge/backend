@@ -9,6 +9,7 @@ import com.example.backend.domain.tag.Category;
 import com.example.backend.domain.tag.SocialTag;
 
 import com.example.backend.domain.tag.Tag;
+import com.example.backend.dto.PostImageDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -99,6 +100,9 @@ public class Social extends Post {
     }
 
     public void setImages(List<PostImage> images){
+        for(PostImage image : images){
+            image.setPost(this);
+        }
         this.images = images;
     }
 
@@ -106,7 +110,7 @@ public class Social extends Post {
     public static Social createSocial(
             User user, String title, String contents, String contact,
             LocalDateTime startDate, LocalDateTime endDate, Integer limitedNums,
-            List<String> image, Category category, List<Tag> tags){
+            List<PostImage> postImages, Category category, List<Tag> tags){
 
         Social social = Social.builder()
                 .user(user).region(user.getRegion())
@@ -117,18 +121,13 @@ public class Social extends Post {
                 .build();
 
         social.setCategory(category);
+        social.setImages(postImages);
 
         //Tag 3개 -> SocialTag 생성 및 세팅
         List<SocialTag> socialTags = tags.stream()
                 .map(tag -> SocialTag.createSocialTag(social, tag))
                 .collect(toList());
         social.setSocialTags(socialTags);
-
-        //이미지 경로 String 1~3개 -> PostImage 생성 및 세팅
-        List<PostImage> postImages = image.stream()
-                .map(imagePath -> new PostImage(imagePath, social))
-                .collect(toList());
-        social.setImages(postImages);
 
         return social;
     }

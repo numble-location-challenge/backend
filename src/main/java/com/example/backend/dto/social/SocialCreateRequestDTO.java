@@ -1,5 +1,7 @@
 package com.example.backend.dto.social;
 
+import com.example.backend.dto.PostImageDTO;
+import com.example.backend.dto.TagDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -41,10 +43,10 @@ public class SocialCreateRequestDTO {
 
     @Schema(description = "List<String> 소분류 태그 1~3개", defaultValue = "헬스")
     @NotNull
-    private List<String> tags = new ArrayList<>();
+    private List<TagDTO> tags;
 
     @Schema(description = "List<String> 배경 이미지 리스트 1~3개", defaultValue = "/social/files/?.jpeg")
     @NotNull
-    private List<String> images = new ArrayList<>();
+    private List<PostImageDTO> images;
 
 }
