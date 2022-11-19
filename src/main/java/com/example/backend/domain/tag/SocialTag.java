@@ -27,7 +27,7 @@ public class SocialTag {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-    //==생성 메서드==/
+    //==생성 메서드==//
     public static SocialTag createSocialTag(Social social, Tag tag) {
         SocialTag socialTag = new SocialTag();
         socialTag.setSocial(social);

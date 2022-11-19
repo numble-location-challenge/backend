@@ -23,7 +23,7 @@ public class Socialing {
     @JoinColumn(name = "user_id")
     private User user;
 
-    //==생성 메서드==/
+    //==생성 메서드==//
     public static Socialing createSocialing(User user){
         Socialing socialing = new Socialing();
         socialing.setUser(user);
@@ -31,7 +31,6 @@ public class Socialing {
     }
 
     //==연관관계 메서드==//
-
     public void setUser(User user) {
         this.user = user;
     }

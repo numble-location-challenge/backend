@@ -37,6 +37,7 @@ public class PostImage {
         this.imagePath = imagePath;
     }
 
+    //==연관관계 메서드==//
     public void setPost(Post post){
         this.post = post;
     }
