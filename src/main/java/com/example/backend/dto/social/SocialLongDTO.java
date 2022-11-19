@@ -79,11 +79,11 @@ public class SocialLongDTO{
     private List<SocialTagDTO> tags;
 
     public SocialLongDTO(Social social) {
-        this.socialings = social.getSocialings().stream().map(socialings -> new SocialingDTO(socialings)).collect(Collectors.toList());
+        this.socialings = social.getSocialings().stream().map(SocialingDTO::new).collect(Collectors.toList());
         this.id = social.getId();
         this.user = toSocialUserDTO(social.getUser());
-        this.images = social.getImages().stream().map(postImage -> new PostImageDTO(postImage)).collect(Collectors.toList());
-        this.comments = social.getComments().stream().map(comment -> new CommentResponseDTO(comment)).collect(Collectors.toList());
+        this.images = social.getImages().stream().map(PostImageDTO::new).collect(Collectors.toList());
+        this.comments = social.getComments().stream().map(CommentResponseDTO::new).collect(Collectors.toList());
         this.contents = social.getContents();
         this.region = social.getRegion();
         this.title = social.getTitle();
@@ -94,7 +94,7 @@ public class SocialLongDTO{
         this.status = social.getStatus();
         this.contact = social.getContact();
         this.category = toCategoryDTO(social.getCategory());
-        this.tags = social.getSocialTags().stream().map(tag -> new SocialTagDTO(tag)).collect(Collectors.toList());
+        this.tags = social.getSocialTags().stream().map(SocialTagDTO::new).collect(Collectors.toList());
     }
 
     public CategoryDTO toCategoryDTO(Category category){
