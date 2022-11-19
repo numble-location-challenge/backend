@@ -42,9 +42,12 @@ public class Comment extends TimeAuditingEntity{
 
     @NotNull
     private String contents;
+    @Column(name = "c_group")
     private int cGroup; // group
     private int level; // 계층
+    @Column(name = "ref_order")
     private int refOrder; // 같은 그룹 내의 순서
+    @Column(name = "parent_num")
     private Long parentNum; // 부모 댓글의 ID
 
     @Builder

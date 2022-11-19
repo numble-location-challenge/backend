@@ -144,8 +144,7 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> getSocialList() {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        while(socialRepository.findAll().iterator().hasNext()){
-            Social social = socialRepository.findAll().iterator().next();
+        for(Social social : socialRepository.findAll()){
             socialShortDTOList.add(new SocialShortDTO(social));
         }
         return socialShortDTOList;
@@ -159,9 +158,9 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> getMySocialList(Long userId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        while(socialRepository.findByUserId(userId).stream().iterator().hasNext()){
-            Social social = socialRepository.findByUserId(userId).stream().iterator().next();
-            socialShortDTOList.add(new SocialShortDTO(social));
+        for(Social social : socialRepository.findAll()){
+            if(Objects.equals(social.getUser().getId(), userId))
+                socialShortDTOList.add(new SocialShortDTO(social));
         }
         return socialShortDTOList;
     }
@@ -174,8 +173,7 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> getJoinSocialList(Long userId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        while(socialRepository.findByUserId(userId).stream().iterator().hasNext()){
-            Social social = socialRepository.findByUserId(userId).stream().iterator().next();
+        for(Social social : socialRepository.findAll()){
             Optional<Socialing> socialing = social.getSocialings().stream().filter(s -> Objects.equals(s.getUser().getId(), userId)).findFirst();
             if(socialing.isPresent()){
                 socialShortDTOList.add(new SocialShortDTO(social));
@@ -191,9 +189,9 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> filteringByCategory(Long categoryId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        while(socialRepository.findByCategoryId(categoryId).stream().iterator().hasNext()){
-            Social social = socialRepository.findByCategoryId(categoryId).stream().iterator().next();
-            socialShortDTOList.add(new SocialShortDTO(social));
+        for(Social social : socialRepository.findAll()){
+            if(Objects.equals(social.getCategory().getId(),categoryId))
+                socialShortDTOList.add(new SocialShortDTO(social));
         }
         return socialShortDTOList;
     }
@@ -206,8 +204,7 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> filteringByTag(Long tagId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        while(socialRepository.findAll().iterator().hasNext()){
-            Social social = socialRepository.findAll().iterator().next();
+        for(Social social : socialRepository.findAll()){
             Optional<SocialTag> socialTag = social.getSocialTags().stream().filter(tag -> Objects.equals(tag.getId(),tagId)).findFirst();
             if(socialTag.isPresent()){
                 socialShortDTOList.add(new SocialShortDTO(social));
@@ -225,18 +222,15 @@ public class SocialServiceImpl implements SocialService {
     public List<SocialShortDTO> sortByList(String properties){
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
         if(properties.equals("")){
-            while(socialRepository.findAll().iterator().hasNext()){
-                Social social = socialRepository.findAll().iterator().next();
-                socialShortDTOList.add(new SocialShortDTO(social));
-            }
+            return getSocialList();
         }else{
             List<Social> socialList = socialRepository.findAll(Sort.by(Sort.Direction.DESC,properties));
             for(Social social : socialList){
                 socialShortDTOList.add(new SocialShortDTO(social));
             }
+            return socialShortDTOList;
         }
 
-        return socialShortDTOList;
     }
 
 }
