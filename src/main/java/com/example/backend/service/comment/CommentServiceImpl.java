@@ -10,7 +10,6 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.post.Post;
 import com.example.backend.dto.comment.CommentRequestDTO;
 import com.example.backend.dto.comment.CommentResponseDTO;
-import com.example.backend.dto.comment.CommentUpdateDTO;
 import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
@@ -50,10 +49,10 @@ public class CommentServiceImpl implements CommentService{
     //TODO 댓글이 아니면 대댓글을 달수 없도록 로직 작성
     @Transactional
     @Override
-    public void createReply(Long postId, String userEmail, CommentRequestDTO commentRequestDTO) {
+    public void createReply(Long postId, String userEmail, Long commentId, CommentRequestDTO commentRequestDTO) {
         User user = userRepository.findByEmail(userEmail).orElseThrow();
         Post post = postRepository.findById(postId).orElseThrow();
-        Comment parent_comment = commentRepository.findByIdAndPostId(commentRequestDTO.getCommentId(), postId); // 부모 댓글의 정보
+        Comment parent_comment = commentRepository.findByIdAndPostId(commentId, postId); // 부모 댓글의 정보
         if (isComment(parent_comment)) {
             int parentLevel = parent_comment.getLevel(); // 부모 댓글의 레벨
             int parentCGroup = parent_comment.getCGroup(); // 부모 댓글의 그룹
@@ -78,10 +77,10 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Transactional
-    public CommentResponseDTO updateComment(Long commentId, String userEmail, CommentUpdateDTO commentUpdateDTO) {
+    public CommentResponseDTO updateComment(Long commentId, String userEmail, CommentRequestDTO commentRequestDTO) {
         Comment comment = commentRepository.findById(commentId).orElseThrow();
         if (hasPermission(comment, userEmail)) {
-            comment.updateComment(commentUpdateDTO.getContents());
+            comment.updateComment(commentRequestDTO.getContents());
             CommentResponseDTO responseDTO = new CommentResponseDTO(comment);
             return responseDTO;
         } else {
