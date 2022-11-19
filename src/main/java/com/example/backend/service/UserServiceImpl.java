@@ -2,11 +2,13 @@ package com.example.backend.service;
 
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
+import com.example.backend.domain.post.Post;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.KaKaoAuthRequestDTO;
 import com.example.backend.dto.user.UserJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
+import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.SocialRepository;
 import com.example.backend.repository.SocialingRepository;
 import com.example.backend.repository.UserRepository;
@@ -25,6 +27,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final SocialRepository socialRepository;
     private final SocialingRepository socilaingRepository;
+    private final PostRepository postRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -106,8 +109,6 @@ public class UserServiceImpl implements UserService{
         socilaingRepository.save(socialing);
     }
 
-    //모임에 참여한 유저내역
-
     //모임 취소
     @Transactional
     @Override
@@ -122,16 +123,18 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public void kickOutUserFromSocial(String email, Long socialId, Long droppedUserId) {
-        //모임장인지 확인
-        //TODO: POST로 해야함,, ㅜㅜ
+        //엔티티 조회
+        Post post = postRepository.findReadOnlyById(socialId)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
+
         Social social = socialRepository.findReadOnlyById(socialId)
-                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        if(email.equals(social.getUser().getEmail())) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
-
-        User findUser = userRepository.findReadOnlyByEmail(email)
-                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-
-        socilaingRepository.deleteByUserIdAndSocialId(findUser.getId(), socialId);
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+        User socialOwner = post.getUser(); //모임장
+        //모임장인지 확인
+        if(!email.equals(socialOwner.getEmail())) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
+        //강퇴하고 숫자-1
+        socilaingRepository.deleteByUserIdAndSocialId(droppedUserId, socialId);
+        social.minusCurrentNums();
     }
 
 
