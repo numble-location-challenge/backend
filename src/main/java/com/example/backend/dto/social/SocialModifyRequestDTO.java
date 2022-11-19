@@ -1,5 +1,6 @@
 package com.example.backend.dto.social;
 
+import com.example.backend.dto.PostImageDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -31,7 +32,7 @@ public class SocialModifyRequestDTO {
     @Schema(description = "모임 주최자 연락 방법", defaultValue = "https://openkakao/~")
     private String contact; //연락 방법
 
-    @Schema(description = "배경 이미지 리스트 1~3개",  defaultValue = "/social/files/?.jpeg")
-    private List<String> images = new ArrayList<>();
+    @Schema(description = "배경 이미지 리스트 1~3개")
+    private List<PostImageDTO> images = new ArrayList<>();
 
 }

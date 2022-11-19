@@ -85,11 +85,11 @@ public class SocialController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> updateSocial(
+    public ResponseDTO<?> modifySocial(
             @AuthenticationPrincipal String email,
             @PathVariable Long socialId,
             @RequestBody final SocialModifyRequestDTO socialModifyRequestDTO){
-        socialService.updateSocial(email, socialId, socialModifyRequestDTO);
+        socialService.modifySocial(email, socialId, socialModifyRequestDTO);
         return ResponseDTO.builder().success(true).message("모임 수정 완료").build();
     }
 
