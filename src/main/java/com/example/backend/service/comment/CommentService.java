@@ -5,7 +5,6 @@ import java.util.List;
 import com.example.backend.domain.Comment;
 import com.example.backend.dto.comment.CommentRequestDTO;
 import com.example.backend.dto.comment.CommentResponseDTO;
-import com.example.backend.dto.comment.CommentUpdateDTO;
 
 public interface CommentService {
 
@@ -13,10 +12,10 @@ public interface CommentService {
 
     void createComment(Long postId, String userEmail, CommentRequestDTO commentRequestDTO); // 댓글 생성
 
-    void createReply(Long postId, String userEmail, CommentRequestDTO commentRequestDTO); // 대댓글 생성
+    void createReply(Long postId, String userEmail,Long commentId, CommentRequestDTO commentRequestDTO); // 대댓글 생성
 
     void deleteComment(Long commentId, String userEmail); // 댓글 및 대댓글 삭제
 
-    CommentResponseDTO updateComment(Long commentId, String userEmail, CommentUpdateDTO commentUpdateDTO); // 댓글 및 대댓글 수정
+    CommentResponseDTO updateComment(Long commentId, String userEmail, CommentRequestDTO commentRequestDTO); // 댓글 및 대댓글 수정
 
 }
