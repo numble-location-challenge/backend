@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface SocialingRepository extends JpaRepository<Socialing, Long> {
 
-    @Query("delete from Socialing s where s.user=:userId and s.social=:socialId")
-    Socialing deleteByUserIdAndSocialId(@Param("userId") Long userId, @Param("socialId") Long socialId);
+    void deleteByUserIdAndSocialId(Long userId, Long socialId);
 
 }

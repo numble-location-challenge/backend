@@ -93,6 +93,7 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public void participateSocial(String email, Long socialId) {
+        //이미 신청된 유저면 신청안되게 하는건 프론트에서 거르는 거겠지..?
         User findUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
@@ -105,24 +106,32 @@ public class UserServiceImpl implements UserService{
         socilaingRepository.save(socialing);
     }
 
+    //모임에 참여한 유저내역
+
     //모임 취소
     @Transactional
     @Override
     public void cancelSocialParticipation(String email, Long socialId) {
-        User findUser = userRepository.findByEmail(email)
+        User findUser = userRepository.findReadOnlyByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
-        //user pk 랑 socialId로 소셜링 찾아옴
-//        Socialing findSocialing = socilaingRepository.deleteByUserIdAndSocialId(findUser.getId(), socialId);
-//        findUser.deleteSocialing(findSocialing); //연관관계 해제
-
+        socilaingRepository.deleteByUserIdAndSocialId(findUser.getId(), socialId);
     }
 
     //모임 강퇴
     @Transactional
     @Override
     public void kickOutUserFromSocial(String email, Long socialId, Long droppedUserId) {
-        //TODO
+        //모임장인지 확인
+        //TODO: POST로 해야함,, ㅜㅜ
+        Social social = socialRepository.findReadOnlyById(socialId)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        if(email.equals(social.getUser().getEmail())) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
+
+        User findUser = userRepository.findReadOnlyByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        socilaingRepository.deleteByUserIdAndSocialId(findUser.getId(), socialId);
     }
 
 
