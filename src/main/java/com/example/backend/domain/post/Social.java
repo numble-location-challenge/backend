@@ -93,6 +93,7 @@ public class Social extends Post {
     public void addSocialing(Socialing socialing){
         socialings.add(socialing);
         socialing.setSocial(this);
+        addCurrentNums();
     }
 
     public void setSocialTags(List<SocialTag> socialTags){
@@ -142,6 +143,7 @@ public class Social extends Post {
     //소셜링 참여 시 사용
     public void addCurrentNums(){
         if(currentNums < limitedNums) currentNums++;
+        if(currentNums == limitedNums) changeStatusToFull();
     }
 
     //소셜링 취소, 강퇴 시 사용
