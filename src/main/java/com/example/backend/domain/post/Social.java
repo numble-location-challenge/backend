@@ -90,7 +90,6 @@ public class Social extends Post {
     }
 
     //==연관관계 메서드==// user, region은 post 메서드 사용
-
     public void addSocialing(Socialing socialing){
         socialings.add(socialing);
         socialing.setSocial(this);
@@ -111,7 +110,7 @@ public class Social extends Post {
         this.images = images;
     }
 
-    //==소셜 생성 메서드==/
+    //==소셜 생성 메서드==//
     public static Social createSocial(
             User user, String title, String contents, String contact,
             LocalDateTime startDate, LocalDateTime endDate, Integer limitedNums,
