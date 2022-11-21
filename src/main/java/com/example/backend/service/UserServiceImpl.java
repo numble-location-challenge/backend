@@ -4,8 +4,8 @@ import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
 import com.example.backend.domain.post.Post;
 import com.example.backend.domain.post.Social;
-import com.example.backend.dto.login.KaKaoAuthRequestDTO;
-import com.example.backend.dto.user.UserJoinRequestDTO;
+import com.example.backend.dto.login.SocialJoinRequestDTO;
+import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
 import com.example.backend.repository.PostRepository;
@@ -33,8 +33,8 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User createDefaultUser(UserJoinRequestDTO userJoinRequestDTO) {
-        User user = userJoinRequestDTO.toEntity();
+    public User createDefaultUser(UserDefaultJoinRequestDTO userDefaultJoinRequestDTO) {
+        User user = userDefaultJoinRequestDTO.toEntity();
 
         validateDuplicate(user.getEmail(), user.getNickname());
         //중복X -> 회원가입 처리
@@ -44,8 +44,8 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User createKakaoUser(KaKaoAuthRequestDTO kaKaoAuthRequestDTO) {
-        User user = getKakaoUserInfo(kaKaoAuthRequestDTO.getKakaoAccessToken());
+    public User createKakaoUser(SocialJoinRequestDTO kaKaoAuthRequestDTO) {
+        User user = getKakaoUserInfo(kaKaoAuthRequestDTO.getAccessToken());
         return null;
         //TODO 세팅 및 회원가입 처리
     }

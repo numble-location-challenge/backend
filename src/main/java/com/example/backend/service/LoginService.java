@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.domain.User;
-import com.example.backend.dto.login.KaKaoAuthRequestDTO;
+import com.example.backend.dto.login.SocialLoginRequestDTO;
 
 import java.util.HashMap;
 
@@ -9,7 +9,7 @@ public interface LoginService {
 
     User defaultLogin(String email, String password);
 
-    User kakaoLogin(KaKaoAuthRequestDTO authRequestDTO);
+    User kakaoLogin(SocialLoginRequestDTO authRequestDTO);
 
     User getKakaoUserInfo(String KakaoAccessToken);
 

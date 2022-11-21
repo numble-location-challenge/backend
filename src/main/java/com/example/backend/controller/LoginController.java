@@ -2,7 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.domain.User;
 import com.example.backend.dto.login.AuthDTO;
-import com.example.backend.dto.login.KaKaoAuthRequestDTO;
+import com.example.backend.dto.login.SocialLoginRequestDTO;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.service.LoginService;
@@ -55,7 +55,7 @@ public class LoginController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseEntity<?> kakaologin(@RequestBody final KaKaoAuthRequestDTO authRequestDTO){
+    public ResponseEntity<?> kakaologin(@RequestBody final SocialLoginRequestDTO authRequestDTO){
 
         User loginUser = loginService.kakaoLogin(authRequestDTO);
         HashMap<String, String> jwtMap = loginService.authorize(loginUser);
