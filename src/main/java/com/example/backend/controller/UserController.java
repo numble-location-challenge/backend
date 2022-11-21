@@ -1,13 +1,14 @@
 package com.example.backend.controller;
 
 import com.example.backend.domain.User;
+import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.*;
-import com.example.backend.dto.login.KaKaoAuthRequestDTO;
-import com.example.backend.dto.user.UserJoinRequestDTO;
+import com.example.backend.dto.login.SocialJoinRequestDTO;
+import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
-import com.example.backend.global.exception.ForbiddenException;
-import com.example.backend.global.exception.ForbiddenExceptionType;
+import com.example.backend.global.exception.InvalidInputException;
+import com.example.backend.global.exception.InvalidInputExceptionType;
 import com.example.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,23 +39,26 @@ public class UserController {
             @ApiResponse(responseCode = "201", description = "CREATED"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
     })
-    public ResponseEntity<?> join(@RequestBody final UserJoinRequestDTO userJoinRequestDTO, UriComponentsBuilder uriBuilder){
-        final User createdUser = userService.createDefaultUser(userJoinRequestDTO);
+    public ResponseEntity<?> join(@RequestBody final UserDefaultJoinRequestDTO userDefaultJoinRequestDTO, UriComponentsBuilder uriBuilder){
+        final User createdUser = userService.createDefaultUser(userDefaultJoinRequestDTO);
         return getCreatedResponseEntity(uriBuilder, createdUser.getId());
     }
 
     //TODO 서비스 구현
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "카카오 회원가입")
-    @PostMapping("/kakaojoin")
+    @Operation(summary = "sns 회원가입", description = "카카오: userType=KAKAO")
+    @PostMapping("/join/sns/{userType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseEntity<?> kakaoJoin(@RequestBody final KaKaoAuthRequestDTO authRequestDTO, UriComponentsBuilder uriBuilder){
-        //프론트에서 회원정보 동의해주면 AT 가지고 정보요청
-        final User createdUser = userService.createKakaoUser(authRequestDTO);
+    public ResponseEntity<?> socialJoin(
+            @PathVariable String userType,
+            @RequestBody final SocialJoinRequestDTO joinDTO, UriComponentsBuilder uriBuilder){
+        //프론트에서 회원정보 동의해주고 region, AT 가지고 회원가입 처리
+        if(!userType.equals(UserType.KAKAO)) throw new InvalidInputException(InvalidInputExceptionType.INVALID_USERTYPE);
+        final User createdUser = userService.createKakaoUser(joinDTO);
         return getCreatedResponseEntity(uriBuilder, createdUser.getId());
     }
 
@@ -62,10 +66,11 @@ public class UserController {
         URI location = uriBuilder.path("/user/{id}")
                 .buildAndExpand(id).toUri();
 
+        //TODO location 추가
         return ResponseEntity.created(location).body(ResponseDTO.builder()
-                        .success(true).message("회원가입 처리되었습니다.")
-                        .data(null)
-                        .build());
+                .success(true).message("회원가입 처리되었습니다.")
+                .data(null)
+                .build());
     }
 
     @ResponseStatus(HttpStatus.OK)

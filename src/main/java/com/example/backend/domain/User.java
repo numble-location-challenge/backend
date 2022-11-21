@@ -29,8 +29,8 @@ public class User {
 
     @NotNull
     private String email; // 아이디
-    @NotNull
-    private String password;
+
+    private String password; //카카오 유저는 비밀번호가 없음
 
     @NotNull
     @Column(name = "username")
@@ -70,6 +70,10 @@ public class User {
         password = passwordEncoder.encode(password);
     }
 
+    public void setId(Long id){
+        this.id = id;
+    }
+
     @Builder
     public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int region, String bio) {
         this.userType = userType;
@@ -82,7 +86,7 @@ public class User {
         this.bio = bio;
     }
 
-    //==연관관계 메서드==/
+    //==연관관계 메서드==//
     public void addSocialing(Socialing socialing){
         socialings.add(socialing);
         socialing.setUser(this);
@@ -93,7 +97,7 @@ public class User {
     }
 
 
-    //==수정 메서드==/
+    //==수정 메서드==//
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;

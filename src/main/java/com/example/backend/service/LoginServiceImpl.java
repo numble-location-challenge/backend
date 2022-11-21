@@ -1,8 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.domain.User;
-import com.example.backend.domain.enumType.UserType;
-import com.example.backend.dto.login.KaKaoAuthRequestDTO;
+import com.example.backend.dto.login.SocialLoginRequestDTO;
 import com.example.backend.global.exception.*;
 import com.example.backend.global.security.JwtSubject;
 import com.example.backend.global.security.TokenService;
@@ -24,6 +23,7 @@ public class LoginServiceImpl implements LoginService{
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final KakaoService kakaoService;
 
     @Override
     public User defaultLogin(String email, String password) {
@@ -37,22 +37,15 @@ public class LoginServiceImpl implements LoginService{
 
     //TODO 프론트랑 협의 필요
     @Override
-    public User kakaoLogin(KaKaoAuthRequestDTO loginDTO) {
-        getKakaoUserInfo(loginDTO.getKakaoAccessToken());
+    public User kakaoLogin(SocialLoginRequestDTO loginDTO) {
+        //AT로 카카오 사용자 정보(id) 가져온다
+        Long kakaoId = kakaoService.getUserId(loginDTO.getAccessToken());
 
-        //가져온 값으로 DB id, type 검증
-        if(true){ //1. DB에 있는 회원이면 로그인 처리 후 토큰 발급
-            User testUser = User.builder().userType(UserType.KAKAO).build();
-            return testUser;
-        }
-        //2. DB에 없으면 null
-        else throw new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_KAKAO_USER);
-    }
-
-    @Override
-    public User getKakaoUserInfo(String KakaoAccessToken) {
-        //TODO AT로 필요한 정보(id,이메일 정도?) 가져옴
-        return null;
+        //가져온 값 중 '카카오의 회원번호'로 DB에 있는지 찾는다
+        //1. DB에 있는 회원이면 컨트롤러로 돌아가 인가처리
+        //2. 기존회원이 아니면 (region 필요) 에러코드
+        return userRepository.findById(kakaoId)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_KAKAO_USER));
     }
 
     @Transactional

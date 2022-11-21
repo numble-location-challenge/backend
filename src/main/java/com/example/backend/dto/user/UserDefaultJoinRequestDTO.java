@@ -14,11 +14,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Schema
-public class UserJoinRequestDTO {
-
-    @Schema(description = "회원 타입", defaultValue = "DEFAULT")
-    @NotNull
-    private UserType userType; // 기본 회원, 카카오 회원 구분
+public class UserDefaultJoinRequestDTO {
 
     @Schema(description = "이메일(아이디)", defaultValue = "hello@numble.com")
     @NotNull
@@ -49,7 +45,7 @@ public class UserJoinRequestDTO {
 
     public User toEntity(){
         return User.builder()
-                .userType(userType).email(email).password(password).username(username).nickname(nickname)
+                .userType(UserType.DEFAULT).email(email).password(password).username(username).nickname(nickname)
                 .phoneNumber(phoneNumber).region(region).bio(bio)
                 .build();
     }
