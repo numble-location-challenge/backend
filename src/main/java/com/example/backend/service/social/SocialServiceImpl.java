@@ -8,17 +8,13 @@ import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
 import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.domain.tag.Tag;
-import com.example.backend.dto.PostImageDTO;
 import com.example.backend.dto.TagDTO;
 import com.example.backend.dto.social.SocialCreateRequestDTO;
-import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.dto.social.SocialLongDTO;
 import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
 import com.example.backend.global.exception.EntityNotExistsException;
 import com.example.backend.global.exception.EntityNotExistsExceptionType;
-import com.example.backend.global.exception.social.SocialNotExistsException;
-import com.example.backend.global.exception.social.SocialNotExistsExceptionType;
 import com.example.backend.repository.PostImageRepository;
 import com.example.backend.repository.SocialRepository;
 import com.example.backend.repository.TagRepository;
@@ -27,13 +23,11 @@ import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -105,7 +99,7 @@ public class SocialServiceImpl implements SocialService {
     public void modifySocial(String email, Long socialId, SocialModifyRequestDTO socialDTO) {
         //엔티티 조회
         Social social = socialRepository.findById(socialId)
-                .orElseThrow(() -> new SocialNotExistsException(SocialNotExistsExceptionType.NOT_FOUND_SOCIAL));
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
 
         // null일 경우에는 수정X
         if(socialDTO.getTitle() != null) social.updateTitle(socialDTO.getTitle());
@@ -135,7 +129,7 @@ public class SocialServiceImpl implements SocialService {
      */
     @Override
     public SocialLongDTO getSocialDetail(Long postId) {
-        Social social = socialRepository.findById(postId).orElseThrow(()->new SocialNotExistsException(SocialNotExistsExceptionType.NOT_FOUND_SOCIAL));
+        Social social = socialRepository.findById(postId).orElseThrow(()->new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
         return new SocialLongDTO(social);
     }
 
