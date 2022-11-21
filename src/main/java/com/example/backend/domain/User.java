@@ -25,6 +25,7 @@ public class User {
 
     @NotNull
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "user_type")
     private UserType userType; // 기본 회원, 카카오 회원 구분
 
     @NotNull
@@ -41,6 +42,7 @@ public class User {
     private String nickname;
 
     @NotNull
+    @Column(name = "phone_number")
     private String phoneNumber;
     @NotNull
     private int region;
@@ -50,7 +52,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Socialing> socialings = new ArrayList<>();
 
-    @Column(length = 500)
+    @Column(length = 500, name = "refresh_token")
     private String refreshToken; //JWT
 
 //    @OneToMany(mappedBy = "user")
