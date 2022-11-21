@@ -5,6 +5,8 @@ import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.dto.social.SocialLongDTO;
 import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
+import com.example.backend.global.exception.InvalidInputException;
+import com.example.backend.global.exception.InvalidInputExceptionType;
 import com.example.backend.service.social.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -188,6 +190,8 @@ public class SocialController {
                 properties = "likes";
                 message = "인기순 정렬";
                 break;
+            default:
+                throw new InvalidInputException(InvalidInputExceptionType.OUT_OF_RANGE_OF_INPUT);
         }
         List<SocialShortDTO> socialShortDTOList = socialService.sortByList(sortDirection, properties);
 
