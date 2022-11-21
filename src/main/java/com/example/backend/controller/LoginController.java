@@ -1,10 +1,13 @@
 package com.example.backend.controller;
 
 import com.example.backend.domain.User;
+import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.AuthDTO;
 import com.example.backend.dto.login.SocialLoginRequestDTO;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
+import com.example.backend.global.exception.InvalidInputException;
+import com.example.backend.global.exception.InvalidInputExceptionType;
 import com.example.backend.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,14 +51,18 @@ public class LoginController {
     }
 
     //TODO 서비스 구현
-    @Operation(summary = "카카오 로그인", description = "처음 로그인하는 경우 errorCode -112가 반환되며, /kakaojoin으로 재요청하면 됩니다.")
-    @PostMapping("/kakaologin")
+    @Operation(summary = "sns 로그인", description = "카카오: userType=KAKAO, 처음 로그인하는 경우 errorCode -112가 반환되며, region 설정 후 카카오 회원가입으로 재요청하면 됩니다.")
+    @PostMapping("/login/sns/{userType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseEntity<?> kakaologin(@RequestBody final SocialLoginRequestDTO authRequestDTO){
+    public ResponseEntity<?> socialLogin(
+            @PathVariable String userType,
+            @RequestBody final SocialLoginRequestDTO authRequestDTO){
+
+        if(!userType.equals(UserType.KAKAO)) throw new InvalidInputException(InvalidInputExceptionType.INVALID_USERTYPE);
 
         User loginUser = loginService.kakaoLogin(authRequestDTO);
         HashMap<String, String> jwtMap = loginService.authorize(loginUser);
@@ -81,7 +88,7 @@ public class LoginController {
                 .body(response);
     }
 
-    //TODO AccessToken은 파괴가 안됨! 나중에 구현...
+    //TODO 프론트에서 AccessToken을 제거하고 이 url을 호출하면 RefreshToken을 DB에서 제거
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
