@@ -2,9 +2,11 @@ package com.example.backend.service;
 
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
+import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Post;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.SocialJoinRequestDTO;
+import com.example.backend.dto.user.KakaoUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
@@ -28,6 +30,7 @@ public class UserServiceImpl implements UserService{
     private final SocialRepository socialRepository;
     private final SocialingRepository socilaingRepository;
     private final PostRepository postRepository;
+    private final KakaoService kakaoService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -44,17 +47,14 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User createKakaoUser(SocialJoinRequestDTO kaKaoAuthRequestDTO) {
-        User user = getKakaoUserInfo(kaKaoAuthRequestDTO.getAccessToken());
-        return null;
-        //TODO 세팅 및 회원가입 처리
-    }
+    public User createKakaoUser(SocialJoinRequestDTO joinDTO) {
+        //카카오 사용자 정보 API에서 받아옴
+        KakaoUserDTO userDTO = kakaoService.getUserInfo(joinDTO.getAccessToken());
 
-    @Override
-    public User getKakaoUserInfo(String KakaoAccessToken) {
-        //TODO 카카오 사용자 정보 API에서 [id, 이메일, 핸드폰 번호, 이름, 프사(?)] 를 받아옴
-
-        return null;
+        validateSocialUserDuplicate(userDTO.getId(), userDTO.getEmail());
+        //중복X -> region 세팅 및 회원가입 처리
+        User user = userDTO.toEntity(joinDTO.getRegion());
+        return userRepository.save(user);
     }
 
     @Override
@@ -73,6 +73,14 @@ public class UserServiceImpl implements UserService{
         }
         else if(userRepository.existsByNickname(nickName)){
             throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXISTS_NICKNAME);
+        }
+    }
+
+    private void validateSocialUserDuplicate(Long id, String email){
+        boolean findUser = userRepository.existsById(id);
+        if(findUser) throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXISTS_KAKAO_USER);
+        else if(userRepository.existsByEmail(email)){
+            throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXISTS_EMAIL);
         }
     }
 
@@ -102,6 +110,10 @@ public class UserServiceImpl implements UserService{
 
         Social findSocial = socialRepository.findById(socialId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+
+        //모임이 꽉찬 상태면 x
+//        if(findSocial.getStatus() != SocialStatus.AVAILABLE) throw new ex
+        //중복 신청이면 x
 
         Socialing socialing = Socialing.createSocialing(findUser);
         findSocial.addSocialing(socialing);
