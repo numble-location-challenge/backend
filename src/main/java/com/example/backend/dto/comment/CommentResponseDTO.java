@@ -1,5 +1,7 @@
 package com.example.backend.dto.comment;
 
+import java.time.LocalDateTime;
+
 import com.example.backend.domain.Comment;
 import com.example.backend.dto.feed.FeedUserDTO;
 
@@ -23,6 +25,8 @@ public class CommentResponseDTO {
     private int refOrder;
     @Schema(description = "대댓글 부모의 댓글 아이디",defaultValue = "3")
     private Long parentNum;
+    @Schema(description = "댓글의 생성 시간", defaultValue = "2022-10-22T17:13:39.566884")
+    private LocalDateTime createDate;
 
     public CommentResponseDTO(Comment comment) {
         this.user = FeedUserDTO.toUserDTO(comment.getUser());
@@ -31,5 +35,6 @@ public class CommentResponseDTO {
         this.level = comment.getLevel();
         this.refOrder = comment.getRefOrder();
         this.parentNum = comment.getParentNum();
+        this.createDate = comment.getCreateDate();
     }
 }
