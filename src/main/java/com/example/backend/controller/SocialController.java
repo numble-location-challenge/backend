@@ -170,20 +170,28 @@ public class SocialController {
     })
     public ResponseDTO<SocialShortDTO> getSortList(@Parameter(required = true) @PathVariable int sortNum){
         String properties = "";
+        Boolean sortDirection = false; // true : DESC, false : ASC
+        String message = "";
         switch (sortNum){
             case 1:
+                sortDirection = true;
                 properties = "createDate";
+                message = "최신순 정렬";
                 break;
             case 2:
+                sortDirection = false;
                 properties = "endDate";
+                message = "마감 임박순 정렬";
                 break;
             case 3:
+                sortDirection = true;
                 properties = "likes";
+                message = "인기순 정렬";
                 break;
         }
-        List<SocialShortDTO> socialShortDTOList = socialService.sortByList(properties);
+        List<SocialShortDTO> socialShortDTOList = socialService.sortByList(sortDirection, properties);
 
-        return ResponseDTO.<SocialShortDTO>builder().success(true).message("정렬된 리스트 출력")
+        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
                 .data(socialShortDTOList).build();
     }
 
