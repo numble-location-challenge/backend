@@ -65,7 +65,8 @@ public class LoginServiceImpl implements LoginService{
     }
 
     @Override
-    public void logout(String email, String accessToken, String refreshToken) {
+    public void logout(String email, String refreshToken) {
+        //TODO http only 쿠키 파기
         tokenService.destroyToken(email, refreshToken);
         User findUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         findUser.deleteRefreshToken(); //DB의 RT 삭제
@@ -73,21 +74,18 @@ public class LoginServiceImpl implements LoginService{
 
     @Override
     public User getUserByRefreshToken(String refreshToken) {
-        //토큰에서 email 가져옴
+        //RT 만료되었다면 validate 메서드에서 ->로그인 유도 401
         JwtSubject jwtSubject = tokenService.validateAndGetSubject(refreshToken);
+        //토큰 subject email로 User 가져옴
         return userRepository.findByEmail(jwtSubject.getEmail())
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
     }
 
     @Override
-    public String refresh(User user, String accessToken, String refreshToken) {
+    public String refresh(User user, String refreshToken) {
         //DB에 있는 RT랑 비교
         if(refreshToken.equals(user.getRefreshToken())) throw new InvalidInputException(InvalidInputExceptionType.NOT_EXISTS_REFRESH_TOKEN);
-        //RT 만료 : 로그인 유도 401
-        if(tokenService.isExpired(refreshToken)) throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_IS_EXPIRED);
-        //RT 유효, AT 유효 : 비정상적인 요청, 403
-        if(tokenService.isExpired(accessToken)) throw new ForbiddenException(ForbiddenExceptionType.TOKEN_NOT_EXPIRED);
-        //RT 유효, AT 만료 : AT 재발급
+        //RT가 유효하므로 AT 재발급
         return tokenService.issueAccessToken(user);
     }
 

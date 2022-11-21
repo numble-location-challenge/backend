@@ -13,9 +13,9 @@ public interface LoginService {
 
     HashMap<String,String> authorize(User user);
 
-    void logout(String email, String accessToken, String refreshToken);
+    void logout(String email, String refreshToken);
 
     User getUserByRefreshToken(String refreshToken);
 
-    String refresh(User user, String accessToken, String refreshToken);
+    String refresh(User user, String refreshToken);
 }
