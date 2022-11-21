@@ -2,7 +2,6 @@ package com.example.backend.service;
 
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
-import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Post;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.SocialJoinRequestDTO;
@@ -10,8 +9,6 @@ import com.example.backend.dto.user.KakaoUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
-import com.example.backend.global.exception.social.SocialNotExistsException;
-import com.example.backend.global.exception.social.SocialNotExistsExceptionType;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.SocialRepository;
 import com.example.backend.repository.SocialingRepository;
@@ -111,7 +108,7 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         Social findSocial = socialRepository.findById(socialId)
-                .orElseThrow(() -> new SocialNotExistsException(SocialNotExistsExceptionType.NOT_FOUND_SOCIAL));
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
 
         //모임이 꽉찬 상태면 x
 //        if(findSocial.getStatus() != SocialStatus.AVAILABLE) throw new ex
@@ -142,7 +139,7 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
 
         Social social = socialRepository.findReadOnlyById(socialId)
-                .orElseThrow(() -> new SocialNotExistsException(SocialNotExistsExceptionType.NOT_FOUND_SOCIAL));
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
         User socialOwner = post.getUser(); //모임장
         //모임장인지 확인
         if(!email.equals(socialOwner.getEmail())) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
