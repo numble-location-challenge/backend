@@ -4,6 +4,7 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
+import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.dto.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,9 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Data
@@ -94,7 +97,12 @@ public class SocialLongDTO{
         this.status = social.getStatus();
         this.contact = social.getContact();
         this.category = toCategoryDTO(social.getCategory());
-        this.tags = social.getSocialTags().stream().map(SocialTagDTO::new).collect(Collectors.toList());
+        this.tags = toSocialTagDTO(
+                social.getSocialTags()
+                .stream().filter(socialTag -> socialTag.getSocial().getId().equals(social.getId()))
+                .collect(Collectors.toList())
+        );
+
     }
 
     public CategoryDTO toCategoryDTO(Category category){
@@ -109,5 +117,9 @@ public class SocialLongDTO{
                 .id(user.getId())
                 .name(user.getNickname())
                 .build();
+    }
+
+    public List<SocialTagDTO> toSocialTagDTO(List<SocialTag> socialTags){
+        return socialTags.stream().map(SocialTagDTO::new).collect(Collectors.toList());
     }
 }
