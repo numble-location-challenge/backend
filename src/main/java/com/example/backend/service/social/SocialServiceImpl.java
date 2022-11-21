@@ -133,7 +133,7 @@ public class SocialServiceImpl implements SocialService {
      */
     @Override
     public SocialLongDTO getSocialDetail(Long postId) {
-        Social social = socialRepository.findById(postId).orElseThrow();
+        Social social = socialRepository.findById(postId).orElseThrow(()->new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
         return new SocialLongDTO(social);
     }
 
@@ -219,12 +219,13 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 정렬된 미리보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> sortByList(String properties){
+    public List<SocialShortDTO> sortByList(Boolean sortDirection, String properties){
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
         if(properties.equals("")){
             return getSocialList();
         }else{
-            List<Social> socialList = socialRepository.findAll(Sort.by(Sort.Direction.DESC,properties));
+            //sortDirection == true ? DESC : ASC
+            List<Social> socialList = socialRepository.findAll(Sort.by(sortDirection ? Sort.Direction.DESC : Sort.Direction.ASC, properties));
             for(Social social : socialList){
                 socialShortDTOList.add(new SocialShortDTO(social));
             }
