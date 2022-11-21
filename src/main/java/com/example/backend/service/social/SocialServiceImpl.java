@@ -183,7 +183,7 @@ public class SocialServiceImpl implements SocialService {
     }
 
     /**
-     * 모임 게시글 카테고리 필터링
+     * 모임 게시글 카테고리 필터링 (안쓰는거 같아서 수정안함)
      * @return List<SocialShortDTO> : 카테고리로 필터링된 미리보기 형식의 리스트
      */
     @Override
@@ -198,14 +198,14 @@ public class SocialServiceImpl implements SocialService {
 
     /**
      * 모임 게시글 태그 필터링
-     * @param tagId 사용자가
-     * @return List<SocialShortDTO> : 태그로 필터링된 미리보기 형식의 리스트
+     * @param tagId 사용자가 선택한 태그 아이디
+     * @return List<SocialShortDTO> : 태그로 필터링된 리스트
      */
     @Override
     public List<SocialShortDTO> filteringByTag(Long tagId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
         for(Social social : socialRepository.findAll()){
-            Optional<SocialTag> socialTag = social.getSocialTags().stream().filter(tag -> Objects.equals(tag.getId(),tagId)).findFirst();
+            Optional<SocialTag> socialTag = social.getSocialTags().stream().filter(st -> st.getTag().getId().equals(tagId)).findFirst();
             if(socialTag.isPresent()){
                 socialShortDTOList.add(new SocialShortDTO(social));
             }
@@ -215,6 +215,7 @@ public class SocialServiceImpl implements SocialService {
 
     /**
      * 리스트 정렬
+     * @param sortDirection 오름차순, 내림차순 기준 (true ? DESC : ASC)
      * @param properties 정렬할 기준
      * @return List<SocialShortDTO> : 정렬된 미리보기 형식의 리스트
      */
@@ -224,7 +225,6 @@ public class SocialServiceImpl implements SocialService {
         if(properties.equals("")){
             return getSocialList();
         }else{
-            //sortDirection == true ? DESC : ASC
             List<Social> socialList = socialRepository.findAll(Sort.by(sortDirection ? Sort.Direction.DESC : Sort.Direction.ASC, properties));
             for(Social social : socialList){
                 socialShortDTOList.add(new SocialShortDTO(social));
