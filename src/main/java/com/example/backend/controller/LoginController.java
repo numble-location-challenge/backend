@@ -6,8 +6,8 @@ import com.example.backend.dto.login.AuthDTO;
 import com.example.backend.dto.login.SocialLoginRequestDTO;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
-import com.example.backend.global.exception.InvalidInputException;
-import com.example.backend.global.exception.InvalidInputExceptionType;
+import com.example.backend.global.exception.InvalidUserInputException;
+import com.example.backend.global.exception.InvalidUserInputExceptionType;
 import com.example.backend.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,7 +15,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -28,15 +30,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LoginController {
 
-    @Value("${jwt.access.header}")
-    private String ACCESS_HEADER;
-
-    @Value("${jwt.refresh.header}")
-    private String REFRESH_HEADER;
+    @Value("${jwt.refresh.expiration}")
+    private Long REFRESH_EXP;
 
     private final LoginService loginService;
 
-    @Operation(summary = "기본 로그인")
+    @Operation(summary = "기본 로그인", description = "AccessToken은 헤더로, RefreshToken은 쿠키로 반환합니다.")
     @PostMapping("/login")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -47,7 +46,7 @@ public class LoginController {
 
         User loginUser = loginService.defaultLogin(loginDTO.getEmail(),loginDTO.getPassword());
         HashMap<String, String> jwtMap = loginService.authorize(loginUser);
-        return getLoginSuccessResponseEntity(loginUser, jwtMap);
+        return getLoginSuccessResponse(loginUser, jwtMap);
     }
 
     //TODO 서비스 구현
@@ -62,14 +61,14 @@ public class LoginController {
             @PathVariable String userType,
             @RequestBody final SocialLoginRequestDTO authRequestDTO){
 
-        if(!userType.equals(UserType.KAKAO)) throw new InvalidInputException(InvalidInputExceptionType.INVALID_USERTYPE);
+        if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
         User loginUser = loginService.kakaoLogin(authRequestDTO);
         HashMap<String, String> jwtMap = loginService.authorize(loginUser);
-        return getLoginSuccessResponseEntity(loginUser, jwtMap);
+        return getLoginSuccessResponse(loginUser, jwtMap);
     }
 
-    private ResponseEntity<?> getLoginSuccessResponseEntity(User loginUser, HashMap<String, String> tokenMap) {
+    private ResponseEntity<?> getLoginSuccessResponse(User loginUser, HashMap<String, String> tokenMap) {
         //set data list
         List<AuthDTO> dataList = List.of(AuthDTO.builder()
                 .userId(loginUser.getId())
@@ -82,15 +81,24 @@ public class LoginController {
                 .data(dataList)
                 .build();
 
+        //refresh token을 http only 쿠키에 담음
+        ResponseCookie cookie = ResponseCookie.from("refreshToken",tokenMap.get("RT"))
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .maxAge(REFRESH_EXP)
+                .path("/refresh")
+                .build();
+
         return ResponseEntity.ok()
-                .header(ACCESS_HEADER, tokenMap.get("AT"))
-                .header(REFRESH_HEADER, tokenMap.get("RT"))
+                .header(HttpHeaders.AUTHORIZATION, tokenMap.get("AT"))
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(response);
     }
 
-    //TODO 프론트에서 AccessToken을 제거하고 이 url을 호출하면 RefreshToken을 DB에서 제거
+    //TODO
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "로그아웃")
+    @Operation(summary = "로그아웃", description = "수정 중입니다!!")
     @PostMapping("/logout")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -98,10 +106,10 @@ public class LoginController {
     })
     public ResponseDTO<?> logout(
             @AuthenticationPrincipal String email,
-            @RequestHeader(value = "Authorization") String accessToken,
-            @RequestHeader(value = "Authorization-refresh") String refreshToken){
-        loginService.logout(email, accessToken, refreshToken);
-        return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
+            @CookieValue(value = "refreshToken") String refreshToken){
+//        loginService.logout(email, refreshToken);
+//        return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
+        return null;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -111,12 +119,10 @@ public class LoginController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED")
     })
-    public ResponseEntity<?> refresh(
-            @RequestHeader(value = "Authorization") String accessToken,
-            @RequestHeader(value = "Authorization-refresh") String refreshToken){
+    public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken") String refreshToken){
 
         User loginUser = loginService.getUserByRefreshToken(refreshToken);
-        final String reissuedAccessToken = loginService.refresh(loginUser, accessToken, refreshToken);
+        final String reissuedAccessToken = loginService.refresh(loginUser, refreshToken);
 
         //set data list
         List<AuthDTO> dataList = List.of(AuthDTO.builder()
@@ -131,7 +137,7 @@ public class LoginController {
                 .build();
 
         return ResponseEntity.ok()
-                .header(ACCESS_HEADER, reissuedAccessToken)
+                .header(HttpHeaders.AUTHORIZATION, reissuedAccessToken)
                 .body(response);
     }
 }

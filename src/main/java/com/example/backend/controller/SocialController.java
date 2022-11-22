@@ -7,8 +7,6 @@ import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
 import com.example.backend.global.exception.social.SocialInvalidInputException;
 import com.example.backend.global.exception.social.SocialInvalidInputExceptionType;
-import com.example.backend.global.exception.InvalidInputException;
-import com.example.backend.global.exception.InvalidInputExceptionType;
 import com.example.backend.service.social.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

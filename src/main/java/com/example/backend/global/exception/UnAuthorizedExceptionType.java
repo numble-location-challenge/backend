@@ -7,7 +7,9 @@ import com.example.backend.global.exception.base.CustomExceptionType;
  */
 public enum UnAuthorizedExceptionType implements CustomExceptionType {
     ACCESS_TOKEN_UN_AUTHORIZED(-188, "Access Token이 없거나 유효하지 않습니다. '/refresh' POST로 재요청 하십시오."),
-    REFRESH_TOKEN_IS_EXPIRED(-177, "만료된 Refresh Token 입니다. 다시 로그인 해주세요.");
+    REFRESH_TOKEN_IS_EXPIRED(-177, "만료된 Refresh Token 입니다. 다시 로그인 해주세요."),
+    INVALID_TOKEN(-166, "올바르지 않은 토큰입니다."),
+    PARSING_FAIL(-155, "토큰 파싱에 실패했습니다.");
 
     private int errorCode;
     private String errorMessage;

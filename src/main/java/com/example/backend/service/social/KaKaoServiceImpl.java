@@ -13,9 +13,6 @@ public class KaKaoServiceImpl implements KakaoService {
 
     private final String requestUrl = "https://kapi.kakao.com/v2/user/me"; //카카오 유저 API
 
-    @Value("${jwt.access.header}")
-    private String ACCESS_HEADER;
-
     @Override
     public Long getUserId(String accessToken) {
         return null;
@@ -25,7 +22,7 @@ public class KaKaoServiceImpl implements KakaoService {
     public KakaoUserDTO getUserInfo(String accessToken) {
         //헤더 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set(ACCESS_HEADER, "Bearer " + accessToken);
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         //요청 보내기
