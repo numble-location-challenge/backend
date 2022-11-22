@@ -1,6 +1,6 @@
 package com.example.backend.global.exception;
 
-import com.example.backend.dto.ResponseDTO;
+import com.example.backend.dto.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
@@ -14,33 +14,47 @@ public class CustomErrorController implements ErrorController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST) //400
     @ExceptionHandler(InvalidInputException.class)
-    public ResponseDTO<?> handleBadRequest(InvalidInputException ex){
-        return ResponseDTO.builder().success(false).message(ex.getExceptionType().getMessage()).build();
+    public ErrorDTO handleBadRequest(InvalidInputException ex){
+        return ErrorDTO.builder()
+                .errorCode(ex.getExceptionType().getErrorCode())
+                .errorMessage(ex.getExceptionType().getMessage())
+                .build();
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED) //401
     @ExceptionHandler(UnAuthorizedException.class)
-    public ResponseDTO<?> handleUnAuthorized(UnAuthorizedException ex){
-        return ResponseDTO.builder().success(false).message(ex.getExceptionType().getMessage()).build();
+    public ErrorDTO handleUnAuthorized(UnAuthorizedException ex){
+        return ErrorDTO.builder()
+                .errorCode(ex.getExceptionType().getErrorCode())
+                .errorMessage(ex.getExceptionType().getMessage())
+                .build();
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN) //403
     @ExceptionHandler(ForbiddenException.class) //TODO
-    public ResponseDTO<?> handleForbidden(ForbiddenException ex){
-        return ResponseDTO.builder().success(false).message(ex.getExceptionType().getMessage()).build();
+    public ErrorDTO handleForbidden(ForbiddenException ex){
+        return ErrorDTO.builder()
+                .errorCode(ex.getExceptionType().getErrorCode())
+                .errorMessage(ex.getExceptionType().getMessage())
+                .build();
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND) //404
     @ExceptionHandler(EntityNotExistsException.class)
-    public ResponseDTO<?> handleNotFound(EntityNotExistsException ex){
-        return ResponseDTO.builder().success(false).message(ex.getExceptionType().getMessage()).build();
+    public ErrorDTO handleNotFound(EntityNotExistsException ex){
+        return ErrorDTO.builder()
+                .errorCode(ex.getExceptionType().getErrorCode())
+                .errorMessage(ex.getExceptionType().getMessage())
+                .build();
     }
 
     //그 외에 놓친 예외들
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ResponseDTO<?> handleEtc(Exception ex){
+    public ErrorDTO handleEtc(Exception ex){
         log.error("Exception: {}", ex);
-        return  ResponseDTO.builder().success(false).message(ex.getMessage()).build();
+        return  ErrorDTO.builder()
+                .errorCode(500)
+                .errorMessage(ex.getMessage()).build();
     }
 }
