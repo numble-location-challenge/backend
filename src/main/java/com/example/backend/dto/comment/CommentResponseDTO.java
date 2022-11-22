@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CommentResponseDTO {
+    @Schema(description = "댓글의 아이디")
+    private Long commentId;
     @Schema(description = "댓글의 유저 정보")
     private FeedUserDTO user;
     @Schema(description = "댓글의 본문", defaultValue = "댓글 본문입니다.")
@@ -29,6 +31,7 @@ public class CommentResponseDTO {
     private LocalDateTime createDate;
 
     public CommentResponseDTO(Comment comment) {
+        this.commentId = comment.getId();
         this.user = FeedUserDTO.toUserDTO(comment.getUser());
         this.contents = comment.getContents();
         this.cGroup = comment.getCGroup();
