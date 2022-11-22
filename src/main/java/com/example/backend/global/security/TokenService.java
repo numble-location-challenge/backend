@@ -5,10 +5,9 @@ import com.example.backend.global.exception.UnAuthorizedException;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,34 +72,34 @@ public class TokenService {
             return objectmapper.writeValueAsString(new JwtSubject(user.getId(), user.getEmail(), jwtType));
         } catch (JsonProcessingException e) {
             log.debug(e.getMessage());
-            throw new UnAuthorizedException(UnAuthorizedExceptionType.ACCESS_TOKEN_UN_AUTHORIZED);
+            throw new UnAuthorizedException(UnAuthorizedExceptionType.PARSING_FAIL);
         }
     }
 
     //jwt 검증 후 아이디(이메일) 추출
     public JwtSubject validateAndGetSubject(String token){ //getSubjects
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getKeyForSign())
-                .build()
-                .parseClaimsJws(token)// token을 Base 64로 디코딩 및 파싱
-                .getBody(); // get userId(payload(Claims))
-
         try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getKeyForSign())
+                    .build()
+                    .parseClaimsJws(token)// token을 Base 64로 디코딩 및 파싱
+                    .getBody(); // get userId(payload(Claims))
+
             return objectmapper.readValue(claims.getSubject(), JwtSubject.class);
+        } catch(SignatureException | MalformedJwtException e){ //서명 또는 구조 문제
+            throw new UnAuthorizedException(UnAuthorizedExceptionType.INVALID_TOKEN);
+        } catch (ExpiredJwtException e){ //유효기간이 만료된 토큰
+            throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_IS_EXPIRED);
         } catch (JsonProcessingException e) {
             log.debug(e.getMessage());
             e.printStackTrace();
-            throw new UnAuthorizedException(UnAuthorizedExceptionType.ACCESS_TOKEN_UN_AUTHORIZED);
+            throw new UnAuthorizedException(UnAuthorizedExceptionType.PARSING_FAIL);
         }
     }
 
     public void destroyToken(String email, String refreshToken) {
-        //TODO Redis?
-
-    }
-
-    public boolean isExpired(String refreshToken) {
         //TODO
-        return false;
+
     }
+
 }

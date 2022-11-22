@@ -61,9 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 securityContext.setAuthentication(authentication);
                 SecurityContextHolder.setContext(securityContext);
+            }else{
+                log.info("토큰이 null입니다.");
             }
         } catch (JwtException e){
-            logger.error("Could not set user authentication in security context", e);
+            log.info("Could not set user authentication in security context", e);
             throw new UnAuthorizedException(UnAuthorizedExceptionType.ACCESS_TOKEN_UN_AUTHORIZED);
         }
 
