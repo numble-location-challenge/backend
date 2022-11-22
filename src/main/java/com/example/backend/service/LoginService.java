@@ -11,7 +11,7 @@ public interface LoginService {
 
     User kakaoLogin(SocialLoginRequestDTO authRequestDTO);
 
-    HashMap<String,String> authorize(User user);
+    HashMap<String,String> getAccessAndRefreshToken(User user);
 
     void logout(String email, String refreshToken);
 

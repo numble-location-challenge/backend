@@ -45,8 +45,8 @@ public class LoginController {
     public ResponseEntity<?> login(@RequestBody final DefaultLoginRequestDTO loginDTO){
 
         User loginUser = loginService.defaultLogin(loginDTO.getEmail(),loginDTO.getPassword());
-        HashMap<String, String> jwtMap = loginService.authorize(loginUser);
-        return getLoginSuccessResponse(loginUser, jwtMap);
+        HashMap<String, String> jwtMap = loginService.getAccessAndRefreshToken(loginUser);
+        return getTokenResponse(loginUser, jwtMap, "로그인에 성공했습니다.");
     }
 
     //TODO 서비스 구현
@@ -64,11 +64,11 @@ public class LoginController {
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
         User loginUser = loginService.kakaoLogin(authRequestDTO);
-        HashMap<String, String> jwtMap = loginService.authorize(loginUser);
-        return getLoginSuccessResponse(loginUser, jwtMap);
+        HashMap<String, String> jwtMap = loginService.getAccessAndRefreshToken(loginUser);
+        return getTokenResponse(loginUser, jwtMap, "카카오 로그인에 성공했습니다.");
     }
 
-    private ResponseEntity<?> getLoginSuccessResponse(User loginUser, HashMap<String, String> tokenMap) {
+    private ResponseEntity<?> getTokenResponse(User loginUser, HashMap<String, String> tokenMap, String message) {
         //set data list
         List<AuthDTO> dataList = List.of(AuthDTO.builder()
                 .userId(loginUser.getId())
@@ -77,7 +77,7 @@ public class LoginController {
 
         //set response
         ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
-                .success(true).message("로그인에 성공했습니다.")
+                .success(true).message(message)
                 .data(dataList)
                 .build();
 
@@ -113,7 +113,7 @@ public class LoginController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Access Token 재발급", description = "Authorization 및 Authorization-refresh 헤더가 요구됩니다.")
+    @Operation(summary = "새로고침 됐을때, accessToken이 만료됐을 때 호출", description = "RefreshToken 쿠키를 사용해서 AccessToken을 재발급합니다.")
     @PostMapping("/refresh")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -132,7 +132,7 @@ public class LoginController {
 
         //set response
         ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
-                .success(true).message("Access Token이 재발급되었습니다.")
+                .success(true).message("AccessToken이 재발급되었습니다.")
                 .data(dataList)
                 .build();
 
