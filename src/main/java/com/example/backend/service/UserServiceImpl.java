@@ -2,7 +2,6 @@ package com.example.backend.service;
 
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
-import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Post;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.SocialJoinRequestDTO;

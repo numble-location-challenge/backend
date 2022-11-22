@@ -37,5 +37,5 @@ public interface SocialService {
     List<SocialShortDTO> filteringByTag(Long TagId);
 
     //최신순 정렬
-    List<SocialShortDTO> sortByList(String properties);
+    List<SocialShortDTO> sortByList(Boolean sortDirection, String properties);
 }

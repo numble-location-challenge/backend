@@ -3,6 +3,7 @@ package com.example.backend.dto.social;
 import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
+import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.dto.CategoryDTO;
 import com.example.backend.dto.LikesDTO;
 import com.example.backend.dto.PostImageDTO;
@@ -78,7 +79,11 @@ public class SocialShortDTO {
         this.limitedNums = social.getLimitedNums();
         this.status = social.getStatus();
         this.category = toCategoryDTO(social.getCategory());
-        this.tags = social.getSocialTags().stream().map(SocialTagDTO::new).collect(Collectors.toList());
+        this.tags = toSocialTagDTO(
+                social.getSocialTags()
+                .stream().filter(socialTag -> socialTag.getSocial().getId().equals(social.getId()))
+                .collect(Collectors.toList())
+        );
         this.likeCnt = social.getLikes();
         this.createDate = social.getCreateDate();
     }
@@ -88,5 +93,8 @@ public class SocialShortDTO {
                 .id(category.getId())
                 .name(category.getName())
                 .build();
+    }
+    public List<SocialTagDTO> toSocialTagDTO(List<SocialTag> socialTags){
+        return socialTags.stream().map(SocialTagDTO::new).collect(Collectors.toList());
     }
 }

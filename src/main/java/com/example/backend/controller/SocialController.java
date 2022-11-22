@@ -5,6 +5,10 @@ import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.dto.social.SocialLongDTO;
 import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
+import com.example.backend.global.exception.social.SocialInvalidInputException;
+import com.example.backend.global.exception.social.SocialInvalidInputExceptionType;
+import com.example.backend.global.exception.InvalidInputException;
+import com.example.backend.global.exception.InvalidInputExceptionType;
 import com.example.backend.service.social.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -170,20 +174,30 @@ public class SocialController {
     })
     public ResponseDTO<SocialShortDTO> getSortList(@Parameter(required = true) @PathVariable int sortNum){
         String properties = "";
+        Boolean sortDirection = false; // true : DESC, false : ASC
+        String message = "";
         switch (sortNum){
             case 1:
+                sortDirection = true;
                 properties = "createDate";
+                message = "최신순 정렬";
                 break;
             case 2:
+                sortDirection = false;
                 properties = "endDate";
+                message = "마감 임박순 정렬";
                 break;
             case 3:
+                sortDirection = true;
                 properties = "likes";
+                message = "인기순 정렬";
                 break;
+            default:
+                throw new SocialInvalidInputException(SocialInvalidInputExceptionType.OUT_OF_RANGE_OF_INPUT);
         }
-        List<SocialShortDTO> socialShortDTOList = socialService.sortByList(properties);
+        List<SocialShortDTO> socialShortDTOList = socialService.sortByList(sortDirection, properties);
 
-        return ResponseDTO.<SocialShortDTO>builder().success(true).message("정렬된 리스트 출력")
+        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
                 .data(socialShortDTOList).build();
     }
 
