@@ -1,6 +1,10 @@
 package com.example.backend.global.exception;
 
 import com.example.backend.dto.ErrorDTO;
+import com.example.backend.global.exception.base.CustomException;
+import com.example.backend.global.exception.comment.CommentInvalidInputException;
+import com.example.backend.global.exception.social.SocialInvalidInputException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
@@ -13,8 +17,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class CustomErrorController implements ErrorController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST) //400
-    @ExceptionHandler(InvalidUserInputException.class)
-    public ErrorDTO handleBadRequest(InvalidUserInputException ex){
+    @ExceptionHandler(value = {InvalidUserInputException.class, CommentInvalidInputException.class,
+        SocialInvalidInputException.class})
+    public ErrorDTO handleBadRequest(CustomException ex){
         return ErrorDTO.builder()
                 .errorCode(ex.getExceptionType().getErrorCode())
                 .errorMessage(ex.getExceptionType().getMessage())
