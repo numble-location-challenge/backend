@@ -35,7 +35,7 @@ public class LoginController {
 
     private final LoginService loginService;
 
-    @Operation(summary = "기본 로그인")
+    @Operation(summary = "기본 로그인", description = "AccessToken은 헤더로, RefreshToken은 쿠키로 반환합니다.")
     @PostMapping("/login")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -96,9 +96,9 @@ public class LoginController {
                 .body(response);
     }
 
-    //TODO 헤더 변경될수도
+    //TODO
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "로그아웃", description = "프론트에서 AccessToken을 제거하고 이 API를 호출하면 RefreshToken을 파기합니다.")
+    @Operation(summary = "로그아웃", description = "수정 중입니다!!")
     @PostMapping("/logout")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -107,8 +107,9 @@ public class LoginController {
     public ResponseDTO<?> logout(
             @AuthenticationPrincipal String email,
             @CookieValue(value = "refreshToken") String refreshToken){
-        loginService.logout(email, refreshToken);
-        return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
+//        loginService.logout(email, refreshToken);
+//        return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
+        return null;
     }
 
     @ResponseStatus(HttpStatus.OK)
