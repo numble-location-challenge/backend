@@ -13,7 +13,7 @@ import com.example.backend.domain.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
-    @Query("SELECT c FROM Comment c where c.post.id =:postId order by c.cGroup desc, c.refOrder asc")
+    @Query("SELECT c FROM Comment c join fetch c.user where c.post.id =:postId order by c.cGroup desc, c.refOrder asc")
     List<Comment> findAllByPostIdOrderByCGroupDescRefOrderAsc(@Param("postId") Long postId);
 
     @Query("SELECT coalesce(Max(c.cGroup),0) FROM Comment c")
