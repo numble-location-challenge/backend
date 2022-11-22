@@ -1,17 +1,19 @@
 package com.example.backend.dto.social;
 
 import com.example.backend.domain.Socialing;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Schema
+@Getter
 public class SocialingDTO {
-    private Long socialingId;
-    private Long socialId;
+
+    @Schema(description = "해당 모임에 참가한 사용자 (작성자 포함)")
     private Long userId;
 
     public SocialingDTO(Socialing socialing){
-        this.socialingId = socialing.getId();
-//        this.socialId = socialing.getSocial();
-//        this.userId = socialing.getUser();
+        this.userId = socialing.getUser().getId();
     }
 }

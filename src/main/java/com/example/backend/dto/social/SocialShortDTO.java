@@ -1,5 +1,6 @@
 package com.example.backend.dto.social;
 
+import com.example.backend.domain.Socialing;
 import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +71,11 @@ public class SocialShortDTO {
     private LocalDateTime createDate;
 
     public SocialShortDTO(Social social) {
+        this.socialings = toSocialingDTO(
+                social.getSocialings().stream()
+                .filter(socialing -> socialing.getSocial().getId().equals(social.getId()))
+                .collect(Collectors.toList())
+        );
         this.socialings = social.getSocialings().stream().map(SocialingDTO::new).collect(Collectors.toList());
         this.id = social.getId();
         this.images = social.getImages().stream().map(PostImageDTO::new).collect(Collectors.toList());
@@ -86,6 +93,11 @@ public class SocialShortDTO {
         );
         this.likeCnt = social.getLikes();
         this.createDate = social.getCreateDate();
+
+    }
+
+    public List<SocialingDTO> toSocialingDTO(List<Socialing> socialings){
+        return socialings.stream().map(SocialingDTO::new).collect(Collectors.toList());
     }
 
     public CategoryDTO toCategoryDTO(Category category){
@@ -95,6 +107,8 @@ public class SocialShortDTO {
                 .build();
     }
     public List<SocialTagDTO> toSocialTagDTO(List<SocialTag> socialTags){
-        return socialTags.stream().map(SocialTagDTO::new).collect(Collectors.toList());
+        return socialTags.stream()
+                .map(SocialTagDTO::new)
+                .collect(Collectors.toList());
     }
 }
