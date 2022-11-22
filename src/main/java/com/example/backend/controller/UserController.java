@@ -7,8 +7,8 @@ import com.example.backend.dto.login.SocialJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
-import com.example.backend.global.exception.InvalidInputException;
-import com.example.backend.global.exception.InvalidInputExceptionType;
+import com.example.backend.global.exception.InvalidUserInputException;
+import com.example.backend.global.exception.InvalidUserInputExceptionType;
 import com.example.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,7 +57,7 @@ public class UserController {
             @PathVariable String userType,
             @RequestBody final SocialJoinRequestDTO joinDTO, UriComponentsBuilder uriBuilder){
         //프론트에서 회원정보 동의해주고 region, AT 가지고 회원가입 처리
-        if(!userType.equals(UserType.KAKAO)) throw new InvalidInputException(InvalidInputExceptionType.INVALID_USERTYPE);
+        if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
         final User createdUser = userService.createKakaoUser(joinDTO);
         return getCreatedResponseEntity(uriBuilder, createdUser.getId());
     }

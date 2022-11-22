@@ -32,7 +32,7 @@ public class LoginServiceImpl implements LoginService{
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         if(passwordEncoder.matches(password, dbUser.getPassword())) return dbUser;
-        else throw new InvalidInputException(InvalidInputExceptionType.ACCOUNT_NOT_MATCH);
+        else throw new InvalidUserInputException(InvalidUserInputExceptionType.ACCOUNT_NOT_MATCH);
     }
 
     //TODO 프론트랑 협의 필요
@@ -66,8 +66,6 @@ public class LoginServiceImpl implements LoginService{
 
     @Override
     public void logout(String email, String refreshToken) {
-        //TODO http only 쿠키 파기
-        tokenService.destroyToken(email, refreshToken);
         User findUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         findUser.deleteRefreshToken(); //DB의 RT 삭제
     }
@@ -84,7 +82,7 @@ public class LoginServiceImpl implements LoginService{
     @Override
     public String refresh(User user, String refreshToken) {
         //DB에 있는 RT랑 비교
-        if(refreshToken.equals(user.getRefreshToken())) throw new InvalidInputException(InvalidInputExceptionType.NOT_EXISTS_REFRESH_TOKEN);
+        if(refreshToken.equals(user.getRefreshToken())) throw new InvalidUserInputException(InvalidUserInputExceptionType.NOT_EXISTS_REFRESH_TOKEN);
         //RT가 유효하므로 AT 재발급
         return tokenService.issueAccessToken(user);
     }

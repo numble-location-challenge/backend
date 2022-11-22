@@ -6,8 +6,8 @@ import com.example.backend.dto.login.AuthDTO;
 import com.example.backend.dto.login.SocialLoginRequestDTO;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
-import com.example.backend.global.exception.InvalidInputException;
-import com.example.backend.global.exception.InvalidInputExceptionType;
+import com.example.backend.global.exception.InvalidUserInputException;
+import com.example.backend.global.exception.InvalidUserInputExceptionType;
 import com.example.backend.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -61,7 +61,7 @@ public class LoginController {
             @PathVariable String userType,
             @RequestBody final SocialLoginRequestDTO authRequestDTO){
 
-        if(!userType.equals(UserType.KAKAO)) throw new InvalidInputException(InvalidInputExceptionType.INVALID_USERTYPE);
+        if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
         User loginUser = loginService.kakaoLogin(authRequestDTO);
         HashMap<String, String> jwtMap = loginService.authorize(loginUser);

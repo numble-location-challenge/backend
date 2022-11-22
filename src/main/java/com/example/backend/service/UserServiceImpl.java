@@ -65,21 +65,21 @@ public class UserServiceImpl implements UserService{
     //중복 검증
     private void validateDuplicate(String email, String nickName) {
         if(userRepository.existsByEmailAndNickname(email, nickName)){
-            throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXIST_EMAIL_AND_NICKNAME);
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXIST_EMAIL_AND_NICKNAME);
         }
         else if(userRepository.existsByEmail(email)){
-            throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXISTS_EMAIL);
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_EMAIL);
         }
         else if(userRepository.existsByNickname(nickName)){
-            throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXISTS_NICKNAME);
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_NICKNAME);
         }
     }
 
     private void validateSocialUserDuplicate(Long id, String email){
         boolean findUser = userRepository.existsById(id);
-        if(findUser) throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXISTS_KAKAO_USER);
+        if(findUser) throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_KAKAO_USER);
         else if(userRepository.existsByEmail(email)){
-            throw new InvalidInputException(InvalidInputExceptionType.ALREADY_EXISTS_EMAIL);
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_EMAIL);
         }
     }
 

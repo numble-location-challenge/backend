@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class CustomErrorController implements ErrorController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST) //400
-    @ExceptionHandler(InvalidInputException.class)
-    public ErrorDTO handleBadRequest(InvalidInputException ex){
+    @ExceptionHandler(InvalidUserInputException.class)
+    public ErrorDTO handleBadRequest(InvalidUserInputException ex){
         return ErrorDTO.builder()
                 .errorCode(ex.getExceptionType().getErrorCode())
                 .errorMessage(ex.getExceptionType().getMessage())

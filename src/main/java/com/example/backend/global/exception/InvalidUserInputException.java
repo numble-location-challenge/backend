@@ -3,11 +3,11 @@ package com.example.backend.global.exception;
 import com.example.backend.global.exception.base.CustomException;
 import com.example.backend.global.exception.base.CustomExceptionType;
 
-public class InvalidInputException extends CustomException {
+public class InvalidUserInputException extends CustomException {
 
-    private InvalidInputExceptionType exceptionType;
+    private InvalidUserInputExceptionType exceptionType;
 
-    public InvalidInputException(InvalidInputExceptionType exceptionType) {
+    public InvalidUserInputException(InvalidUserInputExceptionType exceptionType) {
         this.exceptionType = exceptionType;
     }
 
