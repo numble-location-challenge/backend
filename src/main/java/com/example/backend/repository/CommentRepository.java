@@ -1,6 +1,7 @@
 package com.example.backend.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,7 +13,8 @@ import com.example.backend.domain.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
-    List<Comment> findAllByPost_Id(Long postId);
+    @Query("SELECT c FROM Comment c join fetch c.user where c.post.id =:postId order by c.cGroup desc, c.refOrder asc")
+    List<Comment> findAllByPostIdOrderByCGroupDescRefOrderAsc(@Param("postId") Long postId);
 
     @Query("SELECT coalesce(Max(c.cGroup),0) FROM Comment c")
     Integer findByMaxCommentGroup();
@@ -25,5 +27,5 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
     @Query("DELETE FROM Comment c where c.cGroup =:cGroup")
     void deleteAllByCgroup(@Param("cGroup")int cGroup);
 
-    Comment findByIdAndPostId(Long id, Long postId);
+    Optional<Comment> findByIdAndPostId(Long id, Long postId);
 }

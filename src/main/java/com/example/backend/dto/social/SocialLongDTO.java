@@ -6,6 +6,8 @@ import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
 import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.dto.*;
+import com.example.backend.dto.comment.CommentResponseDTO;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -98,7 +100,7 @@ public class SocialLongDTO{
         this.contact = social.getContact();
         this.category = toCategoryDTO(social.getCategory());
         this.tags = toSocialTagDTO(
-                social.getSocialTags()
+            social.getSocialTags()
                 .stream().filter(socialTag -> socialTag.getSocial().getId().equals(social.getId()))
                 .collect(Collectors.toList())
         );
@@ -107,16 +109,16 @@ public class SocialLongDTO{
 
     public CategoryDTO toCategoryDTO(Category category){
         return CategoryDTO.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .build();
+            .id(category.getId())
+            .name(category.getName())
+            .build();
     }
 
     public SocialUserDTO toSocialUserDTO(User user){
         return SocialUserDTO.builder()
-                .id(user.getId())
-                .name(user.getNickname())
-                .build();
+            .id(user.getId())
+            .name(user.getNickname())
+            .build();
     }
 
     public List<SocialTagDTO> toSocialTagDTO(List<SocialTag> socialTags){

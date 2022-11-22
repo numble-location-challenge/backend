@@ -10,12 +10,20 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.post.Post;
 import com.example.backend.dto.comment.CommentRequestDTO;
 import com.example.backend.dto.comment.CommentResponseDTO;
+import com.example.backend.global.exception.EntityNotExistsException;
+import com.example.backend.global.exception.EntityNotExistsExceptionType;
+import com.example.backend.global.exception.ForbiddenException;
+import com.example.backend.global.exception.ForbiddenExceptionType;
+import com.example.backend.global.exception.comment.CommentInvalidInputException;
+import com.example.backend.global.exception.comment.CommentInvalidInputExceptionType;
 import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CommentServiceImpl implements CommentService{
@@ -24,35 +32,34 @@ public class CommentServiceImpl implements CommentService{
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    //TODO 최근에 달린 댓글이 더 상단에 표시되도록 쿼리 작성
+    @Transactional(readOnly = true)
     @Override
     public List<Comment> getComments(Long postId) {
-        List<Comment> comments = commentRepository.findAllByPost_Id(postId);
+        List<Comment> comments = commentRepository.findAllByPostIdOrderByCGroupDescRefOrderAsc(postId);
         return comments;
     }
 
     @Transactional
     @Override
     public void createComment(Long postId, String userEmail, CommentRequestDTO commentRequestDTO) {
-        User user = userRepository.findByEmail(userEmail).orElseThrow();
-        Post post = postRepository.findById(postId).orElseThrow();
+        User user = userRepository.findByEmail(userEmail).orElseThrow(()-> new EntityNotExistsException(
+            EntityNotExistsExceptionType.NOT_FOUND_USER));
+        Post post = postRepository.findById(postId).orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
         Integer newCommentGroup = commentRepository.findByMaxCommentGroup() + 1;
         //댓글 그룹 번호 NULL이면 0, 아니면 최댓값
-        // commentId가 null 이면 댓글, 아니면 대댓글 저장
-
         Comment comment = Comment.createComment(commentRequestDTO.getContents(), newCommentGroup, 0,
             0, 0L, post, user);
         commentRepository.save(comment);
 
     }
 
-    //TODO 댓글이 아니면 대댓글을 달수 없도록 로직 작성
     @Transactional
     @Override
     public void createReply(Long postId, String userEmail, Long commentId, CommentRequestDTO commentRequestDTO) {
-        User user = userRepository.findByEmail(userEmail).orElseThrow();
-        Post post = postRepository.findById(postId).orElseThrow();
-        Comment parent_comment = commentRepository.findByIdAndPostId(commentId, postId); // 부모 댓글의 정보
+        User user = userRepository.findByEmail(userEmail).orElseThrow(()-> new EntityNotExistsException(
+            EntityNotExistsExceptionType.NOT_FOUND_USER));
+        Post post = postRepository.findById(postId).orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
+        Comment parent_comment = commentRepository.findByIdAndPostId(commentId, postId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT)); // 부모 댓글의 정보
         if (isComment(parent_comment)) {
             int parentLevel = parent_comment.getLevel(); // 부모 댓글의 레벨
             int parentCGroup = parent_comment.getCGroup(); // 부모 댓글의 그룹
@@ -61,30 +68,35 @@ public class CommentServiceImpl implements CommentService{
             Comment comment = Comment.createComment(commentRequestDTO.getContents(), parentCGroup, parentLevel + 1,
                 lastReforder + 1, parent_comment.getId(), post, user);
             commentRepository.save(comment);
+        } else{
+            throw new CommentInvalidInputException(CommentInvalidInputExceptionType.INVALID_INPUT_COMMENT_ID);
         }
     }
 
+    @Transactional
     @Override
     public void deleteComment(Long commentId, String userEmail) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
         if (hasPermission(comment, userEmail)) {
             if (isComment(comment)) {
                 commentRepository.deleteAllByCgroup(comment.getCGroup());
             } else {
                 commentRepository.delete(comment);
             }
+        } else {
+            throw new ForbiddenException(ForbiddenExceptionType.NOT_AUTHORITY_DELETE_COMMENT);
         }
     }
 
     @Transactional
     public CommentResponseDTO updateComment(Long commentId, String userEmail, CommentRequestDTO commentRequestDTO) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
         if (hasPermission(comment, userEmail)) {
             comment.updateComment(commentRequestDTO.getContents());
             CommentResponseDTO responseDTO = new CommentResponseDTO(comment);
             return responseDTO;
         } else {
-            throw new RuntimeException("권한이 없습니다.");
+            throw new ForbiddenException(ForbiddenExceptionType.NOT_AUTHORITY_UPDATE_COMMENT);
         }
     }
 

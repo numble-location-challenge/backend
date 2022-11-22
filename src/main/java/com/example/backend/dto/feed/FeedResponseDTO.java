@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.example.backend.domain.post.Feed;
-import com.example.backend.dto.CommentResponseDTO;
 import com.example.backend.dto.PostImageDTO;
+import com.example.backend.dto.comment.CommentResponseDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

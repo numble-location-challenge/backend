@@ -28,7 +28,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-;
 
 @Tag(name = "comment", description = "댓글 API")
 @RequiredArgsConstructor
@@ -41,7 +40,8 @@ public class CommentController {
     @Operation(summary = "댓글 조회", description = "게시물의 ID를 이용하여 해당 게시물의 댓글을 조회합니다.")
     @ApiResponses(
         {@ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST")
+        ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/comment/{postId}")
     public ResponseDTO<CommentResponseDTO> getComments(@PathVariable Long postId) {
         List<Comment> comments = commentService.getComments(postId);
@@ -57,11 +57,12 @@ public class CommentController {
     @Operation(summary = "댓글 작성", description = "사용자가 댓글을 작성합니다.")
     @ApiResponses(
         {@ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST")
+        ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PostMapping("/comment/{postId}")
     public ResponseDTO createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDTO commentRequestDTO,
         @AuthenticationPrincipal String userEmail) {
-        commentService.createComment(postId, "hello@numble.com", commentRequestDTO);
+        commentService.createComment(postId, userEmail, commentRequestDTO);
         return ResponseDTO.builder().success(true).message("정상 생성되었습니다.").build();
     }
 
@@ -69,11 +70,12 @@ public class CommentController {
     @Operation(summary = "대댓글 작성", description = "사용자가 대댓글을 작성합니다.")
     @ApiResponses(
         {@ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST")
+        ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PostMapping("/comment/{postId}/{commentId}")
     public ResponseDTO createReply(@PathVariable Long postId, @PathVariable Long commentId,
         @Valid @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal String userEmail) {
-        commentService.createReply(postId, "hello@numble.com", commentId, commentRequestDTO);
+        commentService.createReply(postId, userEmail, commentId, commentRequestDTO);
         return ResponseDTO.builder().success(true).message("정상 생성되었습니다.").build();
     }
 
@@ -82,10 +84,11 @@ public class CommentController {
     @ApiResponses(
         {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
-            , @ApiResponse(responseCode = "403", description = "Forbidden")})
+            , @ApiResponse(responseCode = "403", description = "FORBIDDEN")
+        ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @DeleteMapping("/comment/{commentId}")
     public ResponseDTO deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal String userEmail) {
-        commentService.deleteComment(commentId, "hello@numble.com");
+        commentService.deleteComment(commentId, userEmail);
         return ResponseDTO.builder().success(true).message("정상 삭제되었습니다.").build();
     }
 
@@ -94,10 +97,11 @@ public class CommentController {
     @ApiResponses(
         {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
-            , @ApiResponse(responseCode = "403", description = "Forbidden")})
+            , @ApiResponse(responseCode = "403", description = "Forbidden")
+        ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PutMapping("/comment/{commentId}")
-    public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO) {
-        CommentResponseDTO result = commentService.updateComment(commentId, "hello@numble.com", commentRequestDTO);
+    public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal String userEmail) {
+        CommentResponseDTO result = commentService.updateComment(commentId, userEmail, commentRequestDTO);
         return ResponseDTO.builder().success(true).message("정상 수정되었습니다").data(List.of(result)).build();
     }
 }
