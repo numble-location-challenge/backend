@@ -1,10 +1,7 @@
 package com.example.backend.domain;
 
 import com.example.backend.domain.post.Post;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -27,5 +24,16 @@ public class Like {
     @JoinColumn(name = "post_id")
     private Post post; //좋아요 단 글
 
+
+    @Builder
+    private Like(User user, Post post){
+        this.user = user;
+        this.post = post;
+    }
+
+    public static Like createLike(User user, Post post){
+        Like like = Like.builder().user(user).post(post).build();
+        return like;
+    }
     //postType
 }
