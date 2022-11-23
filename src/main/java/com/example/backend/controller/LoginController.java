@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class LoginController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
     })
-    public ResponseEntity<?> login(@RequestBody final DefaultLoginRequestDTO loginDTO){
+    public ResponseEntity<?> login(@RequestBody @Valid final DefaultLoginRequestDTO loginDTO){
 
         User loginUser = loginService.defaultLogin(loginDTO.getEmail(),loginDTO.getPassword());
         HashMap<String, String> jwtMap = loginService.getAccessAndRefreshToken(loginUser);
@@ -59,7 +60,7 @@ public class LoginController {
     })
     public ResponseEntity<?> socialLogin(
             @PathVariable String userType,
-            @RequestBody final SocialLoginRequestDTO authRequestDTO){
+            @RequestBody @Valid final SocialLoginRequestDTO authRequestDTO){
 
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
@@ -84,7 +85,7 @@ public class LoginController {
         //refresh token을 http only 쿠키에 담음
         ResponseCookie cookie = ResponseCookie.from("refreshToken",tokenMap.get("RT"))
                 .httpOnly(true)
-                .secure(true)
+                .secure(false) //TODO SSL 인증서 필요해서 나중에
                 .sameSite("None")
                 .maxAge(REFRESH_EXP)
                 .path("/refresh")
@@ -97,20 +98,20 @@ public class LoginController {
     }
 
     //TODO
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "로그아웃", description = "수정 중입니다!!")
-    @PostMapping("/logout")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND")
-    })
-    public ResponseDTO<?> logout(
-            @AuthenticationPrincipal String email,
-            @CookieValue(value = "refreshToken") String refreshToken){
+//    @ResponseStatus(HttpStatus.OK)
+//    @Operation(summary = "로그아웃", description = "수정 중입니다!!")
+//    @PostMapping("/logout")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "OK"),
+//            @ApiResponse(responseCode = "404", description = "NOT FOUND")
+//    })
+//    public ResponseDTO<?> logout(
+//            @AuthenticationPrincipal String email,
+//            @CookieValue(value = "refreshToken") String refreshToken){
 //        loginService.logout(email, refreshToken);
 //        return ResponseDTO.builder().success(true).message("로그아웃 되었습니다.").build();
-        return null;
-    }
+//        return null;
+//    }
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "새로고침 됐을때, accessToken이 만료됐을 때 호출", description = "RefreshToken 쿠키를 사용해서 AccessToken을 재발급합니다.")

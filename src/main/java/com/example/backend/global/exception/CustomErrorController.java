@@ -8,17 +8,38 @@ import com.example.backend.global.exception.social.SocialInvalidInputException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
 
 @RestControllerAdvice
 @Slf4j
 public class CustomErrorController implements ErrorController {
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ErrorDTO handleBadRequest(MethodArgumentNotValidException ex){
+        List<FieldError> errors = ex.getBindingResult().getFieldErrors();
+        StringBuilder sb = new StringBuilder();
+        for(FieldError error : errors){
+            sb.append("'");
+            sb.append(error.getField());
+            sb.append("' ");
+        }
+        sb.append("validation 에러 입니다.");
+
+        return ErrorDTO.builder()
+                .errorCode(-1) //validation errorCode?
+                .errorMessage(sb.toString())
+                .build();
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST) //400
     @ExceptionHandler(value = {InvalidUserInputException.class, CommentInvalidInputException.class,
-        SocialInvalidInputException.class})
+            SocialInvalidInputException.class})
     public ErrorDTO handleBadRequest(CustomException ex){
         return ErrorDTO.builder()
                 .errorCode(ex.getExceptionType().getErrorCode())

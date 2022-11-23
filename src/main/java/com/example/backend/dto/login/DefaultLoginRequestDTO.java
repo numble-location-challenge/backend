@@ -6,19 +6,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Schema
+@NotNull
 public class DefaultLoginRequestDTO {
 
     @Schema(description = "이메일", defaultValue = "hello@numble.com")
-    @NotNull
+    @NotBlank
     String email;
 
     @Schema(description = "비밀번호", defaultValue = "testPw")
-    @NotNull
+    @NotBlank
     String password;
 }
