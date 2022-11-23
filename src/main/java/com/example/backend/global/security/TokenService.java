@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +66,13 @@ public class TokenService {
                 .compact();
     }
 
+    /**
+     * 토큰 생성 시 호출되는 메서드
+     * 토큰 타입에 맞는 JwtSubject 객체를 생성해서 String으로 변환해 리턴
+     * @param user
+     * @param jwtType
+     * @return String
+     */
     private String getTokenSubjectStr(User user, JwtType jwtType) {
         try {
             return objectmapper.writeValueAsString(new JwtSubject(user.getId(), user.getEmail(), jwtType));
@@ -76,30 +82,23 @@ public class TokenService {
         }
     }
 
-    //jwt 검증 후 아이디(이메일) 추출
-    public JwtSubject validateAndGetSubject(String token){ //getSubjects
+    /**
+     * jwt 검증 후 아이디(이메일) 추출(예외처리는 filter에서)
+     * @param token
+     * @return
+     */
+    public JwtSubject validateAndGetSubject(String token) { //getSubjects
+        Claims claims = getAllClaimsFromToken(token); // get userId(payload(Claims))
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(getKeyForSign())
-                    .build()
-                    .parseClaimsJws(token)// token을 Base 64로 디코딩 및 파싱
-                    .getBody(); // get userId(payload(Claims))
-
             return objectmapper.readValue(claims.getSubject(), JwtSubject.class);
-        } catch(SignatureException | MalformedJwtException e){ //서명 또는 구조 문제
-            throw new UnAuthorizedException(UnAuthorizedExceptionType.INVALID_TOKEN);
-        } catch (ExpiredJwtException e){ //유효기간이 만료된 토큰
-            throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_IS_EXPIRED);
         } catch (JsonProcessingException e) {
-            log.debug(e.getMessage());
             e.printStackTrace();
-            throw new UnAuthorizedException(UnAuthorizedExceptionType.PARSING_FAIL);
+            return null;
         }
     }
 
-    public void destroyToken(String email, String refreshToken) {
-        //TODO
-
+    public Claims getAllClaimsFromToken(String token){
+        return Jwts.parserBuilder().setSigningKey(getKeyForSign()).build().parseClaimsJws(token).getBody();
     }
 
 }

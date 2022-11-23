@@ -21,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class UserController {
             @ApiResponse(responseCode = "201", description = "CREATED"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
     })
-    public ResponseEntity<?> join(@RequestBody final UserDefaultJoinRequestDTO userDefaultJoinRequestDTO, UriComponentsBuilder uriBuilder){
+    public ResponseEntity<?> join(@RequestBody @Valid final UserDefaultJoinRequestDTO userDefaultJoinRequestDTO, UriComponentsBuilder uriBuilder){
         final User createdUser = userService.createDefaultUser(userDefaultJoinRequestDTO);
         return getCreatedResponseEntity(uriBuilder, createdUser.getId());
     }
@@ -55,7 +56,7 @@ public class UserController {
     })
     public ResponseEntity<?> socialJoin(
             @PathVariable String userType,
-            @RequestBody final SocialJoinRequestDTO joinDTO, UriComponentsBuilder uriBuilder){
+            @RequestBody @Valid final SocialJoinRequestDTO joinDTO, UriComponentsBuilder uriBuilder){
         //프론트에서 회원정보 동의해주고 region, AT 가지고 회원가입 처리
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
         final User createdUser = userService.createKakaoUser(joinDTO);
@@ -100,7 +101,7 @@ public class UserController {
     public ResponseDTO<UserProfileDTO> modifyUser(
             @AuthenticationPrincipal String email,
             @PathVariable Long id,
-            @RequestBody final UserModifyRequestDTO userModifyRequestDTO){
+            @RequestBody @Valid final UserModifyRequestDTO userModifyRequestDTO){
 
         //TODO id 검증.. principal 객체로 변경 후 고민
         final User user = userService.modify(email, userModifyRequestDTO);
