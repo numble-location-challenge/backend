@@ -70,7 +70,11 @@ public class LoginServiceImpl implements LoginService{
         findUser.deleteRefreshToken(); //DB의 RT 삭제
     }
 
-    /** 검증 & 만료체크 후 User를 반환 **/
+    /**
+     * 검증 & 만료체크를 거친다
+     * @param refreshToken
+     * @return User
+     */
     @Override
     public User getUserByRefreshToken(String refreshToken) {
         //RT 만료되었다면 validate 메서드에서 ->로그인 유도 401
@@ -80,10 +84,16 @@ public class LoginServiceImpl implements LoginService{
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
     }
 
+    /**
+     * RT 검증 실패시 401 에러 발생
+     * @param user
+     * @param refreshToken
+     * @return AccessToken
+     */
     @Override
     public String refresh(User user, String refreshToken) {
         //DB에 있는 RT랑 비교
-        if(!refreshToken.equals(user.getRefreshToken())) throw new InvalidUserInputException(InvalidUserInputExceptionType.NOT_EXISTS_REFRESH_TOKEN);
+        if(!refreshToken.equals(user.getRefreshToken())) throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_UN_AUTHORIZED);
         //RT가 유효하므로 AT 재발급
         return tokenService.issueAccessToken(user);
     }
