@@ -41,8 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         for(String url : NOT_CHECK_URL){
-            if(url.equals(path)) return true;
+            if(url.equals(path)){
+                log.info("NOT_CHECK_URL입니다.");
+                return true;
+            }
         }
+        log.info("NOT_CHECK_URL이 아닙니다.");
         return false;
     }
 
@@ -80,7 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         else{
             log.info("헤더에 토큰이 담겨있지 않습니다.");
-            throw new AuthenticationException("AuthenticationException 에러");
+//            throw new AuthenticationException("AuthenticationException 에러");
         }
 
         filterChain.doFilter(request, response);
