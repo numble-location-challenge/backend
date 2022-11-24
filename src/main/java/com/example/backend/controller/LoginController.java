@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
-import java.util.List;
 
 @Tag(name = "login/logout", description = "로그인 API")
 @RestController
@@ -73,13 +72,6 @@ public class LoginController {
     }
 
     private ResponseEntity<?> getLoginSuccessResponse(User loginUser, HashMap<String, String> tokenMap, String message) {
-        //set response
-        AuthDTO authDTO = new AuthDTO(loginUser);
-        ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
-                .success(true).message(message)
-                .data(List.of(authDTO))
-                .build();
-
         //refresh token을 http only 쿠키에 담음
         ResponseCookie cookie = ResponseCookie.from(REFRESH_COOKIE, tokenMap.get("RT"))
                 .httpOnly(true)
@@ -89,11 +81,14 @@ public class LoginController {
                 .path("/refresh")
                 .build();
 
+        //set response
+        AuthDTO authDTO = new AuthDTO(loginUser);
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, HttpHeaders.AUTHORIZATION)
                 .header(HttpHeaders.AUTHORIZATION, tokenMap.get("AT"))
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(response);
+                .body(new ResponseDTO<>(authDTO, message));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -110,13 +105,9 @@ public class LoginController {
 
         //set response
         AuthDTO authDTO = new AuthDTO(loginUser);
-        ResponseDTO<AuthDTO> response = ResponseDTO.<AuthDTO>builder()
-                .success(true).message("AccessToken이 재발급되었습니다.")
-                .data(List.of(authDTO))
-                .build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, reissuedAccessToken)
-                .body(response);
+                .body(new ResponseDTO<>(authDTO, "AccessToken이 재발급되었습니다."));
     }
 }

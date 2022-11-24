@@ -14,5 +14,11 @@ import java.util.List;
 public class ResponseDTO<T> {
     private boolean success;
     private String message;
-    private List<T> data;
+    private T data;
+
+    public ResponseDTO(T data, String message){
+        success = true;
+        this.data = data;
+        this.message = message;
+    }
 }

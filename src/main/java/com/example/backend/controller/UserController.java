@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.*;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -68,10 +69,9 @@ public class UserController {
                 .buildAndExpand(id).toUri();
 
         //TODO location 추가
-        return ResponseEntity.created(location).body(ResponseDTO.builder()
-                .success(true).message("회원가입 처리되었습니다.")
-                .data(null)
-                .build());
+        return ResponseEntity.created(location)
+                .header(HttpHeaders.LOCATION, location.toString())
+                .body(new ResponseDTO<>(null, "회원가입 처리되었습니다."));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -85,7 +85,7 @@ public class UserController {
     })
     public ResponseDTO<?> deleteUser(@AuthenticationPrincipal String email){
         userService.delete(email);
-        return ResponseDTO.builder().success(true).message("정상 탈퇴되었습니다.").build();
+        return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 
     //TODO 서비스 구현
@@ -107,15 +107,14 @@ public class UserController {
         final User user = userService.modify(email, userModifyRequestDTO);
 
         //set data list
-        List<UserProfileDTO> dataList = List.of(UserProfileDTO.builder()
+        UserProfileDTO userProfileDTO = UserProfileDTO.builder()
                 .nickname(user.getNickname())
                 .profile(user.getProfile())
                 .region(user.getRegion())
                 .bio(user.getBio())
-                .build());
+                .build();
 
-        return ResponseDTO.<UserProfileDTO>builder().success(true).message("정상 수정 처리 되었습니다.")
-                .data(dataList).build();
+        return new ResponseDTO<>(userProfileDTO, "정상 수정 처리 되었습니다.");
     }
 
     //내 프로필 조회할 때 피드, 댓글도 같이 들고 와야하는지? 일단 빼고 처리
@@ -128,7 +127,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<UserProfileDTO> getUserInfo(
+    public ResponseDTO<?> getUserInfo(
             @AuthenticationPrincipal String email,
             @PathVariable Long id){
 
@@ -142,7 +141,6 @@ public class UserController {
                 .bio(user.getBio())
                 .build());
 
-        return ResponseDTO.<UserProfileDTO>builder().success(true).message("프로필 조회 결과")
-                .data(dataList).build();
+        return new ResponseDTO<>(dataList, "프로필 조회 결과");
     }
 }
