@@ -43,14 +43,14 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/comment/{postId}")
-    public ResponseDTO<CommentResponseDTO> getComments(@PathVariable Long postId) {
+    public ResponseDTO<?> getComments(@PathVariable Long postId) {
         List<Comment> comments = commentService.getComments(postId);
 
         List<CommentResponseDTO> result = comments.stream()
             .map(comment -> new CommentResponseDTO(comment))
             .collect(Collectors.toList());
 
-        return ResponseDTO.<CommentResponseDTO>builder().success(true).message("정상 조회되었습니다.").data(result).build();
+        return new ResponseDTO<>(result,"댓글 조회 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -60,10 +60,10 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PostMapping("/comment/{postId}")
-    public ResponseDTO createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDTO commentRequestDTO,
+    public ResponseDTO<?> createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDTO commentRequestDTO,
         @AuthenticationPrincipal String userEmail) {
         commentService.createComment(postId, userEmail, commentRequestDTO);
-        return ResponseDTO.builder().success(true).message("정상 생성되었습니다.").build();
+        return new ResponseDTO<>(null,"댓글 작성 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -76,7 +76,7 @@ public class CommentController {
     public ResponseDTO createReply(@PathVariable Long postId, @PathVariable Long commentId,
         @Valid @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal String userEmail) {
         commentService.createReply(postId, userEmail, commentId, commentRequestDTO);
-        return ResponseDTO.builder().success(true).message("정상 생성되었습니다.").build();
+        return new ResponseDTO<>(null,"대댓글 작성 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -89,7 +89,7 @@ public class CommentController {
     @DeleteMapping("/comment/{commentId}")
     public ResponseDTO deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal String userEmail) {
         commentService.deleteComment(commentId, userEmail);
-        return ResponseDTO.builder().success(true).message("정상 삭제되었습니다.").build();
+        return new ResponseDTO<>(null,"댓글 삭제 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -102,6 +102,6 @@ public class CommentController {
     @PutMapping("/comment/{commentId}")
     public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal String userEmail) {
         CommentResponseDTO result = commentService.updateComment(commentId, userEmail, commentRequestDTO);
-        return ResponseDTO.builder().success(true).message("정상 수정되었습니다").data(List.of(result)).build();
+        return new ResponseDTO<>(result,"댓글 수정 성공");
     }
 }
