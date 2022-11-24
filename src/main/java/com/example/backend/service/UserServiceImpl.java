@@ -35,12 +35,13 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User createDefaultUser(UserDefaultJoinRequestDTO userDefaultJoinRequestDTO) {
-        User user = userDefaultJoinRequestDTO.toEntity();
+    public User createDefaultUser(UserDefaultJoinRequestDTO joinDTO) {
+        validateDuplicate(joinDTO.getEmail(), joinDTO.getNickname());
 
-        validateDuplicate(user.getEmail(), user.getNickname());
         //중복X -> 회원가입 처리
+        User user = joinDTO.toEntity();
         user.encodePassword(passwordEncoder);
+        user.setDefaultUser();
         return userRepository.save(user);
     }
 
@@ -53,6 +54,8 @@ public class UserServiceImpl implements UserService{
         validateSocialUserDuplicate(userDTO.getId(), userDTO.getEmail());
         //중복X -> region 세팅 및 회원가입 처리
         User user = userDTO.toEntity(joinDTO.getRegion());
+        //패스워드 없음
+        user.setKakaoUser();
         return userRepository.save(user);
     }
 
@@ -67,6 +70,7 @@ public class UserServiceImpl implements UserService{
         if(userDTO.getNickname() != null) user.updateNickname(userDTO.getNickname());
         if(userDTO.getBio() != null) user.updateBio(userDTO.getBio());
         if(userDTO.getProfile() != null) user.updateProfile(userDTO.getProfile());
+        if(userDTO.getRegion() != null) user.updateRegion(userDTO.getRegion());
 
         return null;
     }

@@ -1,7 +1,6 @@
 package com.example.backend.dto.user;
 
 import com.example.backend.domain.User;
-import com.example.backend.domain.enumType.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,7 +46,7 @@ public class UserDefaultJoinRequestDTO {
 
     public User toEntity(){
         return User.builder()
-                .userType(UserType.DEFAULT).email(email).password(password).username(username).nickname(nickname)
+                .email(email).password(password).username(username).nickname(nickname)
                 .phoneNumber(phoneNumber).region(region).bio(bio)
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.example.backend.domain;
 
+import com.example.backend.domain.enumType.UserStatus;
 import com.example.backend.domain.post.Feed;
 import com.example.backend.domain.post.Social;
 import com.example.backend.domain.enumType.UserType;
@@ -23,7 +24,6 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @NotNull
     @Enumerated(value = EnumType.STRING)
     @Column(name = "user_type")
     private UserType userType; // 기본 회원, 카카오 회원 구분
@@ -55,6 +55,10 @@ public class User {
     @Column(length = 500, name = "refresh_token")
     private String refreshToken; //JWT
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "user_status")
+    private UserStatus userStatus;
+
 //    @OneToMany(mappedBy = "user")
 //    private List<Feed> feeds = new ArrayList<>();
 
@@ -76,8 +80,22 @@ public class User {
         this.id = id;
     }
 
+    public void setDefaultUser(){
+        userType = UserType.DEFAULT;
+        userStatus = UserStatus.ACTIVATED;
+    }
+
+    public void setKakaoUser(){
+        userType = UserType.KAKAO;
+        userStatus = UserStatus.ACTIVATED;
+    }
+
+    public void setWithdrawStatus(){
+        userStatus = UserStatus.WITHDRAW;
+    }
+
     @Builder
-    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int region, String bio) {
+    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int region, @NotNull UserStatus userStatus, String bio) {
         this.userType = userType;
         this.email = email;
         this.password = password;
@@ -85,6 +103,7 @@ public class User {
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.region = region;
+        this.userStatus = userStatus;
         this.bio = bio;
     }
 
@@ -100,7 +119,6 @@ public class User {
 
 
     //==수정 메서드==//
-
     public void updateNickname(String nickname){
         this.nickname = nickname;
     }
@@ -115,6 +133,10 @@ public class User {
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateRegion(int region){
+        this.region = region;
     }
 
     public void deleteRefreshToken() {
