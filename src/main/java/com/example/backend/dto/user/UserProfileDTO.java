@@ -1,5 +1,6 @@
 package com.example.backend.dto.user;
 
+import com.example.backend.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.*;
@@ -24,4 +25,10 @@ public class UserProfileDTO {
     @Schema(description = "지역 번호(동)", defaultValue = "조회 또는 변경된 지역번호")
     private int region;
 
+    public UserProfileDTO(User user) {
+        this.nickname = user.getNickname();
+        this.profile = user.getProfile();
+        this.region = user.getRegion();
+        this.bio = user.getBio();
+    }
 }

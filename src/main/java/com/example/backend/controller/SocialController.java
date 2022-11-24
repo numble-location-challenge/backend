@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.domain.post.Social;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.dto.social.SocialLongDTO;
@@ -14,10 +15,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,11 +79,17 @@ public class SocialController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> createSocial(
+    public ResponseEntity<?> createSocial(
             @AuthenticationPrincipal String email,
-            @RequestBody final SocialCreateRequestDTO socialCreateRequestDTO){
-        socialService.createSocial(email, socialCreateRequestDTO);
-        return ResponseDTO.builder().success(true).message("모임 생성 완료").build();
+            @RequestBody final SocialCreateRequestDTO socialCreateRequestDTO, UriComponentsBuilder uriBuilder){
+        Social createdSocial = socialService.createSocial(email, socialCreateRequestDTO);
+
+        URI location = uriBuilder.path("/social/{id}")
+                .buildAndExpand(createdSocial.getId()).toUri();
+
+        return ResponseEntity.created(location)
+                .header(HttpHeaders.LOCATION, location.toString())
+                .body(new ResponseDTO<>(null, "모임 생성 완료"));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -93,8 +105,9 @@ public class SocialController {
             @AuthenticationPrincipal String email,
             @PathVariable Long socialId,
             @RequestBody final SocialModifyRequestDTO socialModifyRequestDTO){
-        socialService.modifySocial(email, socialId, socialModifyRequestDTO);
-        return ResponseDTO.builder().success(true).message("모임 수정 완료").build();
+        Social modifiedSocial = socialService.modifySocial(email, socialId, socialModifyRequestDTO);
+        SocialShortDTO socialShortDTO = new SocialShortDTO(modifiedSocial);
+        return new ResponseDTO<>(socialShortDTO, "모임 수정 완료");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -108,7 +121,7 @@ public class SocialController {
     })
     public ResponseDTO<?> deleteSocial(@Parameter(required = true) @PathVariable Long socialId){
         socialService.deleteSocial(socialId);
-        return ResponseDTO.builder().success(true).message("모임 삭제 완료").build();
+        return new ResponseDTO<>(null, "모임 삭제 완료");
     }
 
     @ResponseStatus(HttpStatus.OK)

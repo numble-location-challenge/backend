@@ -15,7 +15,7 @@ public interface UserService {
 
     User getUser(String email, Long id); //내 프로필 조회
 
-    User modify(String email, UserModifyRequestDTO userModifyRequestDTO);
+    User modify(String email, Long userId, UserModifyRequestDTO userModifyRequestDTO);
 
     //모임신청
     void participateSocial(String email, Long socialId);

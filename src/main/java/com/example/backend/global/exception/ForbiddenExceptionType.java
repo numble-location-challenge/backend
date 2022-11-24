@@ -7,8 +7,6 @@ import com.example.backend.global.exception.base.CustomExceptionType;
  */
 public enum ForbiddenExceptionType implements CustomExceptionType {
     USER_UN_AUTHORIZED(-199, "권한이 없는 페이지입니다."),
-    TOKEN_NOT_EXPIRED(-191, "만료되지 않은 Access Token 토큰입니다."),
-
     NOT_AUTHORITY_UPDATE_COMMENT(-402, "댓글을 수정할 권한이 없습니다."),
     NOT_AUTHORITY_DELETE_COMMENT(-403, "댓글을 삭제할 권한이 없습니다.");
 
