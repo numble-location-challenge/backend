@@ -43,10 +43,10 @@ public class FeedController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/posts/{postId}")
-    public ResponseDTO<FeedResponseDTO> getFeed(@PathVariable("postId") Long postId) {
+    public ResponseDTO<?> getFeed(@PathVariable("postId") Long postId) {
         Feed feed = feedService.getFeed(postId);
-        FeedResponseDTO dto = new FeedResponseDTO(feed);
-        return ResponseDTO.<FeedResponseDTO>builder().success(true).message("정상 조회되었습니다.").data(List.of(dto)).build();
+        FeedResponseDTO result = new FeedResponseDTO(feed);
+        return new ResponseDTO<>(result,"피드 단건 조회 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -56,14 +56,14 @@ public class FeedController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/posts")
-    public ResponseDTO<FeedListResponseDTO> getFeeds(@RequestParam String search) {
+    public ResponseDTO<?> getFeeds(@RequestParam String search) {
         List<Feed> feeds = feedService.getFeeds(search);
 
         List<FeedListResponseDTO> result = feeds.stream()
             .map(feed -> new FeedListResponseDTO(feed))
             .collect(Collectors.toList());
         log.info("size = {}", result.size());
-        return ResponseDTO.<FeedListResponseDTO>builder().success(true).message("정상 조회되었습니다.").data(result).build();
+        return new ResponseDTO<>(result,"피드 리스트 조회 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -74,7 +74,7 @@ public class FeedController {
     @PostMapping("/posts")
     public ResponseDTO<?> createFeed(@RequestBody FeedRequestDTO feedRequestDTO) {
         feedService.createFeed(feedRequestDTO, 1L);
-        return ResponseDTO.builder().success(true).message("정상 생성되었습니다.").build();
+        return new ResponseDTO<>(null,"피드 생성 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -87,7 +87,7 @@ public class FeedController {
     public ResponseDTO<?> deleteFeed(@PathVariable Long postId) {
         Long userId = 1L;
         feedService.deleteFeed(postId, userId);
-        return ResponseDTO.builder().success(true).message("정상 삭제되었습니다.").build();
+        return new ResponseDTO<>(null,"피드 삭제 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -101,6 +101,6 @@ public class FeedController {
         Long userId = 1L;
         Feed feed = feedService.updateFeed(postId, feedRequestDTO, userId);
         FeedResponseDTO result = new FeedResponseDTO(feed);
-        return ResponseDTO.builder().success(true).message("정상 수정 처리 되었습니다.").data(List.of(result)).build();
+        return new ResponseDTO<>(result, "피드 수정 성공");
     }
 }
