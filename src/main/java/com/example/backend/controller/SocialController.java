@@ -82,10 +82,10 @@ public class SocialController {
     public ResponseEntity<?> createSocial(
             @AuthenticationPrincipal String email,
             @RequestBody final SocialCreateRequestDTO socialCreateRequestDTO, UriComponentsBuilder uriBuilder){
-        Social social = socialService.createSocial(email, socialCreateRequestDTO);
+        Social createdSocial = socialService.createSocial(email, socialCreateRequestDTO);
 
         URI location = uriBuilder.path("/social/{id}")
-                .buildAndExpand(social.getId()).toUri();
+                .buildAndExpand(createdSocial.getId()).toUri();
 
         return ResponseEntity.created(location)
                 .header(HttpHeaders.LOCATION, location.toString())
@@ -105,8 +105,9 @@ public class SocialController {
             @AuthenticationPrincipal String email,
             @PathVariable Long socialId,
             @RequestBody final SocialModifyRequestDTO socialModifyRequestDTO){
-        socialService.modifySocial(email, socialId, socialModifyRequestDTO);
-        return new ResponseDTO<>(null, "모임 수정 완료");
+        Social modifiedSocial = socialService.modifySocial(email, socialId, socialModifyRequestDTO);
+        SocialShortDTO socialShortDTO = new SocialShortDTO(modifiedSocial);
+        return new ResponseDTO<>(socialShortDTO, "모임 수정 완료");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -120,7 +121,7 @@ public class SocialController {
     })
     public ResponseDTO<?> deleteSocial(@Parameter(required = true) @PathVariable Long socialId){
         socialService.deleteSocial(socialId);
-        return new ResponseDTO<>(null, "모임 수정 완료");
+        return new ResponseDTO<>(null, "모임 삭제 완료");
     }
 
     @ResponseStatus(HttpStatus.OK)

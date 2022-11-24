@@ -100,7 +100,7 @@ public class SocialServiceImpl implements SocialService {
     //모임 게시글 수정
     @Transactional
     @Override
-    public void modifySocial(String email, Long socialId, SocialModifyRequestDTO socialDTO) {
+    public Social modifySocial(String email, Long socialId, SocialModifyRequestDTO socialDTO) {
         //엔티티 조회
         Social social = socialRepository.findById(socialId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
@@ -123,7 +123,7 @@ public class SocialServiceImpl implements SocialService {
                     .collect(toList());
             social.setImages(postImages);
         }
-
+        return social;
     }
 
     /**
