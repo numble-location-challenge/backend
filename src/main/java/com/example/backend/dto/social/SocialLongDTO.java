@@ -1,5 +1,6 @@
 package com.example.backend.dto.social;
 
+import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
@@ -84,7 +85,11 @@ public class SocialLongDTO{
     private List<SocialTagDTO> tags;
 
     public SocialLongDTO(Social social) {
-        this.socialings = social.getSocialings().stream().map(SocialingDTO::new).collect(Collectors.toList());
+        this.socialings = toSocialingDTO(
+                social.getSocialings().stream()
+                        .filter(socialing -> socialing.getSocial().getId().equals(social.getId()))
+                        .collect(Collectors.toList())
+        );
         this.id = social.getId();
         this.user = toSocialUserDTO(social.getUser());
         this.images = social.getImages().stream().map(PostImageDTO::new).collect(Collectors.toList());
@@ -122,6 +127,12 @@ public class SocialLongDTO{
     }
 
     public List<SocialTagDTO> toSocialTagDTO(List<SocialTag> socialTags){
-        return socialTags.stream().map(SocialTagDTO::new).collect(Collectors.toList());
+        return socialTags.stream()
+                .map(SocialTagDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<SocialingDTO> toSocialingDTO(List<Socialing> socialings){
+        return socialings.stream().map(SocialingDTO::new).collect(Collectors.toList());
     }
 }

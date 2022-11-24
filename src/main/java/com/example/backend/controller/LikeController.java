@@ -30,11 +30,12 @@ public class LikeController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<LikesDTO> getLikeList(@Parameter(required = true) @PathVariable Long userId){
-        List<LikesDTO> likesDTOs = likeService.getLikes(userId);
+    public ResponseDTO<?> getLikeList(@Parameter(required = true) @PathVariable Long userId){
+        List<LikesDTO> likesDTOList = likeService.getLikes(userId);
 
-        return ResponseDTO.<LikesDTO>builder().success(true).message("좋아요 리스트 출력")
-                .data(likesDTOs).build();
+        return new ResponseDTO<>(likesDTOList,"좋아요 리스트 출력");
+//        return ResponseDTO.<LikesDTO>builder().success(true).message("좋아요 리스트 출력")
+//                .data(likesDTOs).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -46,11 +47,11 @@ public class LikeController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<LikesDTO> onLike(@Parameter(required = true) @PathVariable Long userId,@PathVariable Long postId){
-        List<LikesDTO> likesDTOs = new ArrayList<>();
-        likesDTOs.add(likeService.onLike(userId,postId));
+        LikesDTO likesDTO = likeService.onLike(userId,postId);
 
-        return ResponseDTO.<LikesDTO>builder().success(true).message("좋아요 on")
-                .data(likesDTOs).build();
+        return new ResponseDTO<>(likesDTO,"좋아요 on");
+//        return ResponseDTO.<LikesDTO>builder().success(true).message("좋아요 on")
+//                .data(likesDTOs).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -63,7 +64,7 @@ public class LikeController {
     })
     public ResponseDTO<?> offLike(@Parameter(required = true) @PathVariable Long userId,@PathVariable Long postId){
         likeService.offLike(userId,postId);
-
-        return ResponseDTO.builder().success(true).message("좋아요 off").build();
+        return new ResponseDTO<>(null,"좋아요 off");
+//        return ResponseDTO.builder().success(true).message("좋아요 off").build();
     }
 }

@@ -138,7 +138,7 @@ public class SocialServiceImpl implements SocialService {
     }
 
     /**
-     * 모임 게시글 리스트 조회 (미리 보기)
+     * 모임 게시글 전체 조회 (미리 보기)
      * @return List<SocialShortDTO> : 미리 보기 정보만 있는 모임 리스트
      */
     @Override
