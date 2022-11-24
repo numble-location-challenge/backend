@@ -37,11 +37,13 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<SocialShortDTO> getSocialList(){
+    public ResponseDTO<?> getSocialList(){
         List<SocialShortDTO> socialShortDTOList = socialService.getSocialList();
 
-        return ResponseDTO.<SocialShortDTO>builder().success(true).message("모임 리스트 출력")
-                .data(socialShortDTOList).build();
+        return new ResponseDTO<>(socialShortDTOList, "모임 리스트 출력");
+
+//        return ResponseDTO.<SocialShortDTO>builder().success(true).message("모임 리스트 출력")
+//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -54,12 +56,12 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<SocialLongDTO> getSocialDetail(@Parameter(required = true) @PathVariable Long socialId){
-        List<SocialLongDTO> socialLongDTOList = new LinkedList<>();
-        socialLongDTOList.add(socialService.getSocialDetail(socialId));
+    public ResponseDTO<?> getSocialDetail(@Parameter(required = true) @PathVariable Long socialId){
+        SocialLongDTO socialLongDTO = socialService.getSocialDetail(socialId);
 
-        return ResponseDTO.<SocialLongDTO>builder().success(true).message("모임 상세 정보 출력")
-                .data(socialLongDTOList).build();
+        return new ResponseDTO<>(socialLongDTO, "모임 상세 정보 출력");
+//        return ResponseDTO.<SocialLongDTO>builder().success(true).message("모임 상세 정보 출력")
+//                .data(socialLongDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -119,11 +121,12 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<SocialShortDTO> getMySocialList(@Parameter(required = true) @PathVariable Long userId){
+    public ResponseDTO<?> getMySocialList(@Parameter(required = true) @PathVariable Long userId){
         List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(userId);
 
-        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
-                .data(socialShortDTOList).build();
+        return new ResponseDTO<>(socialShortDTOList,"내가 쓴 모임 게시글 출력");
+//        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
+//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -136,11 +139,12 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<SocialShortDTO> getJoinSocialList(@Parameter(required = true) @PathVariable Long userId){
+    public ResponseDTO<?> getJoinSocialList(@Parameter(required = true) @PathVariable Long userId){
         List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(userId);
 
-        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
-                .data(socialShortDTOList).build();
+        return new ResponseDTO<>(socialShortDTOList,"내가 참가한 모임들 출력");
+//        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
+//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -153,11 +157,12 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<SocialShortDTO> getFilteringList(@Parameter(required = true) @PathVariable Long tagNum){
+    public ResponseDTO<?> getFilteringList(@Parameter(required = true) @PathVariable Long tagNum){
         List<SocialShortDTO> socialShortDTOList = socialService.filteringByTag(tagNum);
 
-        return ResponseDTO.<SocialShortDTO>builder().success(true).message("필터링된 리스트 출력")
-                .data(socialShortDTOList).build();
+        return new ResponseDTO<>(socialShortDTOList,"검색 결과 출력");
+//        return ResponseDTO.<SocialShortDTO>builder().success(true).message("필터링된 리스트 출력")
+//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -170,7 +175,7 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<SocialShortDTO> getSortList(@Parameter(required = true) @PathVariable int sortNum){
+    public ResponseDTO<?> getSortList(@Parameter(required = true) @PathVariable int sortNum){
         String properties = "";
         Boolean sortDirection = false; // true : DESC, false : ASC
         String message = "";
@@ -195,8 +200,9 @@ public class SocialController {
         }
         List<SocialShortDTO> socialShortDTOList = socialService.sortByList(sortDirection, properties);
 
-        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
-                .data(socialShortDTOList).build();
+        return new ResponseDTO<>(socialShortDTOList,message);
+//        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
+//                .data(socialShortDTOList).build();
     }
 
 }
