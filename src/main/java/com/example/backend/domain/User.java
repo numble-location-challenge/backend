@@ -101,6 +101,18 @@ public class User {
 
     //==수정 메서드==//
 
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+
+    public void updateBio(String bio){
+        this.bio = bio;
+    }
+
+    public void updateProfile(String profile){
+        this.profile = profile;
+    }
+
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }

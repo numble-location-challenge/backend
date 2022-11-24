@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.domain.User;
+import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.dto.login.SocialLoginRequestDTO;
 import com.example.backend.global.exception.*;
 import com.example.backend.global.security.JwtSubject;
@@ -27,12 +28,12 @@ public class LoginServiceImpl implements LoginService{
     private final KakaoService kakaoService;
 
     @Override
-    public User defaultLogin(String email, String password) {
+    public User defaultLogin(DefaultLoginRequestDTO loginDTO) {
         //비밀번호 일치 확인
-        User dbUser = userRepository.findByEmail(email)
+        User dbUser = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
-        if(passwordEncoder.matches(password, dbUser.getPassword())) return dbUser;
+        if(passwordEncoder.matches(loginDTO.getPassword(), dbUser.getPassword())) return dbUser;
         else throw new InvalidUserInputException(InvalidUserInputExceptionType.ACCOUNT_NOT_MATCH);
     }
 

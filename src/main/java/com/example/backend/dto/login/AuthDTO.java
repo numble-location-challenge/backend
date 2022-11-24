@@ -1,19 +1,24 @@
 package com.example.backend.dto.login;
 
+import com.example.backend.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
+import java.io.Serializable;
+
 @NoArgsConstructor
-@AllArgsConstructor
+@Getter
 @Schema
-public class AuthDTO {
-    @Schema(description = "회원 pk", defaultValue = "1")
+public class AuthDTO implements Serializable {
+    @Schema(description = "회원 pk")
     Long userId;
 
-    @Schema(description = "회원 이메일(아이디)", defaultValue = "hello@numble.com")
+    @Schema(description = "회원 이메일(아이디)")
     String email;
+
+    public AuthDTO(User user) {
+        this.userId = user.getId();
+        this.email = user.getEmail();
+    }
 }
