@@ -1,5 +1,6 @@
 package com.example.backend.service.social;
 
+import com.example.backend.domain.post.Social;
 import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.dto.social.SocialLongDTO;
 import com.example.backend.dto.social.SocialModifyRequestDTO;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public interface SocialService {
     //모임 게시글 생성
-    void createSocial(String email, SocialCreateRequestDTO socialDTO);
+    Social createSocial(String email, SocialCreateRequestDTO socialDTO);
 
     //모임 게시글 삭제
     void deleteSocial(Long postId);

@@ -49,7 +49,7 @@ public class SocialServiceImpl implements SocialService {
     //모임 게시글 생성
     @Transactional
     @Override
-    public void createSocial(String email, SocialCreateRequestDTO socialDTO) {
+    public Social createSocial(String email, SocialCreateRequestDTO socialDTO) {
         //엔티티 조회
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
@@ -87,7 +87,7 @@ public class SocialServiceImpl implements SocialService {
                 socialing
         );
 
-        socialRepository.save(social);
+        return socialRepository.save(social);
     }
 
     //모임 게시글 삭제

@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.*;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -43,7 +42,7 @@ public class UserController {
     })
     public ResponseEntity<?> join(@RequestBody @Valid final UserDefaultJoinRequestDTO userDefaultJoinRequestDTO, UriComponentsBuilder uriBuilder){
         final User createdUser = userService.createDefaultUser(userDefaultJoinRequestDTO);
-        return getCreatedResponseEntity(uriBuilder, createdUser.getId());
+        return getCreatedUserResponse(uriBuilder, createdUser.getId());
     }
 
     //TODO 서비스 구현
@@ -61,16 +60,14 @@ public class UserController {
         //프론트에서 회원정보 동의해주고 region, AT 가지고 회원가입 처리
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
         final User createdUser = userService.createKakaoUser(joinDTO);
-        return getCreatedResponseEntity(uriBuilder, createdUser.getId());
+        return getCreatedUserResponse(uriBuilder, createdUser.getId());
     }
 
-    private ResponseEntity<?> getCreatedResponseEntity(UriComponentsBuilder uriBuilder, Long id) {
+    private ResponseEntity<?> getCreatedUserResponse(UriComponentsBuilder uriBuilder, Long id) {
         URI location = uriBuilder.path("/user/{id}")
                 .buildAndExpand(id).toUri();
 
-        //TODO location 추가
         return ResponseEntity.created(location)
-                .header(HttpHeaders.LOCATION, location.toString())
                 .body(new ResponseDTO<>(null, "회원가입 처리되었습니다."));
     }
 
