@@ -33,6 +33,8 @@ public class LoginController {
     @Value("${jwt.refresh.expiration}")
     private Long REFRESH_EXP;
 
+    private String REFRESH_COOKIE = "refreshToken";
+
     private final LoginService loginService;
 
     @Operation(summary = "기본 로그인", description = "AccessToken은 헤더로, RefreshToken은 쿠키로 반환합니다.")
@@ -82,7 +84,7 @@ public class LoginController {
                 .build();
 
         //refresh token을 http only 쿠키에 담음
-        ResponseCookie cookie = ResponseCookie.from("refreshToken",tokenMap.get("RT"))
+        ResponseCookie cookie = ResponseCookie.from(REFRESH_COOKIE, tokenMap.get("RT"))
                 .httpOnly(true)
                 .secure(false) //TODO SSL 인증서 필요해서 나중에
                 .sameSite("None")
@@ -91,6 +93,7 @@ public class LoginController {
                 .build();
 
         return ResponseEntity.ok()
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, HttpHeaders.AUTHORIZATION)
                 .header(HttpHeaders.AUTHORIZATION, tokenMap.get("AT"))
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(response);

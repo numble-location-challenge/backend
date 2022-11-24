@@ -4,6 +4,7 @@ import com.example.backend.dto.ErrorDTO;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -34,6 +35,7 @@ public class JwtExceptionEntryPoint implements AuthenticationEntryPoint {
                 .build();
             //to json
             String result = om.writeValueAsString(errorDTO);
+            response.setStatus(401);
             response.getWriter().write(result);
     }
 }

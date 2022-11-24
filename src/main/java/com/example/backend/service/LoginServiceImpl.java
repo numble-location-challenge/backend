@@ -6,6 +6,7 @@ import com.example.backend.global.exception.*;
 import com.example.backend.global.security.JwtSubject;
 import com.example.backend.global.security.TokenService;
 import com.example.backend.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -78,7 +79,12 @@ public class LoginServiceImpl implements LoginService{
     @Override
     public User getUserByRefreshToken(String refreshToken) {
         //RT 만료되었다면 validate 메서드에서 ->로그인 유도 401
-        JwtSubject jwtSubject = tokenService.validateAndGetSubject(refreshToken);
+        JwtSubject jwtSubject;
+        try{
+            jwtSubject = tokenService.validateAndGetSubject(refreshToken);
+        } catch(JwtException ex){
+            throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_UN_AUTHORIZED);
+        }
         //토큰 subject email로 User 가져옴
         return userRepository.findByEmail(jwtSubject.getEmail())
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));

@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String TOKEN_PREFIX = "Bearer ";
 
-    private List<String> NOT_CHECK_URL = List.of("/login", "/kakaologin", "/join", "/kakaojoin");
+    private List<String> NOT_CHECK_URL = List.of("/login", "/kakaologin", "/join", "/kakaojoin", "/refresh");
 
     private final TokenService tokenService;
 
@@ -42,11 +42,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         for(String url : NOT_CHECK_URL){
             if(url.equals(path)){
-                log.info("NOT_CHECK_URL입니다.");
                 return true;
             }
         }
-        log.info("NOT_CHECK_URL이 아닙니다.");
         return false;
     }
 

@@ -84,6 +84,8 @@ public class TokenService {
 
     /**
      * jwt 검증 후 아이디(이메일) 추출(예외처리는 filter에서)
+     * 여기서 JwtException 발생하면 호출한 곳으로 돌아가므로
+     * 호출한 곳에서는 예외처리 필수
      * @param token
      * @return
      */
