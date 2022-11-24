@@ -57,9 +57,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User modify(String email, UserModifyRequestDTO userDTO) {
+    public User modify(String email, Long userId, UserModifyRequestDTO userDTO) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        if(!user.getId().equals(userId)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
 
         //user 수정
         if(userDTO.getNickname() != null) user.updateNickname(userDTO.getNickname());

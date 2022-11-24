@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.*;
+import com.example.backend.dto.feed.FeedListResponseDTO;
 import com.example.backend.dto.login.SocialJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
@@ -24,6 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "user", description = "회원 API")
 @RestController
@@ -85,7 +87,6 @@ public class UserController {
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 
-    //TODO 서비스 구현
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 수정", description = "모든 변수 null available")
     @PutMapping("/user/{id}")
@@ -100,17 +101,8 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody @Valid final UserModifyRequestDTO userModifyRequestDTO){
 
-        //TODO id 검증.. principal 객체로 변경 후 고민
-        final User user = userService.modify(email, userModifyRequestDTO);
-
-        //set data list
-        UserProfileDTO userProfileDTO = UserProfileDTO.builder()
-                .nickname(user.getNickname())
-                .profile(user.getProfile())
-                .region(user.getRegion())
-                .bio(user.getBio())
-                .build();
-
+        final User modifiedUser = userService.modify(email, id, userModifyRequestDTO);
+        UserProfileDTO userProfileDTO = new UserProfileDTO(modifiedUser);
         return new ResponseDTO<>(userProfileDTO, "정상 수정 처리 되었습니다.");
     }
 
@@ -129,15 +121,7 @@ public class UserController {
             @PathVariable Long id){
 
         final User user = userService.getUser(email, id);
-
-        //set data list
-        List<UserProfileDTO> dataList = List.of(UserProfileDTO.builder()
-                .nickname(user.getNickname())
-                .profile(user.getProfile())
-                .region(user.getRegion())
-                .bio(user.getBio())
-                .build());
-
-        return new ResponseDTO<>(dataList, "프로필 조회 결과");
+        UserProfileDTO userProfileDTO= new UserProfileDTO(user);
+        return new ResponseDTO<>(userProfileDTO, "프로필 조회 결과");
     }
 }
