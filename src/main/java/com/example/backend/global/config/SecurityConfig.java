@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers(
-                        "/", "/login", "/kakaologin", "/join", "/kakaojoin", "/swagger-ui/**", "/api-docs/**")
+                        "/", "/login", "/kakaologin", "/join", "/kakaojoin", "/refresh", "/swagger-ui/**", "/api-docs/**")
                 .permitAll()
                 .anyRequest().authenticated();
 
