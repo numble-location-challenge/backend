@@ -22,6 +22,8 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private String REFRESH_COOKIE = "refreshToken";
+
     private final JwtLogoutHandler jwtLogoutHandler;
     private final TokenService tokenService;
 
@@ -45,7 +47,7 @@ public class SecurityConfig {
         http
                 .logout().permitAll()
                 .logoutUrl("/logout")
-                .deleteCookies("refreshToken") //로그아웃 후 쿠키 삭제
+                .deleteCookies(REFRESH_COOKIE) //로그아웃 후 쿠키 삭제
                 .addLogoutHandler(jwtLogoutHandler) //DB에서 RT 삭제
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
 
