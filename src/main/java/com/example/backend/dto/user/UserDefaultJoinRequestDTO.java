@@ -40,14 +40,18 @@ public class UserDefaultJoinRequestDTO {
     @Schema(description = "짧은 소개글", defaultValue = "파리&제주스냅 셔터프레소📷\n 청춘스냅 잘하기로 소문난 집")
     private String bio;
 
-    @Schema(description = "지역 번호(동)", defaultValue = "157")
+    @Schema(description = "지역 번호 8자리", defaultValue = "1111010400")
     @NotNull
-    private int region;
+    private Integer dongCode;
+
+    @Schema(description = "행정구역명", defaultValue = "서울특별시 종로구 효자동")
+    @NotNull
+    private String dongName;
 
     public User toEntity(){
         return User.builder()
                 .email(email).password(password).username(username).nickname(nickname)
-                .phoneNumber(phoneNumber).region(region).bio(bio)
+                .phoneNumber(phoneNumber).dongCode(dongCode).dongName(dongName).bio(bio)
                 .build();
     }
 }

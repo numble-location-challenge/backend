@@ -21,6 +21,9 @@ public class UserModifyRequestDTO {
     @Schema(description = "짧은 소개글", defaultValue = "y o u j i n\n지금은 #INTP\n인생의 특별한 퍼즐 조각을 맞춰가는 중🧩")
     String bio;
 
-    @Schema(description = "지역 번호(동)", defaultValue = "903")
-    Integer region;
+    @Schema(description = "지역 번호 8자리", defaultValue = "1111010400")
+    private Integer dongCode;
+
+    @Schema(description = "행정구역명", defaultValue = "서울특별시 종로구 효자동")
+    private String dongName;
 }

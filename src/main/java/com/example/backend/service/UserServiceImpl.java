@@ -3,7 +3,6 @@ package com.example.backend.service;
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
-import com.example.backend.domain.post.Post;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.SocialJoinRequestDTO;
 import com.example.backend.dto.user.KakaoUserDTO;
@@ -53,9 +52,9 @@ public class UserServiceImpl implements UserService{
 
         validateSocialUserDuplicate(userDTO.getId(), userDTO.getEmail());
         //중복X -> region 세팅 및 회원가입 처리
-        User user = userDTO.toEntity(joinDTO.getRegion());
-        //패스워드 없음
-        user.setKakaoUser();
+        User user = userDTO.toEntity(joinDTO.getRegionCode(), joinDTO.getRegionName());
+        user.setId(userDTO.getId()); //pk를 카카오의 id로 세팅
+        user.setKakaoUser(); //status 세팅
         return userRepository.save(user);
     }
 
@@ -70,7 +69,9 @@ public class UserServiceImpl implements UserService{
         if(userDTO.getNickname() != null) user.updateNickname(userDTO.getNickname());
         if(userDTO.getBio() != null) user.updateBio(userDTO.getBio());
         if(userDTO.getProfile() != null) user.updateProfile(userDTO.getProfile());
-        if(userDTO.getRegion() != null) user.updateRegion(userDTO.getRegion());
+        if(userDTO.getDongCode() != null && userDTO.getDongName() != null){
+            user.updateRegion(userDTO.getDongCode(), userDTO.getDongName());
+        }
 
         //TODO region 수정시 모임장인 social의 region도 수정되어야함(피드는 두는게 나은듯)
 

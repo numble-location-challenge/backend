@@ -17,13 +17,10 @@ public class KakaoUserDTO {
     //로그인 하는 사용자에 따라 전화번호가 없는 계정은 동의 항목이 설정되어 있어도 전화번호를 조회할 수 없다
     private String phoneNumber; //phone_number
 
-    //카카오 이메일은 값이 변할 수 있어서 아이디로 쓰기 적절하지 X
-    public User toEntity(int region) {
-        User user =  User.builder()
-                .userType(UserType.KAKAO).email(email).username(name).nickname(UUID.randomUUID().toString())
-                .phoneNumber(phoneNumber).region(region)
+    public User toEntity(int dongCode, String dongName) {
+        return User.builder()
+                .userType(UserType.KAKAO).email(email).username(name).phoneNumber(phoneNumber)
+                .nickname(UUID.randomUUID().toString()).dongCode(dongCode).dongName(dongName)
                 .build();
-        user.setId(id);
-        return user;
     }
 }

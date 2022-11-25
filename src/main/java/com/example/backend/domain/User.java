@@ -1,16 +1,12 @@
 package com.example.backend.domain;
 
 import com.example.backend.domain.enumType.UserStatus;
-import com.example.backend.domain.post.Feed;
-import com.example.backend.domain.post.Social;
 import com.example.backend.domain.enumType.UserType;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -45,7 +41,12 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
     @NotNull
-    private int region;
+    @Column(name = "dong_code")
+    private Integer dongCode;
+    @NotNull
+    @Column(name = "dong_name")
+    private String dongName;
+
     private String profile;
     private String bio;//한마디 소개글
 
@@ -82,14 +83,15 @@ public class User {
     }
 
     @Builder
-    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int region, @NotNull UserStatus userStatus, String bio) {
+    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int dongCode, @NotNull String dongName, @NotNull UserStatus userStatus, String bio) {
         this.userType = userType;
         this.email = email;
         this.password = password;
         this.username = username;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
-        this.region = region;
+        this.dongCode = dongCode;
+        this.dongName = dongName;
         this.userStatus = userStatus;
         this.bio = bio;
     }
@@ -111,8 +113,9 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
-    public void updateRegion(int region){
-        this.region = region;
+    public void updateRegion(int dongCode, String dongName){
+        this.dongCode = dongCode;
+        this.dongName = dongName;
     }
 
     public void deleteRefreshToken() {

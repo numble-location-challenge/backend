@@ -22,13 +22,17 @@ public class UserProfileDTO {
     @Schema(description = "짧은 소개글", defaultValue = "조회 또는 변경된 소개글")
     private String bio;
 
-    @Schema(description = "지역 번호(동)", defaultValue = "조회 또는 변경된 지역번호")
-    private int region;
+    @Schema(description = "지역 번호 8자리", defaultValue = "1111010400")
+    private Integer dongCode;
+
+    @Schema(description = "행정구역명", defaultValue = "서울특별시 종로구 효자동")
+    private String dongName;
 
     public UserProfileDTO(User user) {
         this.nickname = user.getNickname();
         this.profile = user.getProfile();
-        this.region = user.getRegion();
+        this.dongCode = user.getDongCode();
+        this.dongName = user.getDongName();
         this.bio = user.getBio();
     }
 }
