@@ -49,7 +49,7 @@ public class FeedResponseDTO {
         }
         this.images = feed.getImages().stream().map(postImage -> new PostImageDTO(postImage)).collect(Collectors.toList());
         this.comments = feed.getComments().stream().map(comment -> new CommentResponseDTO(comment)).collect(Collectors.toList());
-        this.regions = feed.getRegion();
+        this.regions = feed.getRegionCode();
         //TODO 좋아요 여부 로직 구현 및 시간 로직 구현
         this.isLiked = false;
         this.createTime = feed.getCreateDate();

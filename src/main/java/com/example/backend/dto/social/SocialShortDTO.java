@@ -79,7 +79,7 @@ public class SocialShortDTO {
         this.socialings = social.getSocialings().stream().map(SocialingDTO::new).collect(Collectors.toList());
         this.id = social.getId();
         this.images = social.getImages().stream().map(PostImageDTO::new).collect(Collectors.toList());
-        this.region = social.getRegion();
+        this.region = social.getRegionCode();
         this.title = social.getTitle();
         this.endDate = social.getEndDate();
         this.currentNums = social.getCurrentNums();

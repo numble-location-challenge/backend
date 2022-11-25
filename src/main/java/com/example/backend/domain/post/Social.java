@@ -118,8 +118,7 @@ public class Social extends Post {
             List<PostImage> postImages, Category category, List<Tag> tags, Socialing socialing){
 
         Social social = Social.builder()
-                .user(user).region(user.getRegion())
-                .title(title).contents(contents).contact(contact)
+                .user(user).title(title).contents(contents).contact(contact)
                 .startDate(startDate).endDate(endDate).limitedNums(limitedNums)
                 .likes(0).currentNums(0).hits(0) //currentNums는 Socialing 생성 시 따로 설정
                 .status(SocialStatus.AVAILABLE)
@@ -156,9 +155,10 @@ public class Social extends Post {
     }
 
     @Builder
-    public Social(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes,
-        Category category, List<SocialTag> socialTags, List<Socialing> socialings, SocialStatus status, String title, Integer hits, LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact) {
-        super(user, images, comments, contents, region, likes);
+    public Social(User user, List<PostImage> images, List<Comment> comments, String contents, int likes, Category category,
+                  List<SocialTag> socialTags, List<Socialing> socialings, SocialStatus status, String title, Integer hits,
+                  LocalDateTime startDate, LocalDateTime endDate, Integer currentNums, Integer limitedNums, String contact) {
+        super(user, images, comments, contents, likes);
         this.category = category;
         this.socialTags = socialTags;
         this.socialings = socialings;

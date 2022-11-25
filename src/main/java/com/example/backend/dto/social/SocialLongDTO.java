@@ -95,7 +95,7 @@ public class SocialLongDTO{
         this.images = social.getImages().stream().map(PostImageDTO::new).collect(Collectors.toList());
         this.comments = social.getComments().stream().map(CommentResponseDTO::new).collect(Collectors.toList());
         this.contents = social.getContents();
-        this.region = social.getRegion();
+        this.region = social.getRegionCode();
         this.title = social.getTitle();
         this.startDate = social.getStartDate();
         this.endDate = social.getEndDate();
