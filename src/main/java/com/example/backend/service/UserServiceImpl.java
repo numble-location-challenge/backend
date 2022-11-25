@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void delete(String email) {
+    public void changeToWithdrawnUser(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
