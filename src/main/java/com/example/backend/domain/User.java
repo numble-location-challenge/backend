@@ -49,8 +49,8 @@ public class User {
     private String profile;
     private String bio;//한마디 소개글
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Socialing> socialings = new ArrayList<>();
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<Socialing> socialings = new ArrayList<>();
 
     @Column(length = 500, name = "refresh_token")
     private String refreshToken; //JWT
@@ -58,19 +58,6 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "user_status")
     private UserStatus userStatus;
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Feed> feeds = new ArrayList<>();
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Social> socials = new ArrayList<>();
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Comment> comments = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<Like> likes = new ArrayList<>();
-
 
     public void encodePassword(PasswordEncoder passwordEncoder){
         password = passwordEncoder.encode(password);
@@ -106,17 +93,6 @@ public class User {
         this.userStatus = userStatus;
         this.bio = bio;
     }
-
-    //==연관관계 메서드==//
-    public void addSocialing(Socialing socialing){
-        socialings.add(socialing);
-        socialing.setUser(this);
-    }
-
-    public void deleteSocialing(Socialing socialing){
-        socialings.remove(socialing);
-    }
-
 
     //==수정 메서드==//
     public void updateNickname(String nickname){
