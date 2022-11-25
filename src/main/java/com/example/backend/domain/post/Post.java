@@ -11,7 +11,6 @@ import com.example.backend.domain.PostImage;
 import com.example.backend.domain.TimeAuditingEntity;
 import com.example.backend.domain.User;
 
-import com.example.backend.domain.enumType.SocialStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +35,7 @@ public abstract class Post extends TimeAuditingEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     protected List<PostImage> images = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
     @NotNull

@@ -49,6 +49,7 @@ public class Comment extends TimeAuditingEntity{
     private int refOrder; // 같은 그룹 내의 순서
     @Column(name = "parent_num")
     private Long parentNum; // 부모 댓글의 ID
+    private Boolean deleted; //삭제되었는지 여부
 
     @Builder
     public Comment(User user, Post post, String contents, int cGroup, int level, int refOrder,
@@ -82,6 +83,10 @@ public class Comment extends TimeAuditingEntity{
     }
     public void setUser(User user){
         this.user = user;
+    }
+
+    public void setDeleted(){
+        deleted = true;
     }
 
     public void updateComment(String contents){
