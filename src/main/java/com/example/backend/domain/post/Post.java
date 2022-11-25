@@ -11,7 +11,6 @@ import com.example.backend.domain.PostImage;
 import com.example.backend.domain.TimeAuditingEntity;
 import com.example.backend.domain.User;
 
-import com.example.backend.domain.enumType.SocialStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,24 +35,35 @@ public abstract class Post extends TimeAuditingEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     protected List<PostImage> images = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
     @NotNull
     protected String contents; //내용
 
     @NotNull
-    protected Integer region; //지역 optional
+    @Column(name = "region_code")
+    protected Integer regionCode; //시군구 5자리
+
+    @NotNull
+    @Column(name = "dondg_code")
+    protected Integer dongCode; //읍면동 8자리
+
+    @NotNull
+    @Column(name = "region_name")
+    protected String dongName; //행정구역명
 
     @NotNull
     private int likes; //좋아요 수
 
-    public Post(User user, List<PostImage> images, List<Comment> comments, String contents, Integer region, int likes) {
+    public Post(User user, List<PostImage> images, List<Comment> comments, String contents, int likes) {
         this.user = user;
         this.images = images;
         this.comments = comments;
         this.contents = contents;
-        this.region = region;
+        this.dongCode = user.getDongCode();
+        this.dongName = user.getDongName();
+        this.regionCode = dongCode/1000; //앞 5자리가 시군구 코드
         this.likes = likes;
     }
 

@@ -7,4 +7,5 @@ public interface SocialingRepository extends JpaRepository<Socialing, Long> {
 
     void deleteByUserIdAndSocialId(Long userId, Long socialId);
 
+    void deleteAllByUserId(Long userId);
 }

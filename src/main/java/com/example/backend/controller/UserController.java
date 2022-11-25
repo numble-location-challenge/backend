@@ -3,7 +3,6 @@ package com.example.backend.controller;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.*;
-import com.example.backend.dto.feed.FeedListResponseDTO;
 import com.example.backend.dto.login.SocialJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
@@ -24,8 +23,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "user", description = "회원 API")
 @RestController
@@ -83,7 +80,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteUser(@AuthenticationPrincipal String email){
-        userService.delete(email);
+        userService.changeToWithdrawnUser(email);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 

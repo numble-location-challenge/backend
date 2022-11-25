@@ -1,23 +1,22 @@
 package com.example.backend.service;
 
+import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
-import com.example.backend.domain.post.Post;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.SocialJoinRequestDTO;
 import com.example.backend.dto.user.KakaoUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
-import com.example.backend.repository.PostRepository;
-import com.example.backend.repository.SocialRepository;
-import com.example.backend.repository.SocialingRepository;
-import com.example.backend.repository.UserRepository;
+import com.example.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,19 +27,20 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final SocialRepository socialRepository;
     private final SocialingRepository socilaingRepository;
-    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final KakaoService kakaoService;
 
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
-    public User createDefaultUser(UserDefaultJoinRequestDTO userDefaultJoinRequestDTO) {
-        User user = userDefaultJoinRequestDTO.toEntity();
+    public User createDefaultUser(UserDefaultJoinRequestDTO joinDTO) {
+        validateDuplicate(joinDTO.getEmail(), joinDTO.getNickname());
 
-        validateDuplicate(user.getEmail(), user.getNickname());
         //중복X -> 회원가입 처리
+        User user = joinDTO.toEntity();
         user.encodePassword(passwordEncoder);
+        user.setDefaultUser();
         return userRepository.save(user);
     }
 
@@ -52,7 +52,9 @@ public class UserServiceImpl implements UserService{
 
         validateSocialUserDuplicate(userDTO.getId(), userDTO.getEmail());
         //중복X -> region 세팅 및 회원가입 처리
-        User user = userDTO.toEntity(joinDTO.getRegion());
+        User user = userDTO.toEntity(joinDTO.getRegionCode(), joinDTO.getRegionName());
+        user.setId(userDTO.getId()); //pk를 카카오의 id로 세팅
+        user.setKakaoUser(); //status 세팅
         return userRepository.save(user);
     }
 
@@ -67,6 +69,11 @@ public class UserServiceImpl implements UserService{
         if(userDTO.getNickname() != null) user.updateNickname(userDTO.getNickname());
         if(userDTO.getBio() != null) user.updateBio(userDTO.getBio());
         if(userDTO.getProfile() != null) user.updateProfile(userDTO.getProfile());
+        if(userDTO.getDongCode() != null && userDTO.getDongName() != null){
+            user.updateRegion(userDTO.getDongCode(), userDTO.getDongName());
+        }
+
+        //TODO region 수정시 모임장인 social의 region도 수정되어야함(피드는 두는게 나은듯)
 
         return null;
     }
@@ -94,8 +101,22 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void delete(String email) {
-        userRepository.deleteByEmail(email);
+    public void changeToWithdrawnUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        //DB 에서 삭제하지 않고 상태만 변경
+        user.setWithdrawStatus();
+        //연결된 소셜링 삭제(참여한 모임)
+        socilaingRepository.deleteAllByUserId(user.getId());
+        //내가 모임장인 소셜 삭제
+        socialRepository.deleteAllByUserId(user.getId());
+
+        //작성한 댓글 deleted true로 변경 TODO: test 필요
+        List<Comment> commentList = commentRepository.findAllByUserId(user.getId());
+        if(commentList != null){
+            commentList.forEach(Comment::setDeleted);
+        }
     }
 
     @Override
@@ -144,12 +165,9 @@ public class UserServiceImpl implements UserService{
     @Override
     public void kickOutUserFromSocial(String email, Long socialId, Long droppedUserId) {
         //엔티티 조회
-        Post post = postRepository.findReadOnlyById(socialId)
-                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
-
         Social social = socialRepository.findReadOnlyById(socialId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
-        User socialOwner = post.getUser(); //모임장
+        User socialOwner = social.getUser(); //모임장
         //모임장인지 확인
         if(!email.equals(socialOwner.getEmail())) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
         //강퇴하고 숫자-1

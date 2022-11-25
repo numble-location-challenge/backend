@@ -1,13 +1,9 @@
 package com.example.backend.repository;
 
 import com.example.backend.domain.post.Social;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.*;
 
 import javax.persistence.QueryHint;
-import java.util.List;
 import java.util.Optional;
 
 public interface SocialRepository extends JpaRepository<Social,Long> {
@@ -17,4 +13,7 @@ public interface SocialRepository extends JpaRepository<Social,Long> {
 
     @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
     Optional<Social> findReadOnlyById(Long socialId);
+
+    //자식타입 조회시 부모와 조인해서 조회됨
+    void deleteAllByUserId(Long userId);
 }

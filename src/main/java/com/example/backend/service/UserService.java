@@ -11,7 +11,7 @@ public interface UserService {
 
     User createKakaoUser(SocialJoinRequestDTO authRequestDTO);
 
-    void delete(String email); //회원 탈퇴
+    void changeToWithdrawnUser(String email); //회원 탈퇴
 
     User getUser(String email, Long id); //내 프로필 조회
 

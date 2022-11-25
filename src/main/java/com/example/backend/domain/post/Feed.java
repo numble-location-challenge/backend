@@ -33,7 +33,7 @@ public class Feed extends Post {
     public Feed(User user, List<PostImage> images, List<Comment> comments,
         String contents, Integer region, int likes,
         Social social) {
-        super(user, images, comments, contents, region, likes);
+        super(user, images, comments, contents, likes);
         this.social = social;
     }
 
@@ -61,6 +61,6 @@ public class Feed extends Post {
         this.images = images;
         this.contents = contents;
         this.social = social;
-        this.region = region;
+        this.regionCode = region;
     }
 }

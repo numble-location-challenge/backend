@@ -1,15 +1,12 @@
 package com.example.backend.domain;
 
-import com.example.backend.domain.post.Feed;
-import com.example.backend.domain.post.Social;
+import com.example.backend.domain.enumType.UserStatus;
 import com.example.backend.domain.enumType.UserType;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -23,7 +20,6 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @NotNull
     @Enumerated(value = EnumType.STRING)
     @Column(name = "user_type")
     private UserType userType; // 기본 회원, 카카오 회원 구분
@@ -45,28 +41,24 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
     @NotNull
-    private int region;
+    @Column(name = "dong_code")
+    private Integer dongCode;
+    @NotNull
+    @Column(name = "dong_name")
+    private String dongName;
+
     private String profile;
     private String bio;//한마디 소개글
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Socialing> socialings = new ArrayList<>();
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<Socialing> socialings = new ArrayList<>();
 
     @Column(length = 500, name = "refresh_token")
     private String refreshToken; //JWT
 
-//    @OneToMany(mappedBy = "user")
-//    private List<Feed> feeds = new ArrayList<>();
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Social> socials = new ArrayList<>();
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Comment> comments = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<Like> likes = new ArrayList<>();
-
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "user_status")
+    private UserStatus userStatus;
 
     public void encodePassword(PasswordEncoder passwordEncoder){
         password = passwordEncoder.encode(password);
@@ -76,31 +68,35 @@ public class User {
         this.id = id;
     }
 
+    public void setDefaultUser(){
+        userType = UserType.DEFAULT;
+        userStatus = UserStatus.ACTIVATED;
+    }
+
+    public void setKakaoUser(){
+        userType = UserType.KAKAO;
+        userStatus = UserStatus.ACTIVATED;
+    }
+
+    public void setWithdrawStatus(){
+        userStatus = UserStatus.WITHDRAW;
+    }
+
     @Builder
-    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int region, String bio) {
+    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int dongCode, @NotNull String dongName, @NotNull UserStatus userStatus, String bio) {
         this.userType = userType;
         this.email = email;
         this.password = password;
         this.username = username;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
-        this.region = region;
+        this.dongCode = dongCode;
+        this.dongName = dongName;
+        this.userStatus = userStatus;
         this.bio = bio;
     }
 
-    //==연관관계 메서드==//
-    public void addSocialing(Socialing socialing){
-        socialings.add(socialing);
-        socialing.setUser(this);
-    }
-
-    public void deleteSocialing(Socialing socialing){
-        socialings.remove(socialing);
-    }
-
-
     //==수정 메서드==//
-
     public void updateNickname(String nickname){
         this.nickname = nickname;
     }
@@ -115,6 +111,11 @@ public class User {
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateRegion(int dongCode, String dongName){
+        this.dongCode = dongCode;
+        this.dongName = dongName;
     }
 
     public void deleteRefreshToken() {

@@ -33,7 +33,7 @@ public class FeedSocialDTO {
     public static FeedSocialDTO toFeedSocialDTO(Social social){
         return FeedSocialDTO.builder()
             .id(social.getId())
-            .region(social.getRegion())
+            .region(social.getRegionCode())
             .startDate(social.getStartDate())
             .title(social.getTitle())
             .build();

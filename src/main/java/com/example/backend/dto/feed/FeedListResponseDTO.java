@@ -39,7 +39,7 @@ public class FeedListResponseDTO {
         this.contents = feed.getContents();
         // this.thumbnail = PostImageDTO.getThumbnail(feed.getImages());
         this.social = FeedSocialDTO.toFeedSocialDTO(feed.getSocial());
-        this.regions = feed.getRegion();
+        this.regions = feed.getRegionCode();
         //TODO 좋아요 여부 로직 구현 및 시간 로직 구현
         this.isLiked = false;
         this.createTime = feed.getCreateDate();
