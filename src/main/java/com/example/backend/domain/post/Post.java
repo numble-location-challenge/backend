@@ -46,7 +46,7 @@ public abstract class Post extends TimeAuditingEntity {
     protected Integer regionCode; //시군구 5자리
 
     @NotNull
-    @Column(name = "dondg_code")
+    @Column(name = "dong_code")
     protected Integer dongCode; //읍면동 8자리
 
     @NotNull
