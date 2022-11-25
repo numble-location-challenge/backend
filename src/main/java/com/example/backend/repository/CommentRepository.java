@@ -28,4 +28,6 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
     void deleteAllByCgroup(@Param("cGroup")int cGroup);
 
     Optional<Comment> findByIdAndPostId(Long id, Long postId);
+
+    List<Comment> findAllByUserId(Long userId);
 }
