@@ -19,9 +19,9 @@ public class SocialJoinRequestDTO {
 
     @Schema(description = "지역 번호 8자리", defaultValue = "1111010400")
     @NotNull
-    int regionCode;
+    int dongCode;
 
     @Schema(description = "행정구역명", defaultValue = "서울특별시 종로구 효자동")
     @NotNull
-    String regionName;
+    String dongName;
 }

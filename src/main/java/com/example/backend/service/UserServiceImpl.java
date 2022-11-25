@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService{
 
         validateSocialUserDuplicate(userDTO.getId(), userDTO.getEmail());
         //중복X -> region 세팅 및 회원가입 처리
-        User user = userDTO.toEntity(joinDTO.getRegionCode(), joinDTO.getRegionName());
+        User user = userDTO.toEntity(joinDTO.getDongCode(), joinDTO.getDongName());
         user.setId(userDTO.getId()); //pk를 카카오의 id로 세팅
         user.setKakaoUser(); //status 세팅
         return userRepository.save(user);
