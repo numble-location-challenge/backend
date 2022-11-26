@@ -20,6 +20,9 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
     @Query("SELECT max(c.refOrder) FROM Comment c where c.cGroup =:cGroup and c.post.id =:post_id")
     Integer findLastRefOrderInGroup(@Param("cGroup") int cGroup, @Param("post_id") Long postId);
 
+    @Query("SELECT c FROM Comment c where c.user.id = :userId and c.deleted = false order by c.id desc")
+    List<Comment> findAllByUserIdAndDeletedIsFalse(@Param("userId")Long userId);
+
     Optional<Comment> findByIdAndDeletedIsFalse(Long id);
 
     Long countBycGroup(int cGroup);

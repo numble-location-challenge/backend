@@ -39,6 +39,13 @@ public class CommentServiceImpl implements CommentService{
         return comments;
     }
 
+    @Override
+    public List<Comment> getMyComments(String userEmail) {
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        List<Comment> comments = commentRepository.findAllByUserIdAndDeletedIsFalse(user.getId());
+        return comments;
+    }
+
     @Transactional
     @Override
     public void createComment(Long postId, String userEmail, CommentRequestDTO commentRequestDTO) {
@@ -104,6 +111,8 @@ public class CommentServiceImpl implements CommentService{
             throw new ForbiddenException(ForbiddenExceptionType.NOT_AUTHORITY_UPDATE_COMMENT);
         }
     }
+
+
 
     private boolean hasPermission(Comment comment, String userEmail) {
         if (comment.getUser().getEmail().equals(userEmail)) {
