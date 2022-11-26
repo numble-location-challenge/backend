@@ -6,7 +6,6 @@ import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
 import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.dto.CategoryDTO;
-import com.example.backend.dto.LikesDTO;
 import com.example.backend.dto.PostImageDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,8 +34,14 @@ public class SocialShortDTO {
     @Schema(description = "모임 게시글에 첨부한 사진 (1장)")
     private List<PostImageDTO> images;
 
-    @Schema(description = "작성자의 지역", example = "1")
-    private int region;
+    @Schema(description = "작성자의 행정구역 시군구코드 5자리", example = "11010")
+    private int regionCode;
+
+    @Schema(description = "작성자의 행정구역 동읍면코드 8자리", example = "1101053")
+    private int dongCode;
+
+    @Schema(description = "행정구역명", example = "서울특별시 종로구 사직동")
+    private String dongName;
 
     @Schema(description = "모임 게시글 제목", example = "같이 운동 하실분!")
     @NotNull
@@ -79,7 +83,9 @@ public class SocialShortDTO {
         this.socialings = social.getSocialings().stream().map(SocialingDTO::new).collect(Collectors.toList());
         this.id = social.getId();
         this.images = social.getImages().stream().map(PostImageDTO::new).collect(Collectors.toList());
-        this.region = social.getRegionCode();
+        this.regionCode = social.getRegionCode();
+        this.dongCode = social.getDongCode();
+        this.dongName = social.getDongName();
         this.title = social.getTitle();
         this.endDate = social.getEndDate();
         this.currentNums = social.getCurrentNums();

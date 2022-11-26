@@ -55,7 +55,7 @@ public class LikeController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "좋아요 선택", description = "사용자가 좋아요 누를 시")
+    @Operation(summary = "좋아요 해제", description = "사용자가 좋아요한 게시글을 누를 시")
     @DeleteMapping("/like/{userId}/{postId}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
