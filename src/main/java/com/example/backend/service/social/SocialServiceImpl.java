@@ -133,7 +133,9 @@ public class SocialServiceImpl implements SocialService {
      */
     @Override
     public SocialLongDTO getSocialDetail(Long postId) {
-        Social social = socialRepository.findById(postId).orElseThrow(()->new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+        Social social = socialRepository.findById(postId)
+                .orElseThrow(()->new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+
         return new SocialLongDTO(social);
     }
 
@@ -144,10 +146,14 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<SocialShortDTO> getSocialList(String email) {
         List<Social> socialList = socialRepository.findAll();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        return socialList.stream().filter(social -> social.getRegionCode().equals(user.getDongCode()/100)).map(SocialShortDTO::new).collect(toList());
 
-//        return socialRepository.findAll().stream().map(SocialShortDTO::new).collect(toList());
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        return socialList.stream()
+                .filter(social -> social.getRegionCode().equals(user.getDongCode()/100))
+                .map(SocialShortDTO::new)
+                .collect(toList());
     }
 
     /**
@@ -175,18 +181,11 @@ public class SocialServiceImpl implements SocialService {
     public List<SocialShortDTO> getJoinSocialList(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
         return socialRepository.findAll().stream()
                 .filter(social -> social.getSocialings().contains(user.getId()))
                 .map(SocialShortDTO::new)
                 .collect(toList());
-//        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-//        for(Social social : socialRepository.findAll()){
-//            Optional<Socialing> socialing = social.getSocialings().stream().filter(s -> Objects.equals(s.getUser().getId(), userId)).findFirst();
-//            if(socialing.isPresent()){
-//                socialShortDTOList.add(new SocialShortDTO(social));
-//            }
-//        }
-//        return socialShortDTOList;
     }
 
     /**
@@ -195,17 +194,14 @@ public class SocialServiceImpl implements SocialService {
      */
     @Override
     public List<SocialShortDTO> filteringByCategory(String email, Long categoryId) {
+
         List<SocialShortDTO> socialShortDTOList = getSocialList(email); //내 동에만 있는 리스트 추출
-//        List<Social> socialList = socialRepository.findAll().stream().filter(social -> social.getCategory().equals(categoryId)).collect(toList());
-//        List<SocialShortDTO> socialShortDTOList = socialList.stream().map(SocialShortDTO::new).collect(toList());
-        //일치하는 카테고리 아이디만 추출
-        return socialShortDTOList.stream().filter(socialShortDTO -> socialShortDTO.getCategory().getId().equals(categoryId)).collect(toList());
+
+        return socialShortDTOList.stream()
+                .filter(socialShortDTO -> socialShortDTO.getCategory().getId().equals(categoryId))
+                .collect(toList());
     }
 
-//    @Override
-//    public List<SocialShortDTO> sortByCategoryList(Boolean sortDirection, String properties) {
-//        return null;
-//    }
 
 
     /**
@@ -217,7 +213,9 @@ public class SocialServiceImpl implements SocialService {
     public List<SocialShortDTO> filteringByTag(Long tagId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
         for(Social social : socialRepository.findAll()){
-            Optional<SocialTag> socialTag = social.getSocialTags().stream().filter(st -> st.getTag().getId().equals(tagId)).findFirst();
+            Optional<SocialTag> socialTag = social.getSocialTags().stream()
+                    .filter(st -> st.getTag().getId().equals(tagId))
+                    .findFirst();
             if(socialTag.isPresent()){
                 socialShortDTOList.add(new SocialShortDTO(social));
             }
@@ -235,11 +233,17 @@ public class SocialServiceImpl implements SocialService {
     public List<SocialShortDTO> sortByList(List<SocialShortDTO> list, int sortType){
         switch (sortType){
             case 1: //최신순
-                return list.stream().sorted(Comparator.comparing(SocialShortDTO::getCreateDate).reversed()).collect(toList());
+                return list.stream()
+                        .sorted(Comparator.comparing(SocialShortDTO::getCreateDate).reversed())
+                        .collect(toList());
             case 2: //마감 임박순
-                return list.stream().sorted(Comparator.comparing(SocialShortDTO::getEndDate)).collect(toList());
+                return list.stream()
+                        .sorted(Comparator.comparing(SocialShortDTO::getEndDate))
+                        .collect(toList());
             case 3: //인기순
-                return list.stream().sorted(Comparator.comparing(SocialShortDTO::getLikeCnt).reversed()).collect(toList());
+                return list.stream()
+                        .sorted(Comparator.comparing(SocialShortDTO::getLikeCnt).reversed())
+                        .collect(toList());
             default:
                 return list;
         }

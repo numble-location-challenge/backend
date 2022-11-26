@@ -133,8 +133,6 @@ public class SocialController {
         List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(email);
 
         return new ResponseDTO<>(socialShortDTOList,"내가 쓴 모임 게시글 출력");
-//        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
-//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -149,8 +147,6 @@ public class SocialController {
         List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(email);
 
         return new ResponseDTO<>(socialShortDTOList,"내가 참가한 모임들 출력");
-//        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
-//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -165,8 +161,6 @@ public class SocialController {
         List<SocialShortDTO> socialShortDTOList = socialService.filteringByTag(tagNum);
 
         return new ResponseDTO<>(socialShortDTOList,"검색 결과 출력");
-//        return ResponseDTO.<SocialShortDTO>builder().success(true).message("필터링된 리스트 출력")
-//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -183,8 +177,6 @@ public class SocialController {
         List<SocialShortDTO> sortedList = socialService.sortByList(socialList, sortType); //정렬된 리스트
         String message = (sortType == 1 ? "최신순 정렬" : (sortType == 2) ? "마감 임박순 정렬" : "인기순 정렬");
         return new ResponseDTO<>(sortedList,message);
-//        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
-//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -203,8 +195,6 @@ public class SocialController {
         String message = (sortType == 1 ? "최신순 정렬" : (sortType == 2) ? "마감 임박순 정렬" : "인기순 정렬");
 
         return new ResponseDTO<>(sortedList,message);
-//        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
-//                .data(socialShortDTOList).build();
     }
 
 
