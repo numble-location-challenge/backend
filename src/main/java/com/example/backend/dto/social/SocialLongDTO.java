@@ -49,8 +49,14 @@ public class SocialLongDTO{
     @Schema(description = "모임 게시글 내용", defaultValue = "바로 같이, 가슴이 어디 하는 갑 우는 칼이다.")
     private String contents;
 
-    @Schema(description = "작성자의 지역", defaultValue = "1")
-    private int region;
+    @Schema(description = "작성자의 행정구역 시군구코드 5자리", example = "11010")
+    private int regionCode;
+
+    @Schema(description = "작성자의 행정구역 동읍면코드 8자리", example = "1101053")
+    private int dongCode;
+
+    @Schema(description = "행정구역명", example = "서울특별시 종로구 사직동")
+    private String dongName;
 
     @Schema(description = "모임 게시글 제목",defaultValue = "모임 제목")
     @NotNull
@@ -95,7 +101,9 @@ public class SocialLongDTO{
         this.images = social.getImages().stream().map(PostImageDTO::new).collect(Collectors.toList());
         this.comments = social.getComments().stream().map(CommentResponseDTO::new).collect(Collectors.toList());
         this.contents = social.getContents();
-        this.region = social.getRegionCode();
+        this.regionCode = social.getRegionCode();
+        this.dongCode = social.getDongCode();
+        this.dongName = social.getDongName();
         this.title = social.getTitle();
         this.startDate = social.getStartDate();
         this.endDate = social.getEndDate();
