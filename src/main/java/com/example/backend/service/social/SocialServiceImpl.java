@@ -142,12 +142,12 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 미리 보기 정보만 있는 모임 리스트
      */
     @Override
-    public List<SocialShortDTO> getSocialList() {
-        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        for(Social social : socialRepository.findAll()){
-            socialShortDTOList.add(new SocialShortDTO(social));
-        }
-        return socialShortDTOList;
+    public List<SocialShortDTO> getSocialList(String email) {
+        List<Social> socialList = socialRepository.findAll();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        return socialList.stream().filter(social -> social.getRegionCode().equals(user.getDongCode()/100)).map(SocialShortDTO::new).collect(toList());
+
+//        return socialRepository.findAll().stream().map(SocialShortDTO::new).collect(toList());
     }
 
     /**
@@ -183,18 +183,23 @@ public class SocialServiceImpl implements SocialService {
     }
 
     /**
-     * 모임 게시글 카테고리 필터링 (안쓰는거 같아서 수정안함)
+     * 모임 게시글 카테고리 필터링
      * @return List<SocialShortDTO> : 카테고리로 필터링된 미리보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> filteringByCategory(Long categoryId) {
-        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        for(Social social : socialRepository.findAll()){
-            if(Objects.equals(social.getCategory().getId(),categoryId))
-                socialShortDTOList.add(new SocialShortDTO(social));
-        }
-        return socialShortDTOList;
+    public List<SocialShortDTO> filteringByCategory(String email, Long categoryId) {
+        List<SocialShortDTO> socialShortDTOList = getSocialList(email); //내 동에만 있는 리스트 추출
+//        List<Social> socialList = socialRepository.findAll().stream().filter(social -> social.getCategory().equals(categoryId)).collect(toList());
+//        List<SocialShortDTO> socialShortDTOList = socialList.stream().map(SocialShortDTO::new).collect(toList());
+        //일치하는 카테고리 아이디만 추출
+        return socialShortDTOList.stream().filter(socialShortDTO -> socialShortDTO.getCategory().getId().equals(categoryId)).collect(toList());
     }
+
+    @Override
+    public List<SocialShortDTO> sortByCategoryList(Boolean sortDirection, String properties) {
+        return null;
+    }
+
 
     /**
      * 모임 게시글 태그 필터링
@@ -220,16 +225,19 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 정렬된 미리보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> sortByList(Boolean sortDirection, String properties){
+    public List<SocialShortDTO> sortByList(List<SocialShortDTO> list, Boolean sortDirection, String properties){
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        if(properties.equals("")){
-            return getSocialList();
+        if(properties.equals("")){ //입력이 없으면 기본 리스트 출력
+            return list;
         }else{
             List<Social> socialList = socialRepository.findAll(Sort.by(sortDirection ? Sort.Direction.DESC : Sort.Direction.ASC, properties));
+            //TODO : 리스트 정렬하기
+
             for(Social social : socialList){
                 socialShortDTOList.add(new SocialShortDTO(social));
             }
             return socialShortDTOList;
+
         }
 
     }

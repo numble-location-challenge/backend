@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.websocket.server.PathParam;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class SocialController {
     private final SocialService socialService;
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모임 리스트 출력", description = "간략한 정보만 제공")
+    @Operation(summary = "모임 리스트 출력", description = "간략한 정보만 제공 (userId로 사용자의 동정보를 가져와 행정구역으로 필터링)")
     @GetMapping("/social")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -43,8 +44,8 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> getSocialList(){
-        List<SocialShortDTO> socialShortDTOList = socialService.getSocialList();
+    public ResponseDTO<?> getSocialList(@AuthenticationPrincipal String email){
+        List<SocialShortDTO> socialShortDTOList = socialService.getSocialList(email);
 
         return new ResponseDTO<>(socialShortDTOList, "모임 리스트 출력");
 
@@ -179,8 +180,8 @@ public class SocialController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모임 게시글 정렬하기", description = "sortNum = 1:최신순, 2:마감임박순, 3:인기순")
-    @GetMapping("/social/sort/{sortNum}")
+    @Operation(summary = "모임 게시글 정렬하기", description = "categoryNum : 카테고리 id를 입력해주세요 (-1 입력시 전체 리스트 정렬), sortType : 정렬 타입 (1 : 최신순, 2 : 마감 임박순, 3 : 인기순)")
+    @GetMapping("/social/sort/{categoryNum}/{sortType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
@@ -188,11 +189,17 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> getSortList(@Parameter(required = true) @PathVariable int sortNum){
+    public ResponseDTO<?> getSortList(@AuthenticationPrincipal String email,@Parameter(required = true) @PathVariable Long categoryNum, @PathVariable int sortType){
+        List<SocialShortDTO> socialList;
+        if(categoryNum == -1){
+            socialList = socialService.getSocialList(email);
+        }else{
+            socialList = socialService.filteringByCategory(email,categoryNum);
+        }
         String properties = "";
         Boolean sortDirection = false; // true : DESC, false : ASC
         String message = "";
-        switch (sortNum){
+        switch (sortType){
             case 1:
                 sortDirection = true;
                 properties = "createDate";
@@ -211,7 +218,7 @@ public class SocialController {
             default:
                 throw new SocialInvalidInputException(SocialInvalidInputExceptionType.OUT_OF_RANGE_OF_INPUT);
         }
-        List<SocialShortDTO> socialShortDTOList = socialService.sortByList(sortDirection, properties);
+        List<SocialShortDTO> socialShortDTOList = socialService.sortByList(socialList, sortDirection, properties);
 
         return new ResponseDTO<>(socialShortDTOList,message);
 //        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
