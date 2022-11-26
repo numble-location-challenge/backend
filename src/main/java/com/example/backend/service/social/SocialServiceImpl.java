@@ -202,10 +202,10 @@ public class SocialServiceImpl implements SocialService {
         return socialShortDTOList.stream().filter(socialShortDTO -> socialShortDTO.getCategory().getId().equals(categoryId)).collect(toList());
     }
 
-    @Override
-    public List<SocialShortDTO> sortByCategoryList(Boolean sortDirection, String properties) {
-        return null;
-    }
+//    @Override
+//    public List<SocialShortDTO> sortByCategoryList(Boolean sortDirection, String properties) {
+//        return null;
+//    }
 
 
     /**
@@ -226,27 +226,26 @@ public class SocialServiceImpl implements SocialService {
     }
 
     /**
-     * 리스트 정렬
-     * @param sortDirection 오름차순, 내림차순 기준 (true ? DESC : ASC)
-     * @param properties 정렬할 기준
-     * @return List<SocialShortDTO> : 정렬된 미리보기 형식의 리스트
+     * 리스트 정렬하기
+     * @param list 정렬할 리스트
+     * @param sortType 1:최신순, 2:마감 임박순, 3:인기순
+     * @return
      */
     @Override
-    public List<SocialShortDTO> sortByList(List<SocialShortDTO> list, Boolean sortDirection, String properties){
-        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        if(properties.equals("")){ //입력이 없으면 기본 리스트 출력
-            return list;
-        }else{
-            List<Social> socialList = socialRepository.findAll(Sort.by(sortDirection ? Sort.Direction.DESC : Sort.Direction.ASC, properties));
-            //TODO : 리스트 정렬하기
-
-            for(Social social : socialList){
-                socialShortDTOList.add(new SocialShortDTO(social));
-            }
-            return socialShortDTOList;
-
+    public List<SocialShortDTO> sortByList(List<SocialShortDTO> list, int sortType){
+        switch (sortType){
+            case 1: //최신순
+                return list.stream().sorted(Comparator.comparing(SocialShortDTO::getCreateDate).reversed()).collect(toList());
+            case 2: //마감 임박순
+                return list.stream().sorted(Comparator.comparing(SocialShortDTO::getEndDate)).collect(toList());
+            case 3: //인기순
+                return list.stream().sorted(Comparator.comparing(SocialShortDTO::getLikeCnt).reversed()).collect(toList());
+            default:
+                return list;
         }
 
     }
+
+
 
 }

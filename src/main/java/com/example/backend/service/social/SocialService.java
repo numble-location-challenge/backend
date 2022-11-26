@@ -34,12 +34,9 @@ public interface SocialService {
     //카테고리 필터링
     List<SocialShortDTO> filteringByCategory(String email, Long CategoryId);
 
-    //카테고리로 필터링된거 정렬하기
-    List<SocialShortDTO> sortByCategoryList(Boolean sortDirection, String properties);
-
     //태그 필터링
     List<SocialShortDTO> filteringByTag(Long TagId);
 
-    //최신순 정렬
-    List<SocialShortDTO> sortByList(List<SocialShortDTO> list, Boolean sortDirection, String properties);
+    //리스트 정렬
+    List<SocialShortDTO> sortByList(List<SocialShortDTO> list, int sortType);
 }

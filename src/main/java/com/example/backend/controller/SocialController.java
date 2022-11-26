@@ -40,8 +40,6 @@ public class SocialController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
-            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
     public ResponseDTO<?> getSocialList(@AuthenticationPrincipal String email){
@@ -58,10 +56,8 @@ public class SocialController {
     @GetMapping("/social/{socialId}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+            @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> getSocialDetail(@Parameter(required = true) @PathVariable Long socialId){
         SocialLongDTO socialLongDTO = socialService.getSocialDetail(socialId);
@@ -131,8 +127,6 @@ public class SocialController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
-            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
     public ResponseDTO<?> getMySocialList(@Parameter(required = true) @AuthenticationPrincipal String email){
@@ -149,8 +143,6 @@ public class SocialController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
-            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
     public ResponseDTO<?> getJoinSocialList(@Parameter(required = true) @AuthenticationPrincipal String email){
@@ -167,9 +159,7 @@ public class SocialController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
-            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST")
     })
     public ResponseDTO<?> getFilteringList(@Parameter(required = true) @PathVariable Long tagNum){
         List<SocialShortDTO> socialShortDTOList = socialService.filteringByTag(tagNum);
@@ -180,50 +170,43 @@ public class SocialController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모임 게시글 정렬하기", description = "categoryNum : 카테고리 id를 입력해주세요 (-1 입력시 전체 리스트 정렬), sortType : 정렬 타입 (1 : 최신순, 2 : 마감 임박순, 3 : 인기순)")
-    @GetMapping("/social/sort/{categoryNum}/{sortType}")
+    @Operation(summary = "모임 전체 게시글 정렬하기", description = "sortType : 정렬 타입 (1 : 최신순, 2 : 마감 임박순, 3 : 인기순)")
+    @GetMapping("/social/sort/{sortType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
-            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST")
     })
-    public ResponseDTO<?> getSortList(@AuthenticationPrincipal String email,@Parameter(required = true) @PathVariable Long categoryNum, @PathVariable int sortType){
-        List<SocialShortDTO> socialList;
-        if(categoryNum == -1){
-            socialList = socialService.getSocialList(email);
-        }else{
-            socialList = socialService.filteringByCategory(email,categoryNum);
-        }
-        String properties = "";
-        Boolean sortDirection = false; // true : DESC, false : ASC
-        String message = "";
-        switch (sortType){
-            case 1:
-                sortDirection = true;
-                properties = "createDate";
-                message = "최신순 정렬";
-                break;
-            case 2:
-                sortDirection = false;
-                properties = "endDate";
-                message = "마감 임박순 정렬";
-                break;
-            case 3:
-                sortDirection = true;
-                properties = "likes";
-                message = "인기순 정렬";
-                break;
-            default:
-                throw new SocialInvalidInputException(SocialInvalidInputExceptionType.OUT_OF_RANGE_OF_INPUT);
-        }
-        List<SocialShortDTO> socialShortDTOList = socialService.sortByList(socialList, sortDirection, properties);
+    public ResponseDTO<?> getSortList(@AuthenticationPrincipal String email,@Parameter(required = true) @PathVariable int sortType){
+        List<SocialShortDTO> socialList = socialService.getSocialList(email); //정렬할 리스트
 
-        return new ResponseDTO<>(socialShortDTOList,message);
+        List<SocialShortDTO> sortedList = socialService.sortByList(socialList, sortType); //정렬된 리스트
+        String message = (sortType == 1 ? "최신순 정렬" : (sortType == 2) ? "마감 임박순 정렬" : "인기순 정렬");
+        return new ResponseDTO<>(sortedList,message);
 //        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
 //                .data(socialShortDTOList).build();
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "카테고리별 모임 정렬하기", description = "categoryId : 카테고리 id, sortType = (1 : 최신순, 2 : 마감 임박순, 3 : 인기순)")
+    @GetMapping("/social/{categoryId}/sort/{sortType}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST")
+    })
+    public ResponseDTO<?> getSortCategoryList(@AuthenticationPrincipal String email,@Parameter(required = true) @PathVariable Long categoryId, @PathVariable int sortType){
+        List<SocialShortDTO> categoryList = socialService.filteringByCategory(email,categoryId); //정렬할 리스트
+
+        List<SocialShortDTO> sortedList = socialService.sortByList(categoryList, sortType); //정렬된 리스트
+
+        String message = (sortType == 1 ? "최신순 정렬" : (sortType == 2) ? "마감 임박순 정렬" : "인기순 정렬");
+
+        return new ResponseDTO<>(sortedList,message);
+//        return ResponseDTO.<SocialShortDTO>builder().success(true).message(message)
+//                .data(socialShortDTOList).build();
+    }
+
 
 }
 
