@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "댓글 조회 DTO")
+@Schema(description = "댓글 조회 DTO 삭제된 댓글일 시 deleted= true, user = null, content = 삭제된 댓글입니다.")
 @Getter
 @NoArgsConstructor
 public class CommentResponseDTO {
@@ -29,15 +29,23 @@ public class CommentResponseDTO {
     private Long parentNum;
     @Schema(description = "댓글의 생성 시간", defaultValue = "2022-10-22T17:13:39.566884")
     private LocalDateTime createDate;
+    @Schema(description = "해당 댓글의 삭제 여부", defaultValue = "false")
+    private Boolean deleted;
+
 
     public CommentResponseDTO(Comment comment) {
         this.commentId = comment.getId();
-        this.user = FeedUserDTO.toUserDTO(comment.getUser());
-        this.contents = comment.getContents();
         this.cGroup = comment.getCGroup();
         this.level = comment.getLevel();
         this.refOrder = comment.getRefOrder();
         this.parentNum = comment.getParentNum();
-        this.createDate = comment.getCreateDate();
+        if (comment.getDeleted()) {
+            this.contents = "삭제된 댓글입니다.";
+        } else {
+            this.contents = comment.getContents();
+            this.user = FeedUserDTO.toUserDTO(comment.getUser());
+            this.createDate = comment.getCreateDate();
+        }
+        deleted = comment.getDeleted();
     }
 }
