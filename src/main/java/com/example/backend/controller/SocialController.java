@@ -127,7 +127,7 @@ public class SocialController {
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "내가 쓴 글 보기", description = "본인이 작성한 모임 게시글만 출력")
-    @GetMapping("/social/me/{userId}")
+    @GetMapping("/social/me")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
@@ -135,8 +135,8 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> getMySocialList(@Parameter(required = true) @PathVariable Long userId){
-        List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(userId);
+    public ResponseDTO<?> getMySocialList(@Parameter(required = true) @AuthenticationPrincipal String email){
+        List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(email);
 
         return new ResponseDTO<>(socialShortDTOList,"내가 쓴 모임 게시글 출력");
 //        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")
@@ -145,7 +145,7 @@ public class SocialController {
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "내가 참여한 모임 보기", description = "본인이 참여한 모임 게시글만 출력")
-    @GetMapping("/social/join/{userId}")
+    @GetMapping("/social/join")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
@@ -153,8 +153,8 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> getJoinSocialList(@Parameter(required = true) @PathVariable Long userId){
-        List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(userId);
+    public ResponseDTO<?> getJoinSocialList(@Parameter(required = true) @AuthenticationPrincipal String email){
+        List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(email);
 
         return new ResponseDTO<>(socialShortDTOList,"내가 참가한 모임들 출력");
 //        return ResponseDTO.<SocialShortDTO>builder().success(true).message("내가 쓴 모임 게시글 출력")

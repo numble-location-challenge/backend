@@ -26,10 +26,10 @@ public interface SocialService {
     List<SocialShortDTO> getSocialList(String email);
 
     //본인이 작성한 모임 게시글만 출력
-    List<SocialShortDTO> getMySocialList(Long userId);
+    List<SocialShortDTO> getMySocialList(String email);
 
     //본인이 참여한 모임 게시글만 출력
-    List<SocialShortDTO> getJoinSocialList(Long userId);
+    List<SocialShortDTO> getJoinSocialList(String email);
 
     //카테고리 필터링
     List<SocialShortDTO> filteringByCategory(String email, Long CategoryId);

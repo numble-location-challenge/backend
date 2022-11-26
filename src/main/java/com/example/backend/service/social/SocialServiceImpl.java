@@ -152,34 +152,41 @@ public class SocialServiceImpl implements SocialService {
 
     /**
      * 내가 작성한 게시글 만 보기
-     * @param userId 사용자 아이디
+     * @param email 현재 로그인한 사용자 이메일
      * @return List<SocialShortDTO> : 미리 보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> getMySocialList(Long userId) {
-        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        for(Social social : socialRepository.findAll()){
-            if(Objects.equals(social.getUser().getId(), userId))
-                socialShortDTOList.add(new SocialShortDTO(social));
-        }
-        return socialShortDTOList;
+    public List<SocialShortDTO> getMySocialList(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()->new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        return socialRepository.findAll().stream()
+                .filter(social -> social.getUser().getId().equals(user.getId()))
+                .map(SocialShortDTO::new)
+                .collect(toList());
     }
 
     /**
      * 내가 참여한 모임 게시글 만 보기
-     * @param userId 사용자 아이디
+     * @param email 현재 로그인한 사용자 이메일
      * @return List<SocialShortDTO> : 미리 보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> getJoinSocialList(Long userId) {
-        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
-        for(Social social : socialRepository.findAll()){
-            Optional<Socialing> socialing = social.getSocialings().stream().filter(s -> Objects.equals(s.getUser().getId(), userId)).findFirst();
-            if(socialing.isPresent()){
-                socialShortDTOList.add(new SocialShortDTO(social));
-            }
-        }
-        return socialShortDTOList;
+    public List<SocialShortDTO> getJoinSocialList(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        return socialRepository.findAll().stream()
+                .filter(social -> social.getSocialings().contains(user.getId()))
+                .map(SocialShortDTO::new)
+                .collect(toList());
+//        List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
+//        for(Social social : socialRepository.findAll()){
+//            Optional<Socialing> socialing = social.getSocialings().stream().filter(s -> Objects.equals(s.getUser().getId(), userId)).findFirst();
+//            if(socialing.isPresent()){
+//                socialShortDTOList.add(new SocialShortDTO(social));
+//            }
+//        }
+//        return socialShortDTOList;
     }
 
     /**
