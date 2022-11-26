@@ -20,6 +20,7 @@ import com.example.backend.domain.Comment;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.comment.CommentRequestDTO;
 import com.example.backend.dto.comment.CommentResponseDTO;
+import com.example.backend.dto.comment.MyCommentResponseDTO;
 import com.example.backend.service.comment.CommentService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,6 +52,22 @@ public class CommentController {
             .collect(Collectors.toList());
 
         return new ResponseDTO<>(result,"댓글 조회 성공");
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "내가 작성한 댓글 조회", description = "내가 작성한 댓글을 조회합니다.")
+    @ApiResponses(
+        {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND")})
+    @GetMapping("/comment/me")
+    public ResponseDTO<?> getMyComments(@AuthenticationPrincipal String userEmail) {
+        List<Comment> comments = commentService.getMyComments(userEmail);
+
+        List<MyCommentResponseDTO> result = comments.stream()
+            .map(comment -> new MyCommentResponseDTO(comment))
+            .collect(Collectors.toList());
+
+        return new ResponseDTO<>(result,"내가 작성한 댓글 조회 성공");
     }
 
     @ResponseStatus(HttpStatus.OK)

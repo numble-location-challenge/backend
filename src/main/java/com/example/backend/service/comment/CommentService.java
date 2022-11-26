@@ -18,4 +18,5 @@ public interface CommentService {
 
     CommentResponseDTO updateComment(Long commentId, String userEmail, CommentRequestDTO commentRequestDTO); // 댓글 및 대댓글 수정
 
+    List<Comment> getMyComments(String userEmail);
 }
