@@ -97,7 +97,7 @@ public class CommentController {
     @ApiResponses(
         {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
-            , @ApiResponse(responseCode = "403", description = "Forbidden")
+            , @ApiResponse(responseCode = "403", description = "FORBIDDEN")
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PutMapping("/comment/{commentId}")
     public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal String userEmail) {

@@ -59,7 +59,7 @@ public class CommentServiceImpl implements CommentService{
         User user = userRepository.findByEmail(userEmail).orElseThrow(()-> new EntityNotExistsException(
             EntityNotExistsExceptionType.NOT_FOUND_USER));
         Post post = postRepository.findById(postId).orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
-        Comment parent_comment = commentRepository.findByIdAndPostId(commentId, postId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT)); // 부모 댓글의 정보
+        Comment parent_comment = commentRepository.findByIdAndPostIdAndDeletedIsFalse(commentId, postId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT)); // 부모 댓글의 정보
         if (isComment(parent_comment)) {
             int parentLevel = parent_comment.getLevel(); // 부모 댓글의 레벨
             int parentCGroup = parent_comment.getCGroup(); // 부모 댓글의 그룹
@@ -77,9 +77,14 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public void deleteComment(Long commentId, String userEmail) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
-        if (hasPermission(comment, userEmail)) {
-            if (isComment(comment)) {
-                commentRepository.deleteAllByCgroup(comment.getCGroup());
+        Long countCommentByCGroup = commentRepository.countBycGroup(comment.getCGroup());
+        if (hasPermission(comment, userEmail)) { //유저가 권한을 가지고 있고
+            if (isComment(comment)) { // 대댓글이 아닌 댓글이면서
+                if (countCommentByCGroup > 1){ // 대댓글을 가지면
+                    comment.setDeleted(); //deleted = true 로 변경
+                } else{ //아니면 삭제
+                    commentRepository.delete(comment);
+                }
             } else {
                 commentRepository.delete(comment);
             }
@@ -90,7 +95,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Transactional
     public CommentResponseDTO updateComment(Long commentId, String userEmail, CommentRequestDTO commentRequestDTO) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
+        Comment comment = commentRepository.findByIdAndDeletedIsFalse(commentId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
         if (hasPermission(comment, userEmail)) {
             comment.updateComment(commentRequestDTO.getContents());
             CommentResponseDTO responseDTO = new CommentResponseDTO(comment);
