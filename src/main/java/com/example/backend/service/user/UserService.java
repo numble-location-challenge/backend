@@ -2,7 +2,7 @@ package com.example.backend.service.user;
 
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
-import com.example.backend.dto.login.SocialJoinRequestDTO;
+import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 
@@ -10,7 +10,7 @@ public interface UserService {
 
     User createDefaultUser(UserDefaultJoinRequestDTO userDTO); //회원가입
 
-    User createSnsUser(UserType userType, SocialJoinRequestDTO authRequestDTO);
+    User createSnsUser(UserType userType, SnsJoinRequestDTO authRequestDTO);
 
     void changeToWithdrawnUser(String email); //회원 탈퇴
 

@@ -3,7 +3,7 @@ package com.example.backend.service.login;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
-import com.example.backend.dto.login.SocialLoginRequestDTO;
+import com.example.backend.dto.login.SnsLoginRequestDTO;
 import com.example.backend.global.exception.*;
 import com.example.backend.global.security.JwtSubject;
 import com.example.backend.global.security.TokenService;
@@ -38,7 +38,7 @@ public class LoginServiceImpl implements LoginService{
     }
     
     @Override
-    public User snsLogin(UserType userType, SocialLoginRequestDTO loginDTO) {
+    public User snsLogin(UserType userType, SnsLoginRequestDTO loginDTO) {
         //AT로 카카오 사용자 정보(id) 가져온다
         String email = snsUserService.getUserEmail(userType, loginDTO.getAccessToken());
 

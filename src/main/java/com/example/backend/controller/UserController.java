@@ -3,7 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.*;
-import com.example.backend.dto.login.SocialJoinRequestDTO;
+import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
@@ -59,7 +59,7 @@ public class UserController {
     })
     public ResponseEntity<?> snsJoin(
             @PathVariable("userType") String userTypeStr,
-            @RequestBody @Valid final SocialJoinRequestDTO joinDTO){
+            @RequestBody @Valid final SnsJoinRequestDTO joinDTO){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);

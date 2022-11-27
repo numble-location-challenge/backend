@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Schema
-public class SocialJoinRequestDTO {
+public class SnsJoinRequestDTO {
     @Schema(description = "정보를 조회할 SNS API의 액세스 토큰")
     @NotNull
     String accessToken;

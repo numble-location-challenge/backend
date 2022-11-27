@@ -3,7 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.AuthDTO;
-import com.example.backend.dto.login.SocialLoginRequestDTO;
+import com.example.backend.dto.login.SnsLoginRequestDTO;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.global.exception.InvalidUserInputException;
@@ -59,7 +59,7 @@ public class LoginController {
     })
     public ResponseEntity<?> socialLogin(
             @PathVariable("userType") String userTypeStr,
-            @RequestBody @Valid final SocialLoginRequestDTO authRequestDTO){
+            @RequestBody @Valid final SnsLoginRequestDTO authRequestDTO){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);

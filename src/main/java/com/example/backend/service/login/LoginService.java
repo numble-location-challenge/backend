@@ -3,13 +3,13 @@ package com.example.backend.service.login;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
-import com.example.backend.dto.login.SocialLoginRequestDTO;
+import com.example.backend.dto.login.SnsLoginRequestDTO;
 
 public interface LoginService {
 
     User defaultLogin(DefaultLoginRequestDTO loginDTO);
 
-    User snsLogin(UserType userType, SocialLoginRequestDTO authRequestDTO);
+    User snsLogin(UserType userType, SnsLoginRequestDTO authRequestDTO);
 
     void logout(String email, String refreshToken);
 

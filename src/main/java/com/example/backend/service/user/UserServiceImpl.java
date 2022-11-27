@@ -5,7 +5,7 @@ import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.domain.post.Social;
-import com.example.backend.dto.login.SocialJoinRequestDTO;
+import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.user.SnsUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User createSnsUser(UserType userType, SocialJoinRequestDTO joinDTO) {
+    public User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO) {
         //카카오 사용자 정보 API에서 받아옴
         SnsUserDTO userDTO = snsUserService.getUserInfo(userType, joinDTO.getAccessToken());
         validateSocialUserDuplicate(userDTO.getEmail());
