@@ -3,6 +3,7 @@ package com.example.backend.global.exception;
 import com.example.backend.dto.ErrorDTO;
 import com.example.backend.global.exception.base.CustomException;
 import com.example.backend.global.exception.comment.CommentInvalidInputException;
+import com.example.backend.global.exception.feed.FeedInvalidInputException;
 import com.example.backend.global.exception.social.SocialInvalidInputException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class CustomErrorController implements ErrorController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST) //400
     @ExceptionHandler(value = {InvalidUserInputException.class, CommentInvalidInputException.class,
-            SocialInvalidInputException.class})
+            SocialInvalidInputException.class, FeedInvalidInputException.class})
     public ErrorDTO handleBadRequest(CustomException ex){
         return ErrorDTO.builder()
                 .errorCode(ex.getExceptionType().getErrorCode())
