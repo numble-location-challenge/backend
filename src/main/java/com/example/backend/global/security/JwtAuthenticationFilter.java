@@ -33,17 +33,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String TOKEN_PREFIX = "Bearer ";
 
-    private List<String> NOT_CHECK_URL = List.of("/login", "/kakaologin", "/join", "/kakaojoin", "/refresh");
+    private List<String> NOT_CHECK_URL = List.of("/login", "/join", "/refresh", "/swagger-ui");
 
     private final TokenService tokenService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        for(String url : NOT_CHECK_URL){
-            if(url.equals(path)){
-                return true;
-            }
+        for(String notUrl : NOT_CHECK_URL){
+            if(path.startsWith(notUrl)) return true;
         }
         return false;
     }
@@ -80,19 +78,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new AuthenticationException("AuthenticationException 에러");
             }
         }
-        else{
-            log.info("헤더에 토큰이 담겨있지 않습니다.");
-//            throw new AuthenticationException("AuthenticationException 에러");
-        }
 
         filterChain.doFilter(request, response);
     }
 
-    /**
-     * 토큰 파싱
-     * @param request
-     * @return 성공시 토큰, 실패시 null
-     */
     public String parseBearerToken(HttpServletRequest request) {
         // http 헤더 파싱해 토큰 얻음
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
