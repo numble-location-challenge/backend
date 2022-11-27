@@ -54,11 +54,14 @@ public class Feed extends Post {
     }
 
     public void setImages(List<PostImage> postImages){
+        for (PostImage postImage : postImages){
+            postImage.setPost(this);
+        }
         this.images = postImages;
     }
 
     public void updateFeed(String contents, Social social, List<PostImage> images, Integer region){
-        this.images = images;
+        this.setImages(images);
         this.contents = contents;
         this.social = social;
         this.regionCode = region;
