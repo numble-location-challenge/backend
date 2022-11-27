@@ -3,9 +3,10 @@ package com.example.backend.service;
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
+import com.example.backend.domain.enumType.UserType;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.login.SocialJoinRequestDTO;
-import com.example.backend.dto.user.KakaoUserDTO;
+import com.example.backend.dto.user.SnsUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
@@ -46,18 +47,19 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User createKakaoUser(SocialJoinRequestDTO joinDTO) {
+    public User createSnsUser(UserType userType, SocialJoinRequestDTO joinDTO) {
         //카카오 사용자 정보 API에서 받아옴
-        KakaoUserDTO userDTO = kakaoService.getUserInfo(joinDTO.getAccessToken());
-
-        validateSocialUserDuplicate(userDTO.getId(), userDTO.getEmail());
+        SnsUserDTO userDTO = kakaoService.getUserInfo(userType, joinDTO.getAccessToken());
+        validateSocialUserDuplicate(userDTO.getEmail());
         //중복X -> region 세팅 및 회원가입 처리
-        User user = userDTO.toEntity(joinDTO.getDongCode(), joinDTO.getDongName());
-        user.setId(userDTO.getId()); //pk를 카카오의 id로 세팅
+        User user = userDTO.toEntity(
+                userType, joinDTO.getUsername(), joinDTO.getPhoneNumber(),
+                joinDTO.getDongCode(), joinDTO.getDongName());
         user.setKakaoUser(); //status 세팅
         return userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public User modify(String email, Long userId, UserModifyRequestDTO userDTO) {
         User user = userRepository.findByEmail(email)
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService{
             user.updateRegion(userDTO.getDongCode(), userDTO.getDongName());
         }
 
-        //TODO region 수정시 모임장인 social의 region도 수정되어야함(피드는 두는게 나은듯)
+        //TODO 만약 region 수정 가능하면 모임장인 social의 region도 수정되어야함(피드는 두는게 나은듯)
 
         return null;
     }
@@ -91,11 +93,9 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    private void validateSocialUserDuplicate(Long id, String email){
-        boolean findUser = userRepository.existsById(id);
-        if(findUser) throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_KAKAO_USER);
-        else if(userRepository.existsByEmail(email)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_EMAIL);
+    private void validateSocialUserDuplicate(String email){
+        if(userRepository.existsByEmail(email)){
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_KAKAO_USER);
         }
     }
 

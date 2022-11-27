@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 
 @Slf4j
 @Service
@@ -101,6 +102,18 @@ public class TokenService {
 
     public Claims getAllClaimsFromToken(String token){
         return Jwts.parserBuilder().setSigningKey(getKeyForSign()).build().parseClaimsJws(token).getBody();
+    }
+
+    public HashMap<String,String> getAccessAndRefreshToken(User user) {
+        //토큰 2개 생성
+        final String accessToken = issueAccessToken(user); //AT 생성
+        final String refreshToken = issueRefreshToken(user); //RT 생성
+
+        HashMap<String,String> token = new HashMap<>();
+        token.put("AT", accessToken);
+        token.put("RT", refreshToken);
+
+        return token;
     }
 
 }
