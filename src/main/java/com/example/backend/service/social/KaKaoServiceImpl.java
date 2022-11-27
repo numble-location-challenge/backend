@@ -1,33 +1,75 @@
 package com.example.backend.service.social;
 
+import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.user.KakaoUserDTO;
+import com.example.backend.dto.user.SnsUserDTO;
+import com.example.backend.dto.user.UserInfo;
+import com.example.backend.dto.user.UserInfoFactory;
+import com.example.backend.global.exception.InvalidUserInputException;
+import com.example.backend.global.exception.InvalidUserInputExceptionType;
 import com.example.backend.service.KakaoService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-//TODO
+import lombok.RequiredArgsConstructor;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class KaKaoServiceImpl implements KakaoService {
 
-    private final String requestUrl = "https://kapi.kakao.com/v2/user/me"; //카카오 유저 API
+    @Value("${sns.kakao.userInfoUri}")
+    private String KAKAO_URL;
+
+    private final RestTemplate restTemplate;
 
     @Override
-    public Long getUserId(String accessToken) {
-        return null;
+    public String getUserEmail(UserType userType, String accessToken) {
+        SnsUserDTO userInfo = getUserInfo(userType, accessToken);
+        return userInfo.getEmail();
     }
 
     @Override
-    public KakaoUserDTO getUserInfo(String accessToken) {
-        //헤더 설정
+    public SnsUserDTO getUserInfo(UserType userType, String accessToken) {
+        log.info(KAKAO_URL);
+        String requestUrl = null;
+        switch(userType){
+            case KAKAO: requestUrl = KAKAO_URL; break;
+            default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
+        }
+
+        //헤더, 인코딩 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+        LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
         //요청 보내기
+        ResponseEntity<String> result = restTemplate.exchange(requestUrl, HttpMethod.GET, httpEntity, String.class);
+        log.info(result.getBody());
 
-        //사용자 정보를 JsonNode로 변경하여 필요한 데이터만 추출하여 Dto로 담아 반환
-        return null;
+        //json parser
+        ObjectMapper objectMapper = new ObjectMapper();
+        UserInfo userInfo = UserInfoFactory.getOAuth2UserInfo(userType);
+        try{
+            userInfo = objectMapper.readValue(result.getBody(), KakaoUserDTO.class);
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return UserInfoFactory.getUserDTOFromUserInfo(userType, userInfo);
     }
+
 }
