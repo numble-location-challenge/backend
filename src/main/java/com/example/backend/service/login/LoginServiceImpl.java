@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.login;
 
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
@@ -8,6 +8,7 @@ import com.example.backend.global.exception.*;
 import com.example.backend.global.security.JwtSubject;
 import com.example.backend.global.security.TokenService;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.user.SnsUserService;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 

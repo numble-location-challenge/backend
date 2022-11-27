@@ -11,7 +11,7 @@ import com.example.backend.global.exception.InvalidUserInputException;
 import com.example.backend.global.exception.InvalidUserInputExceptionType;
 import com.example.backend.global.security.TokenService;
 import com.example.backend.global.utils.ResponseUtils;
-import com.example.backend.service.UserService;
+import com.example.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

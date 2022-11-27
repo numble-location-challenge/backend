@@ -1,4 +1,4 @@
-package com.example.backend.service.social;
+package com.example.backend.service.user;
 
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.user.KakaoUserInfo;
@@ -7,7 +7,7 @@ import com.example.backend.dto.user.UserInfo;
 import com.example.backend.dto.user.UserInfoFactory;
 import com.example.backend.global.exception.InvalidUserInputException;
 import com.example.backend.global.exception.InvalidUserInputExceptionType;
-import com.example.backend.service.SnsUserService;
+import com.example.backend.service.user.SnsUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

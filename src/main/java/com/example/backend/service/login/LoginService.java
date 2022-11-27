@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.login;
 
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;

@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.user;
 
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
@@ -23,7 +23,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final SocialRepository socialRepository;

@@ -10,7 +10,7 @@ import com.example.backend.global.exception.InvalidUserInputException;
 import com.example.backend.global.exception.InvalidUserInputExceptionType;
 import com.example.backend.global.security.TokenService;
 import com.example.backend.global.utils.ResponseUtils;
-import com.example.backend.service.LoginService;
+import com.example.backend.service.login.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
