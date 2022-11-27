@@ -8,19 +8,19 @@ import com.example.backend.domain.enumType.UserType;
 public class UserInfoFactory {
     public static UserInfo getOAuth2UserInfo(UserType userType) {
         switch (userType) {
-            case KAKAO: return new KakaoUserDTO();
+            case KAKAO: return new KakaoUserInfo();
             default: throw new IllegalArgumentException("Invalid User Type.");
         }
     }
 
     public static SnsUserDTO getUserDTOFromUserInfo(UserType userType, UserInfo userInfo){
         switch (userType){
-            case KAKAO: return getKakaoDTO(((KakaoUserDTO) userInfo));
+            case KAKAO: return getKakaoDTO(((KakaoUserInfo) userInfo));
             default: throw new IllegalArgumentException("Invalid User Type.");
         }
     }
 
-    private static SnsUserDTO getKakaoDTO(KakaoUserDTO userInfo){
+    private static SnsUserDTO getKakaoDTO(KakaoUserInfo userInfo){
         return SnsUserDTO.builder()
                 .id(userInfo.getId())
                 .email(userInfo.getKakao_account().getEmail())

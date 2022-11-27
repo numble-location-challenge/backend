@@ -24,7 +24,7 @@ public class LoginServiceImpl implements LoginService{
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final KakaoService kakaoService;
+    private final SnsUserService snsUserService;
 
     @Override
     public User defaultLogin(DefaultLoginRequestDTO loginDTO) {
@@ -39,7 +39,7 @@ public class LoginServiceImpl implements LoginService{
     @Override
     public User snsLogin(UserType userType, SocialLoginRequestDTO loginDTO) {
         //AT로 카카오 사용자 정보(id) 가져온다
-        String email = kakaoService.getUserEmail(userType, loginDTO.getAccessToken());
+        String email = snsUserService.getUserEmail(userType, loginDTO.getAccessToken());
 
         //1. DB에 있는 회원이면 컨트롤러로 돌아가 인가처리
         //2. 기존회원이 아니면 (region 필요) 에러코드

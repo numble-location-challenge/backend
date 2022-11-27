@@ -1,13 +1,13 @@
 package com.example.backend.service.social;
 
 import com.example.backend.domain.enumType.UserType;
-import com.example.backend.dto.user.KakaoUserDTO;
+import com.example.backend.dto.user.KakaoUserInfo;
 import com.example.backend.dto.user.SnsUserDTO;
 import com.example.backend.dto.user.UserInfo;
 import com.example.backend.dto.user.UserInfoFactory;
 import com.example.backend.global.exception.InvalidUserInputException;
 import com.example.backend.global.exception.InvalidUserInputExceptionType;
-import com.example.backend.service.KakaoService;
+import com.example.backend.service.SnsUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,10 +22,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KaKaoServiceImpl implements KakaoService {
+public class SnsUserServiceImpl implements SnsUserService {
 
     @Value("${sns.kakao.userInfoUri}")
     private String KAKAO_URL;
@@ -62,7 +63,7 @@ public class KaKaoServiceImpl implements KakaoService {
         ObjectMapper objectMapper = new ObjectMapper();
         UserInfo userInfo = UserInfoFactory.getOAuth2UserInfo(userType);
         try{
-            userInfo = objectMapper.readValue(result.getBody(), KakaoUserDTO.class);
+            userInfo = objectMapper.readValue(result.getBody(), KakaoUserInfo.class);
         } catch (JsonMappingException e) {
             e.printStackTrace();
         } catch (JsonProcessingException e) {

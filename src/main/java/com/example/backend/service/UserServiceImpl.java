@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService{
     private final SocialRepository socialRepository;
     private final SocialingRepository socilaingRepository;
     private final CommentRepository commentRepository;
-    private final KakaoService kakaoService;
+    private final SnsUserService snsUserService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User createSnsUser(UserType userType, SocialJoinRequestDTO joinDTO) {
         //카카오 사용자 정보 API에서 받아옴
-        SnsUserDTO userDTO = kakaoService.getUserInfo(userType, joinDTO.getAccessToken());
+        SnsUserDTO userDTO = snsUserService.getUserInfo(userType, joinDTO.getAccessToken());
         validateSocialUserDuplicate(userDTO.getEmail());
         //중복X -> region 세팅 및 회원가입 처리
         User user = userDTO.toEntity(

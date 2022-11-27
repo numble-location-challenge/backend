@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoUserDTO extends UserInfo{
+public class KakaoUserInfo extends UserInfo{
     private Long id;//id, 사용자의 카카오 회원번호
     private Properties properties;
     private KakaoAccount kakao_account;
