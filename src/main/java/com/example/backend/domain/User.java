@@ -64,10 +64,6 @@ public class User {
         password = passwordEncoder.encode(password);
     }
 
-    public void setId(Long id){
-        this.id = id;
-    }
-
     public void setDefaultUser(){
         userType = UserType.DEFAULT;
         userStatus = UserStatus.ACTIVATED;
