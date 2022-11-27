@@ -1,6 +1,7 @@
-package com.example.backend.dto.user;
+package com.example.backend.service.user.userInfo;
 
 import com.example.backend.domain.enumType.UserType;
+import com.example.backend.dto.user.SnsUserDTO;
 
 /**
  * UserType에 따라 알맞은 구현체를 생성

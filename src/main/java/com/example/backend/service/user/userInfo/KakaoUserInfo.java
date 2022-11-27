@@ -1,4 +1,4 @@
-package com.example.backend.dto.user;
+package com.example.backend.service.user.userInfo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
