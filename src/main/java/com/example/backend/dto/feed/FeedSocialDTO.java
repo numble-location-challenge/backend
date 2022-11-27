@@ -19,14 +19,17 @@ public class FeedSocialDTO {
     private String title;
     @Schema(description = "피드와 연결된 모임글의 지역", defaultValue = "30")
     private Integer region;
+    @Schema(description = "피드의 지역 이름", defaultValue = "서울특별시 종로구 효자동")
+    private String regionName;
     @Schema(description = "피드와 연결된 모임글의 모임 시작 시간",defaultValue = "YYYY-MM-DDT20:30")
     private LocalDateTime startDate;
 
     @Builder
-    public FeedSocialDTO(Long id, String title, Integer region, LocalDateTime startDate) {
+    public FeedSocialDTO(Long id, String title, Integer region, String regionName, LocalDateTime startDate) {
         this.id = id;
         this.title = title;
         this.region = region;
+        this.regionName = regionName;
         this.startDate = startDate;
     }
 
@@ -34,6 +37,7 @@ public class FeedSocialDTO {
         return FeedSocialDTO.builder()
             .id(social.getId())
             .region(social.getRegionCode())
+            .regionName(social.getDongName())
             .startDate(social.getStartDate())
             .title(social.getTitle())
             .build();

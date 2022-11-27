@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FeedResponseDTO {
     @Schema(description = "피드의 아이디", defaultValue = "67")
-    private Long id;
+    private Long postId;
     @Schema(description = "피드를 작성한 유저")
     private FeedUserDTO user;
     @Schema(description = "피드 본문", defaultValue = "본문입니다.")
@@ -33,6 +33,8 @@ public class FeedResponseDTO {
     private List<CommentResponseDTO> comments = new ArrayList<>();
     @Schema(description = "피드의 지역",defaultValue = "3")
     private Integer regions;
+    @Schema(description = "피드의 지역 이름", defaultValue = "서울특별시 종로구 효자동")
+    private String regionName;
     @Schema(description = "좋아요 체크 여부", defaultValue = "false")
     private boolean isLiked;
     @Schema(description = "피드의 생성 날짜 및 시간", defaultValue = "YYYY-MM-DDT20:30")
@@ -41,7 +43,7 @@ public class FeedResponseDTO {
     private int likes;
 
     public FeedResponseDTO(Feed feed) {
-        this.id = feed.getId();
+        this.postId = feed.getId();
         this.user = toUserDTO(feed.getUser());
         this.contents = feed.getContents();
         if (feed.getSocial() != null) {
@@ -50,7 +52,7 @@ public class FeedResponseDTO {
         this.images = feed.getImages().stream().map(postImage -> new PostImageDTO(postImage)).collect(Collectors.toList());
         this.comments = feed.getComments().stream().map(comment -> new CommentResponseDTO(comment)).collect(Collectors.toList());
         this.regions = feed.getRegionCode();
-        //TODO 좋아요 여부 로직 구현 및 시간 로직 구현
+        this.regionName = feed.getDongName();
         this.isLiked = false;
         this.createTime = feed.getCreateDate();
         this.likes = feed.getLikes();
