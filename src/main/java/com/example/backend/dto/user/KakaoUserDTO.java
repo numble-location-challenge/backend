@@ -1,26 +1,32 @@
 package com.example.backend.dto.user;
 
-import com.example.backend.domain.User;
-import com.example.backend.domain.enumType.UserType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-
-import java.util.UUID;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
-public class KakaoUserDTO {
+@EqualsAndHashCode(callSuper=false)
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class KakaoUserDTO extends UserInfo{
     private Long id;//id, 사용자의 카카오 회원번호
+    private Properties properties;
+    private KakaoAccount kakao_account;
 
-    //아래 정보들은 KakaoAccount 타입에서 받아오는 것
-    private String name; //동의 필요, name_needs_agreement가 true
-    private String email; //동의 필요, 예외처리 복잡
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public class Properties {
+        private String nickname;
+        public String profile_image;
+    }
 
-    //로그인 하는 사용자에 따라 전화번호가 없는 계정은 동의 항목이 설정되어 있어도 전화번호를 조회할 수 없다
-    private String phoneNumber; //phone_number
-
-    public User toEntity(int dongCode, String dongName) {
-        return User.builder()
-                .userType(UserType.KAKAO).email(email).username(name).phoneNumber(phoneNumber)
-                .nickname(UUID.randomUUID().toString()).dongCode(dongCode).dongName(dongName)
-                .build();
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public class KakaoAccount{
+        private Boolean has_email;
+        public Boolean is_email_valid;
+        public Boolean is_email_verified;
+        public String email;
     }
 }
