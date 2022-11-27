@@ -48,12 +48,6 @@ public class LoginServiceImpl implements LoginService{
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_KAKAO_USER));
     }
 
-    @Override
-    public void logout(String email, String refreshToken) {
-        User findUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        findUser.deleteRefreshToken(); //DB의 RT 삭제
-    }
-
     /**
      * 검증 & 만료체크를 거친다
      * @param refreshToken
