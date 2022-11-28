@@ -3,10 +3,7 @@ package com.example.backend.service.user;
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
-import com.example.backend.domain.enumType.UserType;
 import com.example.backend.domain.post.Social;
-import com.example.backend.dto.login.SnsJoinRequestDTO;
-import com.example.backend.dto.user.SnsUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
@@ -47,11 +44,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User modify(String email, Long userId, UserModifyRequestDTO userDTO) {
-        User user = userRepository.findByEmail(email)
+    public User modify(Long userId, UserModifyRequestDTO userDTO) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-
-        if(!user.getId().equals(userId)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
 
         //user 수정
         if(userDTO.getNickname() != null) user.updateNickname(userDTO.getNickname());
@@ -60,7 +55,6 @@ public class UserServiceImpl implements UserService {
         if(userDTO.getDongCode() != null && userDTO.getDongName() != null){
             user.updateRegion(userDTO.getDongCode(), userDTO.getDongName());
         }
-
         //TODO 만약 region 수정 가능하면 모임장인 social의 region도 수정되어야함(피드는 두는게 나은듯)
 
         return null;
@@ -81,11 +75,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void changeToWithdrawnUser(String email, Long userId) {
-        User user = userRepository.findByEmail(email)
+    public void changeToWithdrawnUser(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-
-        if(!user.getId().equals(userId)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
 
         //DB 에서 삭제하지 않고 상태만 변경
         user.setWithdrawStatus();
@@ -102,21 +94,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(String email, Long userId) {
-        //url로 들어온 id와 principal의 유저가 같은지 확인
-        User findUser = userRepository.findByEmail(email)
+    public User getUser(Long userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-
-        if(findUser.getId().equals(userId)) return findUser;
-        else throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
     }
 
-    //모임신청
     @Transactional
     @Override
-    public void participateSocial(String email, Long socialId) {
+    public void participateSocial(Long userId, Long socialId) {
         //이미 신청된 유저면 신청안되게 하는건 프론트에서 거르는 거겠지..?
-        User findUser = userRepository.findByEmail(email)
+        User findUser = userRepository.findReadOnlyById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         Social findSocial = socialRepository.findById(socialId)
@@ -132,26 +119,24 @@ public class UserServiceImpl implements UserService {
         socilaingRepository.save(socialing);
     }
 
-    //모임 취소
     @Transactional
     @Override
-    public void cancelSocialParticipation(String email, Long socialId) {
-        User findUser = userRepository.findReadOnlyByEmail(email)
+    public void cancelSocialParticipation(Long userId, Long socialId) {
+        User findUser = userRepository.findReadOnlyById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         socilaingRepository.deleteByUserIdAndSocialId(findUser.getId(), socialId);
     }
 
-    //모임 강퇴
     @Transactional
     @Override
-    public void kickOutUserFromSocial(String email, Long socialId, Long droppedUserId) {
+    public void kickOutUserFromSocial(Long userId, Long socialId, Long droppedUserId) {
         //엔티티 조회
         Social social = socialRepository.findReadOnlyById(socialId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
         User socialOwner = social.getUser(); //모임장
         //모임장인지 확인
-        if(!email.equals(socialOwner.getEmail())) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
+        if(!userId.equals(socialOwner.getId())) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
         //강퇴하고 숫자-1
         socilaingRepository.deleteByUserIdAndSocialId(droppedUserId, socialId);
         social.minusCurrentNums();

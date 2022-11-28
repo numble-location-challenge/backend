@@ -7,6 +7,8 @@ import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
+import com.example.backend.global.exception.ForbiddenException;
+import com.example.backend.global.exception.ForbiddenExceptionType;
 import com.example.backend.global.security.AuthToken;
 import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.global.security.AuthTokenProvider;
@@ -82,7 +84,9 @@ public class UserController {
     public ResponseDTO<?> deleteUser(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long id){
-        userService.changeToWithdrawnUser(user.getEmail(), id);
+
+        checkPathResource(user.getUserId(), id);
+        userService.changeToWithdrawnUser(id);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 
@@ -100,7 +104,8 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody @Valid final UserModifyRequestDTO userModifyRequestDTO){
 
-        final User modifiedUser = userService.modify(user.getEmail(), id, userModifyRequestDTO);
+        checkPathResource(user.getUserId(), id);
+        final User modifiedUser = userService.modify(user.getUserId(), userModifyRequestDTO);
         UserProfileDTO userProfileDTO = new UserProfileDTO(modifiedUser);
         return new ResponseDTO<>(userProfileDTO, "정상 수정 처리 되었습니다.");
     }
@@ -118,8 +123,13 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long id){
 
-        final User findUser = userService.getUser(user.getEmail(), id);
+        checkPathResource(user.getUserId(), id);
+        final User findUser = userService.getUser(user.getUserId());
         UserProfileDTO userProfileDTO= new UserProfileDTO(findUser);
         return new ResponseDTO<>(userProfileDTO, "프로필 조회 결과");
+    }
+
+    public void checkPathResource(Long authId, Long pathId){
+        if(!authId.equals(pathId)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
     }
 }

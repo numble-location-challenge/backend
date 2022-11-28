@@ -29,7 +29,7 @@ public class SocialingController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> participateSocial(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long socialId) {
-        userService.participateSocial(user.getEmail(), socialId);
+        userService.participateSocial(user.getUserId(), socialId);
         return ResponseDTO.builder().success(true).message("모임 신청 처리되었습니다.").build();
     }
 
@@ -43,7 +43,7 @@ public class SocialingController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> cancelParticipationOfSocial(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long socialId) {
-        userService.cancelSocialParticipation(user.getEmail(), socialId);
+        userService.cancelSocialParticipation(user.getUserId(), socialId);
         return ResponseDTO.builder().success(true).message("모임 신청이 취소되었습니다.").build();
     }
 
@@ -57,7 +57,7 @@ public class SocialingController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> kickOutSocialUser(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long socialId, @PathVariable Long kickedUserId) {
-        userService.kickOutUserFromSocial(user.getEmail(), socialId, kickedUserId);
+        userService.kickOutUserFromSocial(user.getUserId(), socialId, kickedUserId);
         return ResponseDTO.builder().success(true).message("해당 유저가 강퇴처리되었습니다.").build();
     }
 }
