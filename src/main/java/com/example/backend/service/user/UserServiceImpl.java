@@ -56,8 +56,7 @@ public class UserServiceImpl implements UserService {
             user.updateRegion(userDTO.getDongCode(), userDTO.getDongName());
         }
         //TODO 만약 region 수정 가능하면 모임장인 social의 region도 수정되어야함(피드는 두는게 나은듯)
-
-        return null;
+        return user;
     }
 
     //중복 검증
