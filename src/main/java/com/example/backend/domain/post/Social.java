@@ -154,6 +154,10 @@ public class Social extends Post {
         status = SocialStatus.FULL;
     }
 
+    public void changeStatusExpiration() {
+        this.status = SocialStatus.EXPIRATION;
+    }
+
     @Builder
     public Social(User user, List<PostImage> images, List<Comment> comments, String contents, int likes, Category category,
                   List<SocialTag> socialTags, List<Socialing> socialings, SocialStatus status, String title, Integer hits,
