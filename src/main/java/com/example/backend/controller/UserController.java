@@ -40,7 +40,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "회원가입",
             description = "unique field 중복 시 errorCode -101(이메일), -102(닉네임), -103(이메일,닉네임)이 반환됩니다.")
-    @PostMapping("/join")
+    @PostMapping("/users")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
@@ -50,10 +50,9 @@ public class UserController {
         return ResponseUtils.getCreatedUserResponse(uriBuilder, createdUser.getId());
     }
 
-    //TODO 서비스 구현
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "sns 회원가입", description = "카카오: userType=KAKAO")
-    @PostMapping("/join/sns/{userType}")
+    @PostMapping("/users/{userType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
@@ -74,21 +73,24 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 탈퇴")
-    @DeleteMapping("/user/delete")
+    @DeleteMapping("/users/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> deleteUser(@AuthenticationPrincipal String email){
+    public ResponseDTO<?> deleteUser(
+            //TODO: id 검증 처리
+            @AuthenticationPrincipal String email,
+            @PathVariable Long id){
         userService.changeToWithdrawnUser(email);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 수정", description = "모든 변수 null available")
-    @PutMapping("/user/{id}")
+    @PutMapping("/users/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
@@ -108,7 +110,7 @@ public class UserController {
     //내 프로필 조회할 때 피드, 댓글도 같이 들고 와야하는지? 일단 빼고 처리
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 프로필 조회")
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
