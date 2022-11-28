@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Entity
 @Table(name = "USERS", uniqueConstraints =
-        {@UniqueConstraint(name = "EMAIL_NICKNAME_UNIQUE", columnNames = {"email","nickname"})})
+        {@UniqueConstraint(name = "EMAIL_NICKNAME_UNIQUE", columnNames = {"email","nickname", "sns_id"})})
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
@@ -23,6 +23,9 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "user_type")
     private UserType userType; // 기본 회원, 카카오 회원 구분
+
+    @Column(name = "sns_id")
+    private Long snsId; //sns 계정 회원가입 유무 확인용
 
     @NotNull
     private String email; // 아이디
@@ -70,7 +73,7 @@ public class User {
     }
 
     public void setKakaoUser(Long snsId){
-        id = snsId;
+        this.snsId = snsId;
         userType = UserType.KAKAO;
         userStatus = UserStatus.ACTIVATED;
     }

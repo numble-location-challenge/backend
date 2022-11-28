@@ -10,9 +10,9 @@ public interface UserService {
 
     User createDefaultUser(UserDefaultJoinRequestDTO userDTO); //회원가입
 
-    void changeToWithdrawnUser(String email); //회원 탈퇴
+    void changeToWithdrawnUser(String email, Long userId); //회원 탈퇴
 
-    User getUser(String email, Long id); //내 프로필 조회
+    User getUser(String email, Long userId); //내 프로필 조회
 
     User modify(String email, Long userId, UserModifyRequestDTO userModifyRequestDTO);
 

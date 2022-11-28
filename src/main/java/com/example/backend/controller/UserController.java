@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "sns 회원가입", description = "카카오: userType=KAKAO")
+    @Operation(summary = "sns 회원가입", description = "카카오 userType=KAKAO, 이미 가입된 계정이라면 errorCode -122가 반환됩니다. 회원가입이 완료된 후 자동 로그인 처리됩니다.")
     @PostMapping("/users/{userType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -63,7 +63,6 @@ public class UserController {
             @RequestBody @Valid final SnsJoinRequestDTO joinDTO){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
-        if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
         final User createdUser = snsUserService.createSnsUser(userType, joinDTO);
         //회원가입 성공시 SNS 유저는 로그인에 성공한다
@@ -81,10 +80,9 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteUser(
-            //TODO: id 검증 처리
             @AuthenticationPrincipal String email,
             @PathVariable Long id){
-        userService.changeToWithdrawnUser(email);
+        userService.changeToWithdrawnUser(email, id);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 
@@ -107,7 +105,6 @@ public class UserController {
         return new ResponseDTO<>(userProfileDTO, "정상 수정 처리 되었습니다.");
     }
 
-    //내 프로필 조회할 때 피드, 댓글도 같이 들고 와야하는지? 일단 빼고 처리
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 프로필 조회")
     @GetMapping("/users/{id}")
