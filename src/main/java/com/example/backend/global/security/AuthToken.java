@@ -1,7 +1,7 @@
 package com.example.backend.global.security;
 
+import com.example.backend.global.security.jwt.JwtType;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import lombok.Getter;

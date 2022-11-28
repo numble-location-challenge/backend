@@ -1,9 +1,10 @@
-package com.example.backend.global.security;
+package com.example.backend.global.security.jwt;
 
 import com.example.backend.domain.User;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.global.exception.EntityNotExistsException;
 import com.example.backend.global.exception.EntityNotExistsExceptionType;
+import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

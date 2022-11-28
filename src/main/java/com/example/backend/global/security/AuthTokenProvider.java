@@ -3,6 +3,7 @@ package com.example.backend.global.security;
 import com.example.backend.domain.User;
 import com.example.backend.global.exception.UnAuthorizedException;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
+import com.example.backend.global.security.jwt.JwtType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
