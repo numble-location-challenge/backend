@@ -39,12 +39,12 @@ public class LoginServiceImpl implements LoginService{
     
     @Override
     public User snsLogin(UserType userType, SnsLoginRequestDTO loginDTO) {
-        //AT로 카카오 사용자 정보(id) 가져온다
-        String email = snsUserService.getUserEmail(userType, loginDTO.getAccessToken());
+        //AT로 사용자 정보(sns API의 id) 가져옴
+        Long userId = snsUserService.getUserId(userType, loginDTO.getAccessToken());
 
         //1. DB에 있는 회원이면 컨트롤러로 돌아가 인가처리
-        //2. 기존회원이 아니면 (region 필요) 에러코드
-        return userRepository.findByEmail(email)
+        //2. 기존회원이 아니면 회원가입 유도
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_KAKAO_USER));
     }
 

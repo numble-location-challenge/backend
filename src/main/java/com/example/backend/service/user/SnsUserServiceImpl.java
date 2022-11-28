@@ -38,9 +38,9 @@ public class SnsUserServiceImpl implements SnsUserService {
     private final UserRepository userRepository;
 
     @Override
-    public String getUserEmail(UserType userType, String accessToken) {
+    public Long getUserId(UserType userType, String accessToken) {
         SnsUserDTO userInfo = getUserInfo(userType, accessToken);
-        return userInfo.getEmail();
+        return userInfo.getId();
     }
 
     @Override
