@@ -87,7 +87,7 @@ public class SnsUserServiceImpl implements SnsUserService {
         User user = userDTO.toEntity(
                 userType, joinDTO.getUsername(), joinDTO.getPhoneNumber(),
                 joinDTO.getDongCode(), joinDTO.getDongName());
-        user.setKakaoUser(); //status 세팅
+        user.setKakaoUser(userDTO.getId()); //status 세팅
         return userRepository.save(user);
     }
 
