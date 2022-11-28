@@ -26,8 +26,8 @@ public class LikeServiceImpl implements LikeService{
     private final UserRepository userRepository;
 
     @Override
-    public List<LikesDTO> getLikes(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    public List<LikesDTO> getLikes(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         List<LikesDTO> likes = likesRepository.findByUserId(user.getId())
                 .stream()
                 .map(LikesDTO::new)
@@ -36,9 +36,9 @@ public class LikeServiceImpl implements LikeService{
     }
 
     @Override
-    public LikesDTO onLike(Long userId, Long postId) {
+    public LikesDTO onLike(String email, Long postId) {
         //user id, post id 검증
-        User user = userRepository.findById(userId).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        User user = userRepository.findByEmail(email).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         Post post = postRepository.findById(postId).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
         //좋아요가 이미 있는지 확인
         Optional<Like> existentLike = likesRepository.findById(user.getId(),post.getId());
@@ -53,15 +53,15 @@ public class LikeServiceImpl implements LikeService{
             LikesDTO likesDTO = new LikesDTO(like);
             return likesDTO;
         }else{
-            offLike(userId,postId);
+            offLike(email,postId);
             return null;
         }
 
     }
 
     @Override
-    public void offLike(Long userId, Long postId) {
-        User user = userRepository.findById(userId).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    public void offLike(String email, Long postId) {
+        User user = userRepository.findByEmail(email).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         Post post = postRepository.findById(postId).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
         //likes에서 삭제
         likesRepository.deleteById(user.getId(),post.getId());
