@@ -22,7 +22,7 @@ public class SecurityConfig {
     private String REFRESH_COOKIE = "refreshToken";
 
     private final JwtLogoutHandler jwtLogoutHandler;
-    private final TokenService tokenService;
+    private final AuthTokenProvider authTokenProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated();
 
         http
-                .addFilterAfter(new JwtAuthenticationFilter(tokenService), CorsFilter.class);
+                .addFilterAfter(new JwtAuthenticationFilter(authTokenProvider), CorsFilter.class);
 
         http
                 .logout().permitAll()

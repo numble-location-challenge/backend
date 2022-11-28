@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private List<String> NOT_CHECK_URL = List.of("/login", "/users", "/refresh", "/swagger-ui");
 
-    private final TokenService tokenService;
+    private final AuthTokenProvider authTokenProvider;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -57,10 +57,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(tokenStr != null && !tokenStr.equalsIgnoreCase("null")){
             try{
                 //string -> AuthToken
-                AuthToken authToken = tokenService.convertAuthToken(tokenStr);
+                AuthToken authToken = authTokenProvider.convertAuthToken(tokenStr);
 
                 //토큰 검증 (jwt이므로 인가서버에 요청하지 않고도 검증 가능)
-                AbstractAuthenticationToken authentication = tokenService.getAuthentication(authToken);
+                AbstractAuthenticationToken authentication = authTokenProvider.getAuthentication(authToken);
                 CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
                 //토큰 타입 검증

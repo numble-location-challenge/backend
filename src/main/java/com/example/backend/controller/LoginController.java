@@ -11,10 +11,9 @@ import com.example.backend.global.exception.InvalidUserInputExceptionType;
 import com.example.backend.global.exception.UnAuthorizedException;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import com.example.backend.global.security.AuthToken;
-import com.example.backend.global.security.TokenService;
+import com.example.backend.global.security.AuthTokenProvider;
 import com.example.backend.global.utils.ResponseUtils;
 import com.example.backend.service.login.LoginService;
-import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,7 +34,7 @@ import javax.validation.Valid;
 public class LoginController {
 
     private final LoginService loginService;
-    private final TokenService tokenService;
+    private final AuthTokenProvider authTokenProvider;
     private final ResponseUtils responseUtils;
 
     @Operation(summary = "기본 로그인", description = "AccessToken은 헤더로, RefreshToken은 쿠키로 반환합니다.")
@@ -48,8 +47,8 @@ public class LoginController {
     public ResponseEntity<?> login(@RequestBody @Valid final DefaultLoginRequestDTO loginDTO){
 
         final User loginUser = loginService.defaultLogin(loginDTO);
-        AuthToken AT = tokenService.issueAccessToken(loginUser);
-        AuthToken RT = tokenService.issueRefreshToken(loginUser);
+        AuthToken AT = authTokenProvider.issueAccessToken(loginUser);
+        AuthToken RT = authTokenProvider.issueRefreshToken(loginUser);
         loginService.updateRefresh(loginUser, RT);
         return responseUtils.getLoginSuccessResponse(loginUser.getId(), AT, RT,"로그인에 성공했습니다.");
     }
@@ -69,8 +68,8 @@ public class LoginController {
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
         final User loginUser = loginService.snsLogin(userType, authRequestDTO);
-        AuthToken AT = tokenService.issueAccessToken(loginUser);
-        AuthToken RT = tokenService.issueRefreshToken(loginUser);
+        AuthToken AT = authTokenProvider.issueAccessToken(loginUser);
+        AuthToken RT = authTokenProvider.issueRefreshToken(loginUser);
         loginService.updateRefresh(loginUser, RT);
         return responseUtils.getLoginSuccessResponse(loginUser.getId(), AT, RT, "카카오 로그인에 성공했습니다.");
     }
@@ -83,7 +82,7 @@ public class LoginController {
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED")
     })
     public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken") String refreshTokenStr){
-        AuthToken refreshToken = tokenService.convertAuthToken(refreshTokenStr);
+        AuthToken refreshToken = authTokenProvider.convertAuthToken(refreshTokenStr);
         //토큰 검증
         if(!refreshToken.validate()) throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_UN_AUTHORIZED);
 

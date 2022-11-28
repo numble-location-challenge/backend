@@ -6,7 +6,7 @@ import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.dto.login.SnsLoginRequestDTO;
 import com.example.backend.global.exception.*;
 import com.example.backend.global.security.AuthToken;
-import com.example.backend.global.security.TokenService;
+import com.example.backend.global.security.AuthTokenProvider;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.user.SnsUserService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class LoginServiceImpl implements LoginService{
 
-    private final TokenService tokenService;
+    private final AuthTokenProvider authTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final SnsUserService snsUserService;
@@ -57,7 +57,7 @@ public class LoginServiceImpl implements LoginService{
                 .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         if(!refreshToken.getToken().equals(user.getRefreshToken())) throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_UN_AUTHORIZED);
         //RT가 유효하므로 AT 재발급
-        return tokenService.issueAccessToken(user);
+        return authTokenProvider.issueAccessToken(user);
     }
 
     @Transactional

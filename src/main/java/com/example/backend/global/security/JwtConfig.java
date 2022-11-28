@@ -11,7 +11,7 @@ public class JwtConfig {
     private String SECRET_KEY;
 
     @Bean
-    public TokenService jwtProvider(){
-        return new TokenService(SECRET_KEY);
+    public AuthTokenProvider jwtProvider(){
+        return new AuthTokenProvider(SECRET_KEY);
     }
 }

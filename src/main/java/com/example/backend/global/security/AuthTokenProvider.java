@@ -21,7 +21,7 @@ import java.util.Date;
 
 //AuthTokenProvider로 변경
 @Slf4j
-public class TokenService {
+public class AuthTokenProvider {
 
     @Value("${jwt.access.expiration}")
     private Long ACCESS_EXP;
@@ -31,7 +31,7 @@ public class TokenService {
 
     private Key key;
 
-    public TokenService(String secret){
+    public AuthTokenProvider(String secret){
         key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
