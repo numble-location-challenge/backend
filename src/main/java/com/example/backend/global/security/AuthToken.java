@@ -51,19 +51,28 @@ public class AuthToken {
         return claimsResolver.apply(claims);
     }
 
-    //TODO 제대로 변환되는지 확인
     public Long getUserIdFromClaims() {
         String subjectStr = getClaimFromToken(Claims::getSubject);
         ObjectMapper om = new ObjectMapper();
         CustomUserDetails userDetails = null;
         try{
             userDetails = om.readValue(subjectStr, CustomUserDetails.class);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
         return userDetails.getUserId();
+    }
+
+    public JwtType getTokenTypeFromClaims(){
+        String subjectStr = getClaimFromToken(Claims::getSubject);
+        ObjectMapper om = new ObjectMapper();
+        CustomUserDetails userDetails = null;
+        try{
+            userDetails = om.readValue(subjectStr, CustomUserDetails.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return userDetails.getJwtType();
     }
 
     //여기서 발생하는 에러는 호출된 곳으로 돌아가고 JwtExceptionEntiryPoint에서 잡힌다

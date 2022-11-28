@@ -1,9 +1,14 @@
 package com.example.backend.global.config;
 
+import com.example.backend.global.security.CustomArgumentResolver;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -24,4 +29,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .maxAge(MAX_AGE_SECS);
     }
 
+    @Bean
+    public CustomArgumentResolver customArgumentResolver(){
+        return new CustomArgumentResolver();
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(customArgumentResolver());
+    }
 }

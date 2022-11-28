@@ -7,10 +7,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 
@@ -19,7 +17,6 @@ import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
 
-//AuthTokenProvider로 변경
 @Slf4j
 public class AuthTokenProvider {
 
@@ -86,7 +83,7 @@ public class AuthTokenProvider {
      * @param token
      * @return
      */
-    public AbstractAuthenticationToken getAuthentication(AuthToken authToken) throws JsonProcessingException {
+    public UsernamePasswordAuthenticationToken getAuthentication(AuthToken authToken) throws JsonProcessingException {
         if(authToken.validate()){
             Claims claims = authToken.getClaimsFromToken(); //에러 발생 가능
             CustomUserDetails userDetails = CustomUserDetails.createUserDetails(claims.getSubject());
