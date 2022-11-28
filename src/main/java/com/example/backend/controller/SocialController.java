@@ -8,6 +8,7 @@ import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
 import com.example.backend.global.exception.social.SocialInvalidInputException;
 import com.example.backend.global.exception.social.SocialInvalidInputExceptionType;
+import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.service.social.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,8 +43,8 @@ public class SocialController {
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> getSocialList(@AuthenticationPrincipal String email){
-        List<SocialShortDTO> socialShortDTOList = socialService.getSocialList(email);
+    public ResponseDTO<?> getSocialList(@AuthenticationPrincipal CustomUserDetails user){
+        List<SocialShortDTO> socialShortDTOList = socialService.getSocialList(user.getEmail());
 
         return new ResponseDTO<>(socialShortDTOList, "모임 리스트 출력");
 
@@ -77,9 +78,9 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseEntity<?> createSocial(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody final SocialCreateRequestDTO socialCreateRequestDTO, UriComponentsBuilder uriBuilder){
-        Social createdSocial = socialService.createSocial(email, socialCreateRequestDTO);
+        Social createdSocial = socialService.createSocial(user.getEmail(), socialCreateRequestDTO);
 
         URI location = uriBuilder.path("/social/{id}")
                 .buildAndExpand(createdSocial.getId()).toUri();
@@ -99,10 +100,10 @@ public class SocialController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> modifySocial(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long socialId,
             @RequestBody final SocialModifyRequestDTO socialModifyRequestDTO){
-        Social modifiedSocial = socialService.modifySocial(email, socialId, socialModifyRequestDTO);
+        Social modifiedSocial = socialService.modifySocial(user.getEmail(), socialId, socialModifyRequestDTO);
         SocialShortDTO socialShortDTO = new SocialShortDTO(modifiedSocial);
         return new ResponseDTO<>(socialShortDTO, "모임 수정 완료");
     }
@@ -129,8 +130,8 @@ public class SocialController {
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> getMySocialList(@Parameter(required = true) @AuthenticationPrincipal String email){
-        List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(email);
+    public ResponseDTO<?> getMySocialList(@Parameter(required = true) @AuthenticationPrincipal CustomUserDetails user){
+        List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(user.getEmail());
 
         return new ResponseDTO<>(socialShortDTOList,"내가 쓴 모임 게시글 출력");
     }
@@ -143,8 +144,8 @@ public class SocialController {
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
-    public ResponseDTO<?> getJoinSocialList(@Parameter(required = true) @AuthenticationPrincipal String email){
-        List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(email);
+    public ResponseDTO<?> getJoinSocialList(@Parameter(required = true) @AuthenticationPrincipal CustomUserDetails user){
+        List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(user.getEmail());
 
         return new ResponseDTO<>(socialShortDTOList,"내가 참가한 모임들 출력");
     }
