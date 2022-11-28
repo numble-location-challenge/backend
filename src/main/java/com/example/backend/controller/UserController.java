@@ -11,6 +11,7 @@ import com.example.backend.global.exception.InvalidUserInputException;
 import com.example.backend.global.exception.InvalidUserInputExceptionType;
 import com.example.backend.global.security.TokenService;
 import com.example.backend.global.utils.ResponseUtils;
+import com.example.backend.service.user.SnsUserService;
 import com.example.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 public class UserController {
 
     private final UserService userService;
+    private final SnsUserService snsUserService;
     private final TokenService tokenService;
     private final ResponseUtils responseUtils;
 
@@ -64,7 +66,7 @@ public class UserController {
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
-        final User createdUser = userService.createSnsUser(userType, joinDTO);
+        final User createdUser = snsUserService.createSnsUser(userType, joinDTO);
         //회원가입 성공시 SNS 유저는 로그인에 성공한다
         HashMap<String, String> jwtMap = tokenService.getAccessAndRefreshToken(createdUser);
         return responseUtils.getLoginSuccessResponse(createdUser, jwtMap, userTypeStr + " 로그인에 성공했습니다.");
