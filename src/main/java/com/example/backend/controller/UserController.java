@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "sns 회원가입", description = "카카오: userType=KAKAO")
+    @Operation(summary = "sns 회원가입", description = "카카오 userType=KAKAO, 이미 가입된 계정이라면 errorCode -122가 반환됩니다.")
     @PostMapping("/users/{userType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
