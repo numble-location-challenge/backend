@@ -4,6 +4,7 @@ import com.example.backend.domain.PostImage;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
 
+import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
 import com.example.backend.domain.tag.Category;
 import com.example.backend.domain.tag.SocialTag;
@@ -25,11 +26,14 @@ import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +43,7 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
+@EnableScheduling
 public class SocialServiceImpl implements SocialService {
 
     private final UserRepository userRepository;
@@ -150,6 +155,8 @@ public class SocialServiceImpl implements SocialService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
+        changeStatus(socialList);
+
         return socialList.stream()
                 .filter(social -> social.getRegionCode().equals(user.getDongCode()/100))
                 .map(SocialShortDTO::new)
@@ -203,7 +210,6 @@ public class SocialServiceImpl implements SocialService {
     }
 
 
-
     /**
      * 모임 게시글 태그 필터링
      * @param tagId 사용자가 선택한 태그 아이디
@@ -250,6 +256,20 @@ public class SocialServiceImpl implements SocialService {
 
     }
 
+    /**
+     * 모임 status 변경
+     * @param socials 변경할 social list
+     */
+    public void changeStatus(List<Social> socials){
+        LocalDateTime now = LocalDateTime.now();
+        for(Social social : socials){
+            //available 인 social 중에서 endDate가 현재 시간 보다 이전 시간이면 변경
+            if(social.getStatus().equals(SocialStatus.AVAILABLE) && now.isAfter(social.getEndDate())){
+                social.changeStatusExpiration();
+            }
+        }
+
+    }
 
 
 }
