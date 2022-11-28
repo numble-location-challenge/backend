@@ -81,10 +81,9 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteUser(
-            //TODO: id 검증 처리
             @AuthenticationPrincipal String email,
             @PathVariable Long id){
-        userService.changeToWithdrawnUser(email);
+        userService.changeToWithdrawnUser(email, id);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 
@@ -107,7 +106,6 @@ public class UserController {
         return new ResponseDTO<>(userProfileDTO, "정상 수정 처리 되었습니다.");
     }
 
-    //내 프로필 조회할 때 피드, 댓글도 같이 들고 와야하는지? 일단 빼고 처리
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "회원 프로필 조회")
     @GetMapping("/users/{id}")

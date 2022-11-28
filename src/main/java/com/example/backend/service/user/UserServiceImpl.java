@@ -81,9 +81,11 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void changeToWithdrawnUser(String email) {
+    public void changeToWithdrawnUser(String email, Long userId) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+
+        if(!user.getId().equals(userId)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
 
         //DB 에서 삭제하지 않고 상태만 변경
         user.setWithdrawStatus();
@@ -100,12 +102,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(String email, Long id) {
+    public User getUser(String email, Long userId) {
         //url로 들어온 id와 principal의 유저가 같은지 확인
         User findUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
-        if(findUser.getId().equals(id)) return findUser;
+        if(findUser.getId().equals(userId)) return findUser;
         else throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
     }
 
