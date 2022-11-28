@@ -155,7 +155,7 @@ public class SocialServiceImpl implements SocialService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
-        changeStatus(socialList);
+        if(!socialList.isEmpty()) changeStatus(socialList);
 
         return socialList.stream()
                 .filter(social -> social.getRegionCode().equals(user.getDongCode()/100))
@@ -201,14 +201,12 @@ public class SocialServiceImpl implements SocialService {
      */
     @Override
     public List<SocialShortDTO> filteringByCategory(String email, Long categoryId) {
-
         List<SocialShortDTO> socialShortDTOList = getSocialList(email); //내 동에만 있는 리스트 추출
 
         return socialShortDTOList.stream()
                 .filter(socialShortDTO -> socialShortDTO.getCategory().getId().equals(categoryId))
                 .collect(toList());
     }
-
 
     /**
      * 모임 게시글 태그 필터링
