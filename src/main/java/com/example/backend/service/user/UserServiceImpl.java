@@ -47,20 +47,6 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO) {
-        //카카오 사용자 정보 API에서 받아옴
-        SnsUserDTO userDTO = snsUserService.getUserInfo(userType, joinDTO.getAccessToken());
-        validateSocialUserDuplicate(userDTO.getEmail());
-        //중복X -> region 세팅 및 회원가입 처리
-        User user = userDTO.toEntity(
-                userType, joinDTO.getUsername(), joinDTO.getPhoneNumber(),
-                joinDTO.getDongCode(), joinDTO.getDongName());
-        user.setKakaoUser(); //status 세팅
-        return userRepository.save(user);
-    }
-
-    @Transactional
-    @Override
     public User modify(String email, Long userId, UserModifyRequestDTO userDTO) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
@@ -90,12 +76,6 @@ public class UserServiceImpl implements UserService {
         }
         else if(userRepository.existsByNickname(nickName)){
             throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_NICKNAME);
-        }
-    }
-
-    private void validateSocialUserDuplicate(String email){
-        if(userRepository.existsByEmail(email)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_KAKAO_USER);
         }
     }
 

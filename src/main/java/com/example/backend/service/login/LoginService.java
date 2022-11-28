@@ -11,8 +11,6 @@ public interface LoginService {
 
     User snsLogin(UserType userType, SnsLoginRequestDTO authRequestDTO);
 
-    void logout(String email, String refreshToken);
-
     User getUserByRefreshToken(String refreshToken);
 
     String refresh(User user, String refreshToken);

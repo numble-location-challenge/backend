@@ -51,7 +51,7 @@ public class LoginController {
     }
 
     @Operation(summary = "sns 로그인", description = "카카오: userType=KAKAO, 처음 로그인하는 경우 errorCode -112가 반환되며, region 설정 후 카카오 회원가입으로 재요청하면 됩니다.")
-    @PostMapping("/login/sns/{userType}")
+    @PostMapping("/login/{userType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),

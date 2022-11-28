@@ -69,7 +69,8 @@ public class User {
         userStatus = UserStatus.ACTIVATED;
     }
 
-    public void setKakaoUser(){
+    public void setKakaoUser(Long snsId){
+        id = snsId;
         userType = UserType.KAKAO;
         userStatus = UserStatus.ACTIVATED;
     }
