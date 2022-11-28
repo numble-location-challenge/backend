@@ -1,20 +1,20 @@
-package com.example.backend.service;
+package com.example.backend.service.login;
 
 import com.example.backend.domain.User;
+import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
-import com.example.backend.dto.login.SocialLoginRequestDTO;
+import com.example.backend.dto.login.SnsLoginRequestDTO;
 import com.example.backend.global.exception.*;
 import com.example.backend.global.security.JwtSubject;
 import com.example.backend.global.security.TokenService;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.user.SnsUserService;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
 
 
 @Service
@@ -25,7 +25,7 @@ public class LoginServiceImpl implements LoginService{
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final KakaoService kakaoService;
+    private final SnsUserService snsUserService;
 
     @Override
     public User defaultLogin(DefaultLoginRequestDTO loginDTO) {
@@ -36,34 +36,16 @@ public class LoginServiceImpl implements LoginService{
         if(passwordEncoder.matches(loginDTO.getPassword(), dbUser.getPassword())) return dbUser;
         else throw new InvalidUserInputException(InvalidUserInputExceptionType.ACCOUNT_NOT_MATCH);
     }
-
-    //TODO 프론트랑 협의 필요
+    
     @Override
-    public User kakaoLogin(SocialLoginRequestDTO loginDTO) {
+    public User snsLogin(UserType userType, SnsLoginRequestDTO loginDTO) {
         //AT로 카카오 사용자 정보(id) 가져온다
-        Long kakaoId = kakaoService.getUserId(loginDTO.getAccessToken());
+        String email = snsUserService.getUserEmail(userType, loginDTO.getAccessToken());
 
-        //가져온 값 중 '카카오의 회원번호'로 DB에 있는지 찾는다
         //1. DB에 있는 회원이면 컨트롤러로 돌아가 인가처리
         //2. 기존회원이 아니면 (region 필요) 에러코드
-        return userRepository.findById(kakaoId)
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_KAKAO_USER));
-    }
-
-    @Transactional
-    @Override
-    public HashMap<String,String> getAccessAndRefreshToken(User user) {
-        //토큰 2개 생성
-        final String accessToken = tokenService.issueAccessToken(user); //AT 생성
-        final String refreshToken = tokenService.issueRefreshToken(user); //RT 생성
-
-        user.updateRefreshToken(refreshToken); //DB의 RT 갈아끼우기
-
-        HashMap<String,String> token = new HashMap<>();
-        token.put("AT", accessToken);
-        token.put("RT", refreshToken);
-
-        return token;
     }
 
     @Override
@@ -103,6 +85,12 @@ public class LoginServiceImpl implements LoginService{
         if(!refreshToken.equals(user.getRefreshToken())) throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_UN_AUTHORIZED);
         //RT가 유효하므로 AT 재발급
         return tokenService.issueAccessToken(user);
+    }
+
+    @Transactional
+    @Override
+    public void updateRefresh(User loginUser, String refreshToken) {
+        loginUser.updateRefreshToken(refreshToken); //DB의 RT 갈아끼우기
     }
 
 }

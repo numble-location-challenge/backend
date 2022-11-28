@@ -3,13 +3,15 @@ package com.example.backend.controller;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.*;
-import com.example.backend.dto.login.SocialJoinRequestDTO;
+import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
 import com.example.backend.global.exception.InvalidUserInputException;
 import com.example.backend.global.exception.InvalidUserInputExceptionType;
-import com.example.backend.service.UserService;
+import com.example.backend.global.security.TokenService;
+import com.example.backend.global.utils.ResponseUtils;
+import com.example.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
+import java.util.HashMap;
 
 @Tag(name = "user", description = "회원 API")
 @RestController
@@ -30,6 +32,8 @@ import java.net.URI;
 public class UserController {
 
     private final UserService userService;
+    private final TokenService tokenService;
+    private final ResponseUtils responseUtils;
 
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "회원가입",
@@ -41,7 +45,7 @@ public class UserController {
     })
     public ResponseEntity<?> join(@RequestBody @Valid final UserDefaultJoinRequestDTO userDefaultJoinRequestDTO, UriComponentsBuilder uriBuilder){
         final User createdUser = userService.createDefaultUser(userDefaultJoinRequestDTO);
-        return getCreatedUserResponse(uriBuilder, createdUser.getId());
+        return ResponseUtils.getCreatedUserResponse(uriBuilder, createdUser.getId());
     }
 
     //TODO 서비스 구현
@@ -53,21 +57,17 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseEntity<?> socialJoin(
-            @PathVariable String userType,
-            @RequestBody @Valid final SocialJoinRequestDTO joinDTO, UriComponentsBuilder uriBuilder){
-        //프론트에서 회원정보 동의해주고 region, AT 가지고 회원가입 처리
+    public ResponseEntity<?> snsJoin(
+            @PathVariable("userType") String userTypeStr,
+            @RequestBody @Valid final SnsJoinRequestDTO joinDTO){
+
+        UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
-        final User createdUser = userService.createKakaoUser(joinDTO);
-        return getCreatedUserResponse(uriBuilder, createdUser.getId());
-    }
 
-    private ResponseEntity<?> getCreatedUserResponse(UriComponentsBuilder uriBuilder, Long id) {
-        URI location = uriBuilder.path("/user/{id}")
-                .buildAndExpand(id).toUri();
-
-        return ResponseEntity.created(location)
-                .body(new ResponseDTO<>(null, "회원가입 처리되었습니다."));
+        final User createdUser = userService.createSnsUser(userType, joinDTO);
+        //회원가입 성공시 SNS 유저는 로그인에 성공한다
+        HashMap<String, String> jwtMap = tokenService.getAccessAndRefreshToken(createdUser);
+        return responseUtils.getLoginSuccessResponse(createdUser, jwtMap, userTypeStr + " 로그인에 성공했습니다.");
     }
 
     @ResponseStatus(HttpStatus.OK)

@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.ResponseDTO;
-import com.example.backend.service.UserService;
+import com.example.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

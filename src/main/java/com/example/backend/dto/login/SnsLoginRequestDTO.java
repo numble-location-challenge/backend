@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Schema
-public class SocialLoginRequestDTO {
+public class SnsLoginRequestDTO {
     @NotNull
     String accessToken;
 }

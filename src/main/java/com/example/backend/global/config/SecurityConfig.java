@@ -1,9 +1,6 @@
 package com.example.backend.global.config;
 
-import com.example.backend.global.security.JwtAuthenticationFilter;
-import com.example.backend.global.security.JwtExceptionEntryPoint;
-import com.example.backend.global.security.JwtLogoutHandler;
-import com.example.backend.global.security.TokenService;
+import com.example.backend.global.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,12 +29,13 @@ public class SecurityConfig {
         http
                 .cors()//기본 cors 설정
                 .and()
+                .csrf().disable()
                 .formLogin().disable() //formLogin 인증 비활성화
                 .httpBasic().disable() //httpBasic 인증 비활성화
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers(
-                        "/", "/login", "/kakaologin", "/join", "/kakaojoin", "/refresh", "/swagger-ui/**", "/api-docs/**")
+                        "/", "/login/**", "/join/**", "/refresh", "/swagger-ui/**", "/api-docs/**")
                 .permitAll()
                 .anyRequest().authenticated();
 
@@ -53,9 +51,7 @@ public class SecurityConfig {
 
         http
                 .exceptionHandling()
-                .authenticationEntryPoint(new JwtExceptionEntryPoint()) //예외처리
-                .and()
-                .csrf().disable();
+                .authenticationEntryPoint(new JwtExceptionEntryPoint()); //예외처리
 
         return http.build();
     }

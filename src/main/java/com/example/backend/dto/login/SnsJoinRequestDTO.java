@@ -6,22 +6,31 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Schema
-public class SocialJoinRequestDTO {
+public class SnsJoinRequestDTO {
     @Schema(description = "정보를 조회할 SNS API의 액세스 토큰")
     @NotNull
     String accessToken;
 
+    @Schema(description = "이름", defaultValue = "송유진")
+    @NotBlank
+    private String username;
+
+    @Schema(description = "핸드폰 번호", defaultValue = "010-1234-5678")
+    @NotBlank
+    private String phoneNumber;
+
     @Schema(description = "지역 번호 8자리", defaultValue = "1111010400")
     @NotNull
-    int regionCode;
+    int dongCode;
 
     @Schema(description = "행정구역명", defaultValue = "서울특별시 종로구 효자동")
     @NotNull
-    String regionName;
+    String dongName;
 }
