@@ -38,7 +38,7 @@ public class SnsUserServiceImpl implements SnsUserService {
     private final UserRepository userRepository;
 
     @Override
-    public Long getUserId(UserType userType, String accessToken) {
+    public Long getSnsId(UserType userType, String accessToken) {
         SnsUserDTO userInfo = getUserInfo(userType, accessToken);
         return userInfo.getId();
     }
@@ -87,7 +87,11 @@ public class SnsUserServiceImpl implements SnsUserService {
         User user = userDTO.toEntity(
                 userType, joinDTO.getUsername(), joinDTO.getPhoneNumber(),
                 joinDTO.getDongCode(), joinDTO.getDongName());
-        user.setKakaoUser(userDTO.getId()); //status 세팅
+
+        switch(userType){
+            case KAKAO: user.setKakaoUser(userDTO.getId()); break;//sns 유저 세팅
+            default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
+        }
         return userRepository.save(user);
     }
 

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);//이메일로 회원 조회
-    Optional<User> findByIdAndUserType(Long id, UserType userType);
+    Optional<User> findBySnsIdAndUserType(Long id, UserType userType);
 
     @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
     Optional<User> findReadOnlyByEmail(String email); //더티체킹 필요없이 조회만 필요할 때 사용

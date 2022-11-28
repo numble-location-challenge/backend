@@ -63,7 +63,6 @@ public class UserController {
             @RequestBody @Valid final SnsJoinRequestDTO joinDTO){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
-        if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
         final User createdUser = snsUserService.createSnsUser(userType, joinDTO);
         //회원가입 성공시 SNS 유저는 로그인에 성공한다

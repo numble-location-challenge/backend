@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface SnsUserService {
 
-    Long getUserId(UserType userType, String accessToken);
+    Long getSnsId(UserType userType, String accessToken);
 
     SnsUserDTO getUserInfo(UserType userType, String accessToken);
 

@@ -42,11 +42,11 @@ public class LoginServiceImpl implements LoginService{
     @Override
     public User snsLogin(UserType userType, SnsLoginRequestDTO loginDTO) {
         //AT로 사용자 정보(sns API의 id) 가져옴
-        Long userId = snsUserService.getUserId(userType, loginDTO.getAccessToken());
-        log.info("api user id: {}",userId.toString());
+        Long snsId = snsUserService.getSnsId(userType, loginDTO.getAccessToken());
+        log.info("sns API user id: {}",snsId.toString());
         //1. DB에 있는 회원이면 컨트롤러로 돌아가 인가처리
         //2. 기존회원이 아니면 회원가입 유도
-        return userRepository.findByIdAndUserType(userId, userType)
+        return userRepository.findBySnsIdAndUserType(snsId, userType)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_KAKAO_USER));
     }
 
