@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String TOKEN_PREFIX = "Bearer ";
 
-    private List<String> NOT_CHECK_URL = List.of("/login", "/users", "/refresh", "/swagger-ui");
+    private List<String> NOT_CHECK_URL = List.of("/login", "/refresh", "/swagger-ui");
 
     private final AuthTokenProvider authTokenProvider;
 
@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         for(String notUrl : NOT_CHECK_URL){
             if(path.startsWith(notUrl)) return true;
         }
+        if(path.equals("/users")) return true;
         return false;
     }
 
