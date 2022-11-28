@@ -26,6 +26,7 @@ import com.example.backend.global.exception.feed.FeedInvalidInputException;
 import com.example.backend.global.exception.feed.FeedInvalidInputExceptionType;
 import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.FeedRepository;
+import com.example.backend.repository.LikesRepository;
 import com.example.backend.repository.PostImageRepository;
 import com.example.backend.repository.SocialRepository;
 import com.example.backend.repository.UserRepository;
@@ -43,9 +44,10 @@ public class FeedServiceImpl implements FeedService {
     private final SocialRepository socialRepository;
     private final CommentRepository commentRepository;
     private final PostImageRepository postImageRepository;
+    private final LikesRepository likesRepository;
 
     @Override
-    public Feed getFeed(Long feedId){
+    public Feed getFeed(Long feedId, String userEmail){
         Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_FEED));
         return feed;
     }
@@ -145,6 +147,13 @@ public class FeedServiceImpl implements FeedService {
             throw new ForbiddenException(ForbiddenExceptionType.NOT_AUTHORITY_UPDATE_FEED);
         }
         return feed;
+    }
+
+    @Override
+    public boolean checkLike(Long postId, String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        return likesRepository.existsByUserIdAndPostId(user.getId(), postId);
     }
 
     private boolean hasPermission(Feed feed, String userEmail) {

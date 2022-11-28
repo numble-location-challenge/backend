@@ -53,7 +53,6 @@ public class FeedResponseDTO {
         this.comments = feed.getComments().stream().map(comment -> new CommentResponseDTO(comment)).collect(Collectors.toList());
         this.regions = feed.getRegionCode();
         this.regionName = feed.getDongName();
-        this.isLiked = false;
         this.createTime = feed.getCreateDate();
         this.likes = feed.getLikes();
     }
