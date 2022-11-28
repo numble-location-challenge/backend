@@ -27,9 +27,9 @@ public class JwtLogoutHandler implements LogoutHandler {
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         //시큐리티 컨텍스트에서 email 가져옴
-        String email = (String) authentication.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         //email로 DB에 있는 유저인지 확인
-        User findUser = userRepository.findByEmail(email)
+        User findUser = userRepository.findById(userDetails.getUserId())
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         //DB의 RT 삭제
         findUser.deleteRefreshToken();

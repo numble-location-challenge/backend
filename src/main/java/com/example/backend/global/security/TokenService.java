@@ -7,24 +7,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
 
+//AuthTokenProvider로 변경
 @Slf4j
-@Service
-@RequiredArgsConstructor
 public class TokenService {
-
-    @Value("${jwt.secret}")
-    private String SECRET_KEY;
 
     @Value("${jwt.access.expiration}")
     private Long ACCESS_EXP;
@@ -32,51 +29,51 @@ public class TokenService {
     @Value("${jwt.refresh.expiration}")
     private Long REFRESH_EXP;
 
-    private final ObjectMapper objectmapper;
+    private Key key;
 
-    public Key getKeyForSign(){
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+    public TokenService(String secret){
+        key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String issueAccessToken(User user) {
+    public AuthToken createAuthToken(String id, Date expiry) {
+        return new AuthToken(key, id, expiry);
+    }
+
+    public AuthToken convertAuthToken(String token) {
+        return new AuthToken(token, key);
+    }
+
+    public AuthToken issueAccessToken(User user) {
         String subject = getTokenSubjectStr(user, JwtType.ACCESS);
         Date expiryDate = Date.from(
                 Instant.now().plusSeconds(ACCESS_EXP));
 
-        return createToken(subject, expiryDate);
+        AuthToken authToken = createAuthToken(subject, expiryDate);
+        log.info("issueAccessToken.AuthToken.getToken(): {} ", authToken.getToken());
+        return authToken;
     }
 
-    public String issueRefreshToken(User user) {
+    public AuthToken issueRefreshToken(User user) {
         String subject = getTokenSubjectStr(user, JwtType.REFRESH);
         Date expiryDate = Date.from(
                 Instant.now().plusSeconds(REFRESH_EXP));
 
-        return createToken(subject, expiryDate);
-    }
-
-    private String createToken(String subject, Date expiryDate) {
-        // JWT Token 생성
-        return Jwts.builder()
-                // header 내용 및 SECRET_KEY 세팅
-                .signWith(getKeyForSign(), SignatureAlgorithm.HS512) //알고리즘
-                // payload
-                .setClaims(Jwts.claims().setSubject(subject)) // sub
-                .setIssuer("Numble backend") // iss
-                .setIssuedAt(new Date()) // iat 현재시간으로 생성
-                .setExpiration(expiryDate) // exp
-                .compact();
+        AuthToken authToken = createAuthToken(subject, expiryDate);
+        log.info("issueRefreshToken.AuthToken.getToken(): {} ", authToken.getToken());
+        return authToken;
     }
 
     /**
      * 토큰 생성 시 호출되는 메서드
-     * 토큰 타입에 맞는 JwtSubject 객체를 생성해서 String으로 변환해 리턴
+     * 토큰 타입에 맞는 CustomUserDetails 객체를 생성해서 String으로 변환해 리턴
      * @param user
      * @param jwtType
      * @return String
      */
     private String getTokenSubjectStr(User user, JwtType jwtType) {
+        ObjectMapper om = new ObjectMapper();
         try {
-            return objectmapper.writeValueAsString(new JwtSubject(user.getId(), user.getEmail(), jwtType));
+            return om.writeValueAsString(new CustomUserDetails(user.getId(), user.getEmail(), jwtType));
         } catch (JsonProcessingException e) {
             log.debug(e.getMessage());
             throw new UnAuthorizedException(UnAuthorizedExceptionType.PARSING_FAIL);
@@ -84,36 +81,19 @@ public class TokenService {
     }
 
     /**
-     * jwt 검증 후 아이디(이메일) 추출(예외처리는 filter에서)
-     * 여기서 JwtException 발생하면 호출한 곳으로 돌아가므로
-     * 호출한 곳에서는 예외처리 필수
+     * jwt 검증 후 아이디(이메일) 추출
+     * 여기서 JwtException 발생하면 호출한 곳으로 돌아가므로, 호출한 곳(filter)에서는 예외처리 필수
      * @param token
      * @return
      */
-    public JwtSubject validateAndGetSubject(String token) { //getSubjects
-        Claims claims = getAllClaimsFromToken(token); // get userId(payload(Claims))
-        try {
-            return objectmapper.readValue(claims.getSubject(), JwtSubject.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+    public AbstractAuthenticationToken getAuthentication(AuthToken authToken) throws JsonProcessingException {
+        if(authToken.validate()){
+            Claims claims = authToken.getClaimsFromToken(); //에러 발생 가능
+            CustomUserDetails userDetails = CustomUserDetails.createUserDetails(claims.getSubject());
+            return new UsernamePasswordAuthenticationToken(userDetails, null, AuthorityUtils.NO_AUTHORITIES);
+        } else {
             return null;
         }
-    }
-
-    public Claims getAllClaimsFromToken(String token){
-        return Jwts.parserBuilder().setSigningKey(getKeyForSign()).build().parseClaimsJws(token).getBody();
-    }
-
-    public HashMap<String,String> getAccessAndRefreshToken(User user) {
-        //토큰 2개 생성
-        final String accessToken = issueAccessToken(user); //AT 생성
-        final String refreshToken = issueRefreshToken(user); //RT 생성
-
-        HashMap<String,String> token = new HashMap<>();
-        token.put("AT", accessToken);
-        token.put("RT", refreshToken);
-
-        return token;
     }
 
 }
