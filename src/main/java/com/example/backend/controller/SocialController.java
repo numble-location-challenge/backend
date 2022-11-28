@@ -104,8 +104,8 @@ public class SocialController {
             @PathVariable Long socialId,
             @RequestBody final SocialModifyRequestDTO socialModifyRequestDTO){
         Social modifiedSocial = socialService.modifySocial(user.getEmail(), socialId, socialModifyRequestDTO);
-        SocialShortDTO socialShortDTO = new SocialShortDTO(modifiedSocial);
-        return new ResponseDTO<>(socialShortDTO, "모임 수정 완료");
+        SocialLongDTO socialLongDTO = new SocialLongDTO(modifiedSocial);
+        return new ResponseDTO<>(socialLongDTO, "모임 수정 완료");
     }
 
     @ResponseStatus(HttpStatus.OK)
