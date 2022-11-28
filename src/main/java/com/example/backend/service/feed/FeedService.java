@@ -10,7 +10,7 @@ import com.example.backend.dto.feed.FeedSearch;
 
 public interface FeedService {
 
-    Feed getFeed(Long feedId);
+    Feed getFeed(Long feedId, String userEmail);
 
     Slice<Feed> getFeeds(FeedSearch feedSearch, String userEmail);
 
@@ -23,4 +23,6 @@ public interface FeedService {
     Feed updateFeed(Long postId, FeedRequestDTO feedRequestDTO, String userEmail);
 
     List<Feed> getMyFeeds(String userEmail);
+
+    boolean checkLike(Long PostId, String userEmail);
 }
