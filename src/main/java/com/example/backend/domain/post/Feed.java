@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.PostImage;
@@ -28,6 +29,9 @@ public class Feed extends Post {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "social_id")
     private Social social; //작성자가 참여 중인 모임 연결
+
+    @Transient
+    private boolean liked;
 
     @Builder
     public Feed(User user, List<PostImage> images, List<Comment> comments,
@@ -53,6 +57,10 @@ public class Feed extends Post {
         return feed;
     }
 
+    public int getCommentCount(){
+        return this.getComments().size();
+    }
+
     public void setImages(List<PostImage> postImages){
         for (PostImage postImage : postImages){
             postImage.setPost(this);
@@ -65,5 +73,13 @@ public class Feed extends Post {
         this.contents = contents;
         this.social = social;
         this.regionCode = region;
+    }
+
+    public void setLiked(boolean liked){
+        this.liked = liked;
+    }
+
+    public boolean isLiked() {
+        return liked;
     }
 }
