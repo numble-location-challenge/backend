@@ -7,9 +7,11 @@ import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
-import com.example.backend.global.exception.InvalidUserInputException;
-import com.example.backend.global.exception.InvalidUserInputExceptionType;
-import com.example.backend.global.security.TokenService;
+import com.example.backend.global.exception.ForbiddenException;
+import com.example.backend.global.exception.ForbiddenExceptionType;
+import com.example.backend.global.security.AuthToken;
+import com.example.backend.global.security.CustomUserDetails;
+import com.example.backend.global.security.AuthTokenProvider;
 import com.example.backend.global.utils.ResponseUtils;
 import com.example.backend.service.user.SnsUserService;
 import com.example.backend.service.user.UserService;
@@ -25,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 
 @Tag(name = "user", description = "회원 API")
 @RestController
@@ -34,7 +35,7 @@ public class UserController {
 
     private final UserService userService;
     private final SnsUserService snsUserService;
-    private final TokenService tokenService;
+    private final AuthTokenProvider authTokenProvider;
     private final ResponseUtils responseUtils;
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -66,8 +67,9 @@ public class UserController {
 
         final User createdUser = snsUserService.createSnsUser(userType, joinDTO);
         //회원가입 성공시 SNS 유저는 로그인에 성공한다
-        HashMap<String, String> jwtMap = tokenService.getAccessAndRefreshToken(createdUser);
-        return responseUtils.getLoginSuccessResponse(createdUser, jwtMap, userTypeStr + " 로그인에 성공했습니다.");
+        AuthToken AT = authTokenProvider.issueAccessToken(createdUser);
+        AuthToken RT = authTokenProvider.issueRefreshToken(createdUser);
+        return responseUtils.getLoginSuccessResponse(createdUser.getId(), AT, RT, userTypeStr + " 로그인에 성공했습니다.");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -80,9 +82,11 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteUser(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long id){
-        userService.changeToWithdrawnUser(email, id);
+
+        checkPathResource(user.getUserId(), id);
+        userService.changeToWithdrawnUser(id);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 
@@ -96,11 +100,12 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<UserProfileDTO> modifyUser(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long id,
             @RequestBody @Valid final UserModifyRequestDTO userModifyRequestDTO){
 
-        final User modifiedUser = userService.modify(email, id, userModifyRequestDTO);
+        checkPathResource(user.getUserId(), id);
+        final User modifiedUser = userService.modify(user.getUserId(), userModifyRequestDTO);
         UserProfileDTO userProfileDTO = new UserProfileDTO(modifiedUser);
         return new ResponseDTO<>(userProfileDTO, "정상 수정 처리 되었습니다.");
     }
@@ -115,11 +120,16 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> getUserInfo(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long id){
 
-        final User user = userService.getUser(email, id);
-        UserProfileDTO userProfileDTO= new UserProfileDTO(user);
+        checkPathResource(user.getUserId(), id);
+        final User findUser = userService.getUser(user.getUserId());
+        UserProfileDTO userProfileDTO= new UserProfileDTO(findUser);
         return new ResponseDTO<>(userProfileDTO, "프로필 조회 결과");
+    }
+
+    public void checkPathResource(Long authId, Long pathId){
+        if(!authId.equals(pathId)) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
     }
 }

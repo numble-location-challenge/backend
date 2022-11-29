@@ -1,12 +1,13 @@
-package com.example.backend.global.security;
+package com.example.backend.global.security.jwt;
 
+import com.example.backend.global.security.AuthToken;
+import com.example.backend.global.security.AuthTokenProvider;
+import com.example.backend.global.security.CustomUserDetails;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -33,9 +34,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String TOKEN_PREFIX = "Bearer ";
 
-    private List<String> NOT_CHECK_URL = List.of("/login", "/users", "/refresh", "/swagger-ui");
+    private List<String> NOT_CHECK_URL = List.of("/login", "/refresh", "/swagger-ui");
 
-    private final TokenService tokenService;
+    private final AuthTokenProvider authTokenProvider;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -43,6 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         for(String notUrl : NOT_CHECK_URL){
             if(path.startsWith(notUrl)) return true;
         }
+        if(path.equals("/users")) return true;
         return false;
     }
 
@@ -55,20 +57,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         log.info("JWT Filter is running...");
         // 요청에서 토큰 가져오기
-        String token = parseBearerToken(request);
-        if(token != null && !token.equalsIgnoreCase("null")){
+        String tokenStr = parseBearerToken(request);
+        if(tokenStr != null && !tokenStr.equalsIgnoreCase("null")){
             try{
+                //string -> AuthToken
+                AuthToken authToken = authTokenProvider.convertAuthToken(tokenStr);
+
                 //토큰 검증 (jwt이므로 인가서버에 요청하지 않고도 검증 가능)
-                JwtSubject jwtSubject = tokenService.validateAndGetSubject(token);
+                AbstractAuthenticationToken authentication = authTokenProvider.getAuthentication(authToken);
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
                 //토큰 타입 검증
-                if(jwtSubject != null && !jwtSubject.getJwtType().equals(JwtType.ACCESS)) throw new JwtException("Access Token type 이 아닙니다");
-                //사용자 인증정보 저장
-                AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        jwtSubject.getEmail(),
-                        null,
-                        AuthorityUtils.NO_AUTHORITIES
-                );
-                // SecurityContextHolder에 등록(요청 끝날때까지 들고있어야함)
+                if(userDetails != null && !userDetails.getJwtType().equals(JwtType.ACCESS)) throw new JwtException("Access Token type 이 아닙니다");
+
+                //사용자 인증정보 SecurityContextHolder에 등록(요청 끝날때까지 들고있어야함)
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 securityContext.setAuthentication(authentication);

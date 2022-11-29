@@ -8,7 +8,10 @@ import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.global.exception.InvalidUserInputException;
 import com.example.backend.global.exception.InvalidUserInputExceptionType;
-import com.example.backend.global.security.TokenService;
+import com.example.backend.global.exception.UnAuthorizedException;
+import com.example.backend.global.exception.UnAuthorizedExceptionType;
+import com.example.backend.global.security.AuthToken;
+import com.example.backend.global.security.AuthTokenProvider;
 import com.example.backend.global.utils.ResponseUtils;
 import com.example.backend.service.login.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 
 @Tag(name = "login/logout", description = "로그인 API")
 @RestController
@@ -32,7 +34,7 @@ import java.util.HashMap;
 public class LoginController {
 
     private final LoginService loginService;
-    private final TokenService tokenService;
+    private final AuthTokenProvider authTokenProvider;
     private final ResponseUtils responseUtils;
 
     @Operation(summary = "기본 로그인", description = "AccessToken은 헤더로, RefreshToken은 쿠키로 반환합니다.")
@@ -45,9 +47,10 @@ public class LoginController {
     public ResponseEntity<?> login(@RequestBody @Valid final DefaultLoginRequestDTO loginDTO){
 
         final User loginUser = loginService.defaultLogin(loginDTO);
-        HashMap<String, String> jwtMap = tokenService.getAccessAndRefreshToken(loginUser);
-        loginService.updateRefresh(loginUser, jwtMap.get("RT"));
-        return responseUtils.getLoginSuccessResponse(loginUser, jwtMap, "로그인에 성공했습니다.");
+        AuthToken AT = authTokenProvider.issueAccessToken(loginUser);
+        AuthToken RT = authTokenProvider.issueRefreshToken(loginUser);
+        loginService.updateRefresh(loginUser, RT);
+        return responseUtils.getLoginSuccessResponse(loginUser.getId(), AT, RT,"로그인에 성공했습니다.");
     }
 
     @Operation(summary = "sns 로그인", description = "카카오: userType=KAKAO, 처음 로그인하는 경우 errorCode -112가 반환되며, region 설정 후 카카오 회원가입으로 재요청하면 됩니다.")
@@ -65,9 +68,10 @@ public class LoginController {
         if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
 
         final User loginUser = loginService.snsLogin(userType, authRequestDTO);
-        HashMap<String, String> jwtMap = tokenService.getAccessAndRefreshToken(loginUser);
-        loginService.updateRefresh(loginUser, jwtMap.get("RT"));
-        return responseUtils.getLoginSuccessResponse(loginUser, jwtMap, "카카오 로그인에 성공했습니다.");
+        AuthToken AT = authTokenProvider.issueAccessToken(loginUser);
+        AuthToken RT = authTokenProvider.issueRefreshToken(loginUser);
+        loginService.updateRefresh(loginUser, RT);
+        return responseUtils.getLoginSuccessResponse(loginUser.getId(), AT, RT, "카카오 로그인에 성공했습니다.");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -77,16 +81,19 @@ public class LoginController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED")
     })
-    public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken") String refreshToken){
+    public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken") String refreshTokenStr){
+        AuthToken refreshToken = authTokenProvider.convertAuthToken(refreshTokenStr);
+        //토큰 검증
+        if(!refreshToken.validate()) throw new UnAuthorizedException(UnAuthorizedExceptionType.REFRESH_TOKEN_UN_AUTHORIZED);
 
-        User loginUser = loginService.getUserByRefreshToken(refreshToken);
-        final String reissuedAccessToken = loginService.refresh(loginUser, refreshToken);
+        Long userId = refreshToken.getUserIdFromClaims();
+        final AuthToken reissuedAT = loginService.refresh(userId, refreshToken);
 
         //set response
-        AuthDTO authDTO = new AuthDTO(loginUser);
+        AuthDTO authDTO = new AuthDTO(userId);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, reissuedAccessToken)
+                .header(HttpHeaders.AUTHORIZATION, reissuedAT.getToken())
                 .body(new ResponseDTO<>(authDTO, "AccessToken이 재발급되었습니다."));
     }
 }

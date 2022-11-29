@@ -14,7 +14,7 @@ public class AuthDTO implements Serializable {
     @Schema(description = "회원 pk")
     Long userId;
 
-    public AuthDTO(User user) {
-        this.userId = user.getId();
+    public AuthDTO(Long userId) {
+        this.userId = userId;
     }
 }

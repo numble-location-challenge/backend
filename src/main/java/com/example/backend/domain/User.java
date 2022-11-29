@@ -56,7 +56,7 @@ public class User {
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //    private List<Socialing> socialings = new ArrayList<>();
 
-    @Column(length = 500, name = "refresh_token")
+    @Column(length = 1000, name = "refresh_token")
     private String refreshToken; //JWT
 
     @Enumerated(value = EnumType.STRING)

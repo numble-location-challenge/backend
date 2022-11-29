@@ -1,6 +1,9 @@
 package com.example.backend.global.config;
 
 import com.example.backend.global.security.*;
+import com.example.backend.global.security.jwt.JwtAuthenticationFilter;
+import com.example.backend.global.security.jwt.JwtExceptionEntryPoint;
+import com.example.backend.global.security.jwt.JwtLogoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +25,7 @@ public class SecurityConfig {
     private String REFRESH_COOKIE = "refreshToken";
 
     private final JwtLogoutHandler jwtLogoutHandler;
-    private final TokenService tokenService;
+    private final AuthTokenProvider authTokenProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -35,12 +38,12 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers(
-                        "/", "/login/**", "/users/**", "/refresh", "/swagger-ui/**", "/api-docs/**")
+                        "/", "/login/**", "/users", "/refresh", "/swagger-ui/**", "/api-docs/**")
                 .permitAll()
                 .anyRequest().authenticated();
 
         http
-                .addFilterAfter(new JwtAuthenticationFilter(tokenService), CorsFilter.class);
+                .addFilterAfter(new JwtAuthenticationFilter(authTokenProvider), CorsFilter.class);
 
         http
                 .logout().permitAll()

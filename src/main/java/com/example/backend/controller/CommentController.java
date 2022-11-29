@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.example.backend.global.security.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -60,8 +61,8 @@ public class CommentController {
         {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/comment/me")
-    public ResponseDTO<?> getMyComments(@AuthenticationPrincipal String userEmail) {
-        List<Comment> comments = commentService.getMyComments(userEmail);
+    public ResponseDTO<?> getMyComments(@AuthenticationPrincipal CustomUserDetails user) {
+        List<Comment> comments = commentService.getMyComments(user.getEmail());
 
         List<MyCommentResponseDTO> result = comments.stream()
             .map(comment -> new MyCommentResponseDTO(comment))
@@ -78,8 +79,8 @@ public class CommentController {
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PostMapping("/comment/{postId}")
     public ResponseDTO<?> createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDTO commentRequestDTO,
-        @AuthenticationPrincipal String userEmail) {
-        commentService.createComment(postId, userEmail, commentRequestDTO);
+        @AuthenticationPrincipal CustomUserDetails user) {
+        commentService.createComment(postId, user.getEmail(), commentRequestDTO);
         return new ResponseDTO<>(null,"댓글 작성 성공");
     }
 
@@ -91,8 +92,8 @@ public class CommentController {
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PostMapping("/comment/{postId}/{commentId}")
     public ResponseDTO createReply(@PathVariable Long postId, @PathVariable Long commentId,
-        @Valid @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal String userEmail) {
-        commentService.createReply(postId, userEmail, commentId, commentRequestDTO);
+        @Valid @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
+        commentService.createReply(postId, user.getEmail(), commentId, commentRequestDTO);
         return new ResponseDTO<>(null,"대댓글 작성 성공");
     }
 
@@ -104,8 +105,8 @@ public class CommentController {
             , @ApiResponse(responseCode = "403", description = "FORBIDDEN")
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @DeleteMapping("/comment/{commentId}")
-    public ResponseDTO deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal String userEmail) {
-        commentService.deleteComment(commentId, userEmail);
+    public ResponseDTO deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal CustomUserDetails user) {
+        commentService.deleteComment(commentId, user.getEmail());
         return new ResponseDTO<>(null,"댓글 삭제 성공");
     }
 
@@ -117,8 +118,8 @@ public class CommentController {
             , @ApiResponse(responseCode = "403", description = "FORBIDDEN")
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PutMapping("/comment/{commentId}")
-    public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal String userEmail) {
-        CommentResponseDTO result = commentService.updateComment(commentId, userEmail, commentRequestDTO);
+    public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
+        CommentResponseDTO result = commentService.updateComment(commentId, user.getEmail(), commentRequestDTO);
         return new ResponseDTO<>(result,"댓글 수정 성공");
     }
 }

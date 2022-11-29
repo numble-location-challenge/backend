@@ -4,6 +4,7 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.dto.login.SnsLoginRequestDTO;
+import com.example.backend.global.security.AuthToken;
 
 public interface LoginService {
 
@@ -11,9 +12,9 @@ public interface LoginService {
 
     User snsLogin(UserType userType, SnsLoginRequestDTO authRequestDTO);
 
-    User getUserByRefreshToken(String refreshToken);
+//    User getUserByRefreshToken(String refreshToken);
 
-    String refresh(User user, String refreshToken);
+    AuthToken refresh(Long userId, AuthToken refreshToken);
 
-    void updateRefresh(User loginUser, String refreshToken);
+    void updateRefresh(User loginUser, AuthToken refreshToken);
 }
