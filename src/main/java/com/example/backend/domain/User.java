@@ -3,6 +3,7 @@ package com.example.backend.domain;
 import com.example.backend.domain.enumType.UserStatus;
 import com.example.backend.domain.enumType.UserType;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotNull;
         {@UniqueConstraint(name = "EMAIL_NICKNAME_UNIQUE", columnNames = {"email","nickname", "sns_id"})})
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public class User {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +47,7 @@ public class User {
     private String phoneNumber;
     @NotNull
     @Column(name = "dong_code")
-    private Integer dongCode;
+    private Long dongCode;
     @NotNull
     @Column(name = "dong_name")
     private String dongName;
@@ -82,8 +84,15 @@ public class User {
         userStatus = UserStatus.WITHDRAW;
     }
 
+    public Integer getRegionCodeFromDongCode(){
+        String s = dongCode.toString();
+        Integer regionCode = Integer.parseInt(s.substring(0, 4));//앞 5자리가 시군구 코드
+        log.info("dongCode={}, regionCode={}",dongCode, regionCode);
+        return regionCode;
+    }
+
     @Builder
-    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull int dongCode, @NotNull String dongName, @NotNull UserStatus userStatus, String bio) {
+    public User(@NotNull UserType userType, @NotNull String email, @NotNull String password, @NotNull String username, @NotNull String nickname, @NotNull String phoneNumber, @NotNull Long dongCode, @NotNull String dongName, @NotNull UserStatus userStatus, String bio) {
         this.userType = userType;
         this.email = email;
         this.password = password;
@@ -113,7 +122,7 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
-    public void updateRegion(int dongCode, String dongName){
+    public void updateRegion(Long dongCode, String dongName){
         this.dongCode = dongCode;
         this.dongName = dongName;
     }

@@ -158,7 +158,7 @@ public class SocialServiceImpl implements SocialService {
         if(!socialList.isEmpty()) changeStatus(socialList);
 
         return socialList.stream()
-                .filter(social -> social.getRegionCode().equals(user.getDongCode()/100))
+                .filter(social -> social.getRegionCode().equals(user.getRegionCodeFromDongCode()))
                 .map(SocialShortDTO::new)
                 .collect(toList());
     }

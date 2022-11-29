@@ -26,9 +26,9 @@ public class SnsJoinRequestDTO {
     @NotBlank
     private String phoneNumber;
 
-    @Schema(description = "지역 번호 8자리", defaultValue = "1111010400")
+    @Schema(description = "지역 번호", defaultValue = "1111010400")
     @NotNull
-    int dongCode;
+    Long dongCode;
 
     @Schema(description = "행정구역명", defaultValue = "서울특별시 종로구 효자동")
     @NotNull

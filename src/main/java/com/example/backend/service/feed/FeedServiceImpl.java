@@ -58,7 +58,7 @@ public class FeedServiceImpl implements FeedService {
     public Slice<Feed> getFeeds(FeedSearch feedSearch, String userName){
         User user = userRepository.findByEmail(userName)
             .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        int regionCode = user.getDongCode()/1000;
+        Integer regionCode = user.getRegionCodeFromDongCode();
         log.info("getPage {} , getSize {}, cond {}", feedSearch.getPage(),feedSearch.getSize(),feedSearch.getFilter());
         int pageNum = (feedSearch.getPage() == 0) ? 0 : (feedSearch.getPage()-1);
         Pageable pageable = PageRequest.of(pageNum, feedSearch.getSize());
@@ -85,7 +85,7 @@ public class FeedServiceImpl implements FeedService {
     @Override
     public List<Feed> getHotPreviewFeeds(String userEmail){
         User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        int regionCode = user.getDongCode()/1000;
+        int regionCode = user.getRegionCodeFromDongCode();
         Pageable limit = PageRequest.of(0,10);
         List<Feed> hotFeeds = feedRepository.findHotFeeds(regionCode,limit);
         return hotFeeds;

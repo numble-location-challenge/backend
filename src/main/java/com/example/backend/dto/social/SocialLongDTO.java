@@ -53,7 +53,7 @@ public class SocialLongDTO{
     private int regionCode;
 
     @Schema(description = "작성자의 행정구역 동읍면코드 8자리", example = "1101053")
-    private int dongCode;
+    private long dongCode;
 
     @Schema(description = "행정구역명", example = "서울특별시 종로구 사직동")
     private String dongName;
