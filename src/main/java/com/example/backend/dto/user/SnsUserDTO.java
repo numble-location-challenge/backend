@@ -21,7 +21,7 @@ public class SnsUserDTO {
         this.email = email;
     }
 
-    public User toEntity(UserType usertype, String username, String phoneNumber, int dongCode, String dongName) {
+    public User toEntity(UserType usertype, String username, String phoneNumber, Long dongCode, String dongName) {
         return User.builder()
                 .userType(usertype).email(email).nickname(nickname)
                 .username(username).phoneNumber(phoneNumber)

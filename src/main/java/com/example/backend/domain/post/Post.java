@@ -14,6 +14,7 @@ import com.example.backend.domain.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Entity
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "post_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public abstract class Post extends TimeAuditingEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +49,7 @@ public abstract class Post extends TimeAuditingEntity {
 
     @NotNull
     @Column(name = "dong_code")
-    protected Integer dongCode; //읍면동 8자리
+    protected Long dongCode; //읍면동 (자릿수 유동적)
 
     @NotNull
     @Column(name = "region_name")
@@ -63,7 +65,7 @@ public abstract class Post extends TimeAuditingEntity {
         this.contents = contents;
         this.dongCode = user.getDongCode();
         this.dongName = user.getDongName();
-        this.regionCode = dongCode/1000; //앞 5자리가 시군구 코드
+        this.regionCode = user.getRegionCodeFromDongCode();
         this.likes = likes;
     }
 
