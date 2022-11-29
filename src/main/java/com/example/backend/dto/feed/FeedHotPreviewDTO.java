@@ -23,7 +23,7 @@ public class FeedHotPreviewDTO {
     public FeedHotPreviewDTO(Feed feed) {
         this.postId = feed.getId();
         this.contents = feed.getContents();
-        this.isLiked = false;
+        this.isLiked = feed.isLiked();
         this.thumbnail = PostImageDTO.getThumbnail(feed.getImages());
         this.likes = feed.getLikes();
     }

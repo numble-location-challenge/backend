@@ -23,22 +23,24 @@ public class FeedListResponseDTO {
     private FeedUserDTO user;
     @Schema(description = "피드 본문", defaultValue = "본문입니다.")
     private String contents;
-    @Schema(description = "피드와 연결된 소셜 DTO")
-    private FeedSocialDTO social;
     @Schema(description = "피드 썸네일")
     private PostImageDTO thumbnail;
-    @Schema(description = "댓글 리스트에서 가장 최신의 댓글 미리보기 DTO")
-    private CommentPreviewDTO comment;
-    @Schema(description = "피드 지역", defaultValue = "2")
+    @Schema(description = "피드의 지역 코드", defaultValue = "1111")
     private Integer regions;
     @Schema(description = "피드의 지역 이름", defaultValue = "서울특별시 종로구 효자동")
     private String regionName;
-    @Schema(description = "피드 좋아요 여부",defaultValue = "false")
-    private boolean isLiked;
     @Schema(description = "피드 생성시간", defaultValue = "YYYY-MM-DDT20:30")
     private LocalDateTime createTime;
     @Schema(description = "피드 좋아요 수", defaultValue = "3")
     private int likes;
+    @Schema(description = "피드 좋아요 여부",defaultValue = "false")
+    private boolean isLiked;
+    @Schema(description = "해당 피드의 총 댓글 갯수", defaultValue = "10")
+    private int comments_cnt;
+    @Schema(description = "댓글 리스트에서 가장 최신의 댓글 미리보기 DTO")
+    private CommentPreviewDTO comment;
+    @Schema(description = "피드와 연결된 소셜 DTO")
+    private FeedSocialDTO social;
 
     public FeedListResponseDTO(Feed feed) {
         this.postId = feed.getId();
@@ -50,10 +52,11 @@ public class FeedListResponseDTO {
         }
         this.comment = findCommentPreview(feed.getComments());
         this.regions = feed.getRegionCode();
-        //TODO 좋아요 여부 로직 구현 및 시간 로직 구현
-        this.isLiked = false;
+        this.regionName = feed.getDongName();
+        this.isLiked = feed.isLiked();
         this.createTime = feed.getCreateDate();
         this.likes = feed.getLikes();
+        this.comments_cnt = feed.getCommentCount();
     }
 
     private CommentPreviewDTO findCommentPreview(List<Comment> comments){
