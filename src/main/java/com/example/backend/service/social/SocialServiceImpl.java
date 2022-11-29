@@ -203,11 +203,9 @@ public class SocialServiceImpl implements SocialService {
      */
     @Override
     public List<SocialShortDTO> getJoinSocialList(Long userId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-
         List<SocialShortDTO> socialShortDTOList = getSocialList(userId);
         List<SocialShortDTO> resultDTO = new LinkedList<>();
+
         for (SocialShortDTO shortDTO : socialShortDTOList) {
             Optional<SocialingDTO> socialing = shortDTO.getSocialings().stream().filter(s -> s.getUserId().equals(userId)).findAny();
             if (!socialing.isEmpty()) {
@@ -216,11 +214,6 @@ public class SocialServiceImpl implements SocialService {
         }
 
         return resultDTO;
-
-//        return socialRepository.findAll().stream()
-//                .filter(social -> social.getSocialings().contains(user.getId()))
-//                .map(SocialShortDTO::new)
-//                .collect(toList());
     }
 
     /**
