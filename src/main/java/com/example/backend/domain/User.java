@@ -86,7 +86,7 @@ public class User {
 
     public Integer getRegionCodeFromDongCode(){
         String s = dongCode.toString();
-        Integer regionCode = Integer.parseInt(s.substring(0, 4));//앞 5자리가 시군구 코드
+        Integer regionCode = Integer.parseInt(s.substring(0, 5));//앞 5자리가 시군구 코드
         log.info("dongCode={}, regionCode={}",dongCode, regionCode);
         return regionCode;
     }
