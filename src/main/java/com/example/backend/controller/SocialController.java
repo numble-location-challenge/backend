@@ -44,7 +44,7 @@ public class SocialController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
     public ResponseDTO<?> getSocialList(@AuthenticationPrincipal CustomUserDetails user){
-        List<SocialShortDTO> socialShortDTOList = socialService.getSocialList(user.getEmail());
+        List<SocialShortDTO> socialShortDTOList = socialService.getSocialList(user.getUserId());
 
         return new ResponseDTO<>(socialShortDTOList, "모임 리스트 출력");
 
@@ -60,8 +60,8 @@ public class SocialController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> getSocialDetail(@Parameter(required = true) @PathVariable Long socialId){
-        SocialLongDTO socialLongDTO = socialService.getSocialDetail(socialId);
+    public ResponseDTO<?> getSocialDetail(@AuthenticationPrincipal CustomUserDetails user, @Parameter(required = true) @PathVariable Long socialId){
+        SocialLongDTO socialLongDTO = socialService.getSocialDetail(user.getUserId(),socialId);
 
         return new ResponseDTO<>(socialLongDTO, "모임 상세 정보 출력");
 //        return ResponseDTO.<SocialLongDTO>builder().success(true).message("모임 상세 정보 출력")
@@ -131,7 +131,7 @@ public class SocialController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
     public ResponseDTO<?> getMySocialList(@Parameter(required = true) @AuthenticationPrincipal CustomUserDetails user){
-        List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(user.getEmail());
+        List<SocialShortDTO> socialShortDTOList = socialService.getMySocialList(user.getUserId());
 
         return new ResponseDTO<>(socialShortDTOList,"내가 쓴 모임 게시글 출력");
     }
@@ -145,7 +145,7 @@ public class SocialController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
     })
     public ResponseDTO<?> getJoinSocialList(@Parameter(required = true) @AuthenticationPrincipal CustomUserDetails user){
-        List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(user.getEmail());
+        List<SocialShortDTO> socialShortDTOList = socialService.getJoinSocialList(user.getUserId());
 
         return new ResponseDTO<>(socialShortDTOList,"내가 참가한 모임들 출력");
     }
@@ -172,8 +172,8 @@ public class SocialController {
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "403", description = "BAD REQUEST")
     })
-    public ResponseDTO<?> getSortList(@AuthenticationPrincipal String email,@Parameter(required = true) @PathVariable int sortType){
-        List<SocialShortDTO> socialList = socialService.getSocialList(email); //정렬할 리스트
+    public ResponseDTO<?> getSortList(@AuthenticationPrincipal CustomUserDetails user,@Parameter(required = true) @PathVariable int sortType){
+        List<SocialShortDTO> socialList = socialService.getSocialList(user.getUserId()); //정렬할 리스트
 
         List<SocialShortDTO> sortedList = socialService.sortByList(socialList, sortType); //정렬된 리스트
         String message = (sortType == 1 ? "최신순 정렬" : (sortType == 2) ? "마감 임박순 정렬" : "인기순 정렬");
@@ -188,8 +188,8 @@ public class SocialController {
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
             @ApiResponse(responseCode = "403", description = "BAD REQUEST")
     })
-    public ResponseDTO<?> getSortCategoryList(@AuthenticationPrincipal String email,@Parameter(required = true) @PathVariable Long categoryId, @PathVariable int sortType){
-        List<SocialShortDTO> categoryList = socialService.filteringByCategory(email,categoryId); //정렬할 리스트
+    public ResponseDTO<?> getSortCategoryList(@AuthenticationPrincipal CustomUserDetails user,@Parameter(required = true) @PathVariable Long categoryId, @PathVariable int sortType){
+        List<SocialShortDTO> categoryList = socialService.filteringByCategory(user.getUserId(),categoryId); //정렬할 리스트
 
         List<SocialShortDTO> sortedList = socialService.sortByList(categoryList, sortType); //정렬된 리스트
 

@@ -24,21 +24,19 @@ import java.util.stream.Collectors;
 @Schema(description = "모임 목록에 출력할 데이터 DTO (일부 데이터만 출력)")
 public class SocialShortDTO {
 
-    @Schema(description = "모임에 참여한 사용자")
-    private List<SocialingDTO> socialings = new ArrayList<>();
-
     @Schema(description = "모임 게시글 아이디")
     @NotNull
     private Long id;
 
-    @Schema(description = "모임 게시글에 첨부한 사진 (1장)")
-    private List<PostImageDTO> images;
+    @Schema(description = "모임을 생성한 사용자 아이디")
+    @NotNull
+    private Long userId;
 
     @Schema(description = "작성자의 행정구역 시군구코드 5자리", example = "11010")
     private int regionCode;
 
     @Schema(description = "작성자의 행정구역 동읍면코드 8자리", example = "1101053")
-    private long dongCode;
+    private Long dongCode;
 
     @Schema(description = "행정구역명", example = "서울특별시 종로구 사직동")
     private String dongName;
@@ -46,6 +44,12 @@ public class SocialShortDTO {
     @Schema(description = "모임 게시글 제목", example = "같이 운동 하실분!")
     @NotNull
     private String title; //모임 제목
+
+    @Schema(description = "모임에 참여한 사용자")
+    private List<SocialingDTO> socialings = new ArrayList<>();
+
+    @Schema(description = "모임 게시글에 첨부한 사진 (1장)")
+    private List<PostImageDTO> images;
 
     @Schema(description = "모임 종료 날짜")
     @NotNull
@@ -74,14 +78,18 @@ public class SocialShortDTO {
     @Schema(description = "최신순 정렬에 사용")
     private LocalDateTime createDate;
 
+    @Schema(description = "좋아요 여부")
+    private boolean likeOrElse = false;
+
     public SocialShortDTO(Social social) {
+        this.id = social.getId();
+        this.userId = social.getUser().getId();
         this.socialings = toSocialingDTO(
                 social.getSocialings().stream()
                 .filter(socialing -> socialing.getSocial().getId().equals(social.getId()))
                 .collect(Collectors.toList())
         );
-        this.socialings = social.getSocialings().stream().map(SocialingDTO::new).collect(Collectors.toList());
-        this.id = social.getId();
+//        this.socialings = social.getSocialings().stream().map(SocialingDTO::new).collect(Collectors.toList());
         this.images = social.getImages().stream().map(PostImageDTO::new).collect(Collectors.toList());
         this.regionCode = social.getRegionCode();
         this.dongCode = social.getDongCode();
@@ -100,6 +108,10 @@ public class SocialShortDTO {
         this.likeCnt = social.getLikes();
         this.createDate = social.getCreateDate();
 
+    }
+
+    public void updateLikeOrElse(boolean orElse){
+        this.likeOrElse = orElse;
     }
 
     public List<SocialingDTO> toSocialingDTO(List<Socialing> socialings){

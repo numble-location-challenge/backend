@@ -1,5 +1,6 @@
 package com.example.backend.service.social;
 
+import com.example.backend.domain.Like;
 import com.example.backend.domain.PostImage;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
@@ -11,17 +12,11 @@ import com.example.backend.domain.tag.SocialTag;
 import com.example.backend.domain.tag.Tag;
 import com.example.backend.dto.PostImageDTO;
 import com.example.backend.dto.TagDTO;
-import com.example.backend.dto.social.SocialCreateRequestDTO;
+import com.example.backend.dto.social.*;
 import com.example.backend.domain.tag.SocialTag;
-import com.example.backend.dto.social.SocialLongDTO;
-import com.example.backend.dto.social.SocialModifyRequestDTO;
-import com.example.backend.dto.social.SocialShortDTO;
 import com.example.backend.global.exception.EntityNotExistsException;
 import com.example.backend.global.exception.EntityNotExistsExceptionType;
-import com.example.backend.repository.PostImageRepository;
-import com.example.backend.repository.SocialRepository;
-import com.example.backend.repository.TagRepository;
-import com.example.backend.repository.UserRepository;
+import com.example.backend.repository.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +46,8 @@ public class SocialServiceImpl implements SocialService {
     private final TagRepository tagRePository;
     private final PostImageRepository postImageRepository;
 
+    private final LikesRepository likesRepository;
+
     //모임 게시글 생성
     @Transactional
     @Override
@@ -66,7 +63,7 @@ public class SocialServiceImpl implements SocialService {
         log.info(stringTags.toString());
         List<Tag> tags = tagRePository.findAllByNames(stringTags);
 
-        if(tags == null) throw new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_TAG);
+        if (tags == null) throw new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_TAG);
         Category category = tags.get(0).getCategory(); //LAZY 로딩
 
         //이미지 경로 String 1~3개 -> PostImage 생성 및 세팅
@@ -111,15 +108,15 @@ public class SocialServiceImpl implements SocialService {
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
 
         // null일 경우에는 수정X
-        if(socialDTO.getTitle() != null) social.updateTitle(socialDTO.getTitle());
-        if(socialDTO.getContents() != null) social.updateContents(socialDTO.getContents());
-        if(socialDTO.getStartDate() != null) social.updateStartDate(socialDTO.getStartDate());
-        if(socialDTO.getEndDate() != null) social.updateEndDate(socialDTO.getEndDate());
-        if(socialDTO.getLimitedNums() != null) social.updateLimitedNums(socialDTO.getLimitedNums());
-        if(socialDTO.getContact() != null) social.updateContact(socialDTO.getContact());
+        if (socialDTO.getTitle() != null) social.updateTitle(socialDTO.getTitle());
+        if (socialDTO.getContents() != null) social.updateContents(socialDTO.getContents());
+        if (socialDTO.getStartDate() != null) social.updateStartDate(socialDTO.getStartDate());
+        if (socialDTO.getEndDate() != null) social.updateEndDate(socialDTO.getEndDate());
+        if (socialDTO.getLimitedNums() != null) social.updateLimitedNums(socialDTO.getLimitedNums());
+        if (socialDTO.getContact() != null) social.updateContact(socialDTO.getContact());
 
         //이미지
-        if(!CollectionUtils.isEmpty(socialDTO.getImages())){
+        if (!CollectionUtils.isEmpty(socialDTO.getImages())) {
             //DB에서 PostImage 삭제
             postImageRepository.deleteAllByPostId(social.getId());
             //갈아끼움
@@ -133,66 +130,90 @@ public class SocialServiceImpl implements SocialService {
 
     /**
      * 모임 게시글 단건 조회 (상세 보기)
+     *
      * @param postId 게시글 아이디
      * @return SocialLongDTO : 모든 정보가 다 있는 모임 DTO
      */
     @Override
-    public SocialLongDTO getSocialDetail(Long postId) {
+    public SocialLongDTO getSocialDetail(Long userId, Long postId) {
         Social social = socialRepository.findById(postId)
-                .orElseThrow(()->new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+        SocialLongDTO socialLongDTO = new SocialLongDTO(social);
+
+        socialLongDTO.updateLikeOrElse(likesRepository.existsByUserIdAndPostId(userId, postId));
 
         return new SocialLongDTO(social);
     }
 
     /**
      * 모임 게시글 전체 조회 (미리 보기)
+     *
      * @return List<SocialShortDTO> : 미리 보기 정보만 있는 모임 리스트
      */
     @Override
-    public List<SocialShortDTO> getSocialList(String email) {
-        List<Social> socialList = socialRepository.findAll();
-
-        User user = userRepository.findByEmail(email)
+    public List<SocialShortDTO> getSocialList(Long userId) {
+        //사용자 id 검증
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
-        if(!socialList.isEmpty()) changeStatus(socialList);
+        List<Social> socialList = socialRepository.findAll(); //social list 가져오기
+        List<Like> likes = likesRepository.findByUserId(userId); //like list 가져오기
 
-        return socialList.stream()
+        System.out.println(user.getRegionCodeFromDongCode());
+
+        //social 리스트 dto 만들기
+        List<SocialShortDTO> socialShortDTOS = socialList.stream()
                 .filter(social -> social.getRegionCode().equals(user.getRegionCodeFromDongCode()))
                 .map(SocialShortDTO::new)
                 .collect(toList());
+
+        //만들어진 dto에 좋아요 정보 변경하기
+        socialShortDTOS.forEach(socialShortDTO -> checkedLike(socialShortDTO, likes));
+
+        return socialShortDTOS;
+    }
+
+    public void checkedLike(SocialShortDTO social, List<Like> likes) {
+        for (Like like : likes) {
+            if (Objects.equals(like.getPost().getId(), social.getId())) {
+                social.updateLikeOrElse(true);
+                return;
+            }
+        }
     }
 
     /**
      * 내가 작성한 게시글 만 보기
-     * @param email 현재 로그인한 사용자 이메일
+     *
+     * @param userId 현재 로그인한 사용자 아이디
      * @return List<SocialShortDTO> : 미리 보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> getMySocialList(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    public List<SocialShortDTO> getMySocialList(Long userId) {
+        List<SocialShortDTO> socialShortDTOList = getSocialList(userId);
+        return socialShortDTOList.stream().filter(socialShortDTO -> socialShortDTO.getUserId().equals(userId)).collect(toList());
 
-        return socialRepository.findAll().stream()
-                .filter(social -> social.getUser().getId().equals(user.getId()))
-                .map(SocialShortDTO::new)
-                .collect(toList());
     }
 
     /**
      * 내가 참여한 모임 게시글 만 보기
-     * @param email 현재 로그인한 사용자 이메일
+     *
+     * @param userId 현재 로그인한 사용자 아이디
      * @return List<SocialShortDTO> : 미리 보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> getJoinSocialList(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    public List<SocialShortDTO> getJoinSocialList(Long userId) {
+        List<SocialShortDTO> socialShortDTOList = getSocialList(userId);
+        List<SocialShortDTO> resultDTO = new LinkedList<>();
 
-        return socialRepository.findAll().stream()
-                .filter(social -> social.getSocialings().contains(user.getId()))
-                .map(SocialShortDTO::new)
-                .collect(toList());
+        for (SocialShortDTO shortDTO : socialShortDTOList) {
+            Optional<SocialingDTO> socialing = shortDTO.getSocialings().stream().filter(s -> s.getUserId().equals(userId)).findAny();
+            if (!socialing.isEmpty()) {
+                resultDTO.add(shortDTO);
+            }
+        }
+
+        return resultDTO;
     }
 
     /**
@@ -200,8 +221,8 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 카테고리로 필터링된 미리보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> filteringByCategory(String email, Long categoryId) {
-        List<SocialShortDTO> socialShortDTOList = getSocialList(email); //내 동에만 있는 리스트 추출
+    public List<SocialShortDTO> filteringByCategory(Long userId, Long categoryId) {
+        List<SocialShortDTO> socialShortDTOList = getSocialList(userId); //내 동에만 있는 리스트 추출
 
         return socialShortDTOList.stream()
                 .filter(socialShortDTO -> socialShortDTO.getCategory().getId().equals(categoryId))
@@ -209,21 +230,25 @@ public class SocialServiceImpl implements SocialService {
     }
 
     /**
-     * 모임 게시글 태그 필터링
+     * 모임 게시글 태그 필터링 (태그 검색)
      * @param tagId 사용자가 선택한 태그 아이디
      * @return List<SocialShortDTO> : 태그로 필터링된 리스트
      */
     @Override
     public List<SocialShortDTO> filteringByTag(Long tagId) {
         List<SocialShortDTO> socialShortDTOList = new LinkedList<>();
+
         for(Social social : socialRepository.findAll()){
             Optional<SocialTag> socialTag = social.getSocialTags().stream()
                     .filter(st -> st.getTag().getId().equals(tagId))
-                    .findFirst();
-            if(socialTag.isPresent()){
+                    .findAny();
+
+            if(!socialTag.isEmpty()){
+                socialTag.stream().forEach(tag -> System.out.println(tag.getTag().getId()));
                 socialShortDTOList.add(new SocialShortDTO(social));
             }
         }
+
         return socialShortDTOList;
     }
 

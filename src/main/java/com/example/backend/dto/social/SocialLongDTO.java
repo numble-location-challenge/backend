@@ -29,9 +29,6 @@ import java.util.stream.Collectors;
 @Schema(description = "모임 단건 조회에 출력할 데이터 DTO (모든 데이터 출력)")
 public class SocialLongDTO{
 
-    @Schema(description = "모임에 참여한 사용자")
-    private List<SocialingDTO> socialings = new ArrayList<>();
-
     @Schema(description = "모임 게시글 아이디", defaultValue = "12")
     @NotNull
     private Long id;
@@ -40,27 +37,12 @@ public class SocialLongDTO{
     @NotNull
     private SocialUserDTO user;
 
-    @Schema(description = "모임 게시글에 첨부한 사진")
-    private List<PostImageDTO> images = new ArrayList<>();
-
-    @Schema(description = "모임 게시글에 달린 댓글")
-    private List<CommentResponseDTO> comments = new ArrayList<>();
-
-    @Schema(description = "모임 게시글 내용", defaultValue = "바로 같이, 가슴이 어디 하는 갑 우는 칼이다.")
-    private String contents;
-
-    @Schema(description = "작성자의 행정구역 시군구코드 5자리", example = "11010")
-    private int regionCode;
-
-    @Schema(description = "작성자의 행정구역 동읍면코드 8자리", example = "1101053")
-    private long dongCode;
-
-    @Schema(description = "행정구역명", example = "서울특별시 종로구 사직동")
-    private String dongName;
-
     @Schema(description = "모임 게시글 제목",defaultValue = "모임 제목")
     @NotNull
     private String title; //모임 제목
+
+    @Schema(description = "모임 게시글 내용", defaultValue = "바로 같이, 가슴이 어디 하는 갑 우는 칼이다.")
+    private String contents;
 
     @Schema(description = "모임 시작 날짜")
     @NotNull
@@ -69,6 +51,21 @@ public class SocialLongDTO{
     @Schema(description = "모임 종료 날짜")
     @NotNull
     private LocalDateTime endDate; //모임 끝나는 날짜
+
+    @Schema(description = "모임 게시글에 첨부한 사진")
+    private List<PostImageDTO> images = new ArrayList<>();
+
+    @Schema(description = "모임 게시글에 달린 댓글")
+    private List<CommentResponseDTO> comments = new ArrayList<>();
+
+    @Schema(description = "작성자의 행정구역 시군구코드 5자리", example = "11010")
+    private int regionCode;
+
+    @Schema(description = "작성자의 행정구역 동읍면코드 8자리", example = "1101053")
+    private Long dongCode;
+
+    @Schema(description = "행정구역명", example = "서울특별시 종로구 사직동")
+    private String dongName;
 
     @Schema(description = "현재 모임에 신청한 인원",defaultValue = "4")
     private int currentNums; //현재 신청한 인원수
@@ -89,6 +86,15 @@ public class SocialLongDTO{
 
     @Schema(description = "소분류")
     private List<SocialTagDTO> tags;
+
+    @Schema(description = "좋아요 개수")
+    private int likesCnt;
+
+    @Schema(description = "좋아요 여부")
+    private boolean likeOrElse;
+
+    @Schema(description = "모임에 참여한 사용자")
+    private List<SocialingDTO> socialings = new ArrayList<>();
 
     public SocialLongDTO(Social social) {
         this.socialings = toSocialingDTO(
@@ -117,7 +123,11 @@ public class SocialLongDTO{
                 .stream().filter(socialTag -> socialTag.getSocial().getId().equals(social.getId()))
                 .collect(Collectors.toList())
         );
+        this.likesCnt = social.getLikes();
+    }
 
+    public void updateLikeOrElse(boolean orElse){
+        this.likeOrElse = orElse;
     }
 
     public CategoryDTO toCategoryDTO(Category category){
