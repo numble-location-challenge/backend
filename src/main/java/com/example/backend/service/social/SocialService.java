@@ -20,7 +20,7 @@ public interface SocialService {
     Social modifySocial(String email, Long socialId, SocialModifyRequestDTO socialDTO);
 
     //모임 게시글 1개 출력 (상세보기)
-    SocialLongDTO getSocialDetail(Long socialId);
+    SocialLongDTO getSocialDetail(Long userId, Long socialId);
 
     //모임 게시글 리스트 출력 (미리보기)
     List<SocialShortDTO> getSocialList(Long userId);

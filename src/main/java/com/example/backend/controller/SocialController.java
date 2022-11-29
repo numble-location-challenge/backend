@@ -60,8 +60,8 @@ public class SocialController {
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<?> getSocialDetail(@Parameter(required = true) @PathVariable Long socialId){
-        SocialLongDTO socialLongDTO = socialService.getSocialDetail(socialId);
+    public ResponseDTO<?> getSocialDetail(@AuthenticationPrincipal CustomUserDetails user, @Parameter(required = true) @PathVariable Long socialId){
+        SocialLongDTO socialLongDTO = socialService.getSocialDetail(user.getUserId(),socialId);
 
         return new ResponseDTO<>(socialLongDTO, "모임 상세 정보 출력");
 //        return ResponseDTO.<SocialLongDTO>builder().success(true).message("모임 상세 정보 출력")
