@@ -23,16 +23,16 @@ public interface SocialService {
     SocialLongDTO getSocialDetail(Long socialId);
 
     //모임 게시글 리스트 출력 (미리보기)
-    List<SocialShortDTO> getSocialList(String email);
+    List<SocialShortDTO> getSocialList(Long userId);
 
     //본인이 작성한 모임 게시글만 출력
-    List<SocialShortDTO> getMySocialList(String email);
+    List<SocialShortDTO> getMySocialList(Long userId);
 
     //본인이 참여한 모임 게시글만 출력
-    List<SocialShortDTO> getJoinSocialList(String email);
+    List<SocialShortDTO> getJoinSocialList(Long userId);
 
     //카테고리 필터링
-    List<SocialShortDTO> filteringByCategory(String email, Long CategoryId);
+    List<SocialShortDTO> filteringByCategory(Long userId, Long CategoryId);
 
     //태그 필터링
     List<SocialShortDTO> filteringByTag(Long TagId);

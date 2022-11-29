@@ -149,10 +149,10 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 미리 보기 정보만 있는 모임 리스트
      */
     @Override
-    public List<SocialShortDTO> getSocialList(String email) {
+    public List<SocialShortDTO> getSocialList(Long userId) {
         List<Social> socialList = socialRepository.findAll();
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         if(!socialList.isEmpty()) changeStatus(socialList);
@@ -169,8 +169,8 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 미리 보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> getMySocialList(String email) {
-        User user = userRepository.findByEmail(email)
+    public List<SocialShortDTO> getMySocialList(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(()->new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         return socialRepository.findAll().stream()
@@ -185,8 +185,8 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 미리 보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> getJoinSocialList(String email) {
-        User user = userRepository.findByEmail(email)
+    public List<SocialShortDTO> getJoinSocialList(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         return socialRepository.findAll().stream()
@@ -200,8 +200,8 @@ public class SocialServiceImpl implements SocialService {
      * @return List<SocialShortDTO> : 카테고리로 필터링된 미리보기 형식의 리스트
      */
     @Override
-    public List<SocialShortDTO> filteringByCategory(String email, Long categoryId) {
-        List<SocialShortDTO> socialShortDTOList = getSocialList(email); //내 동에만 있는 리스트 추출
+    public List<SocialShortDTO> filteringByCategory(Long userId, Long categoryId) {
+        List<SocialShortDTO> socialShortDTOList = getSocialList(userId); //내 동에만 있는 리스트 추출
 
         return socialShortDTOList.stream()
                 .filter(socialShortDTO -> socialShortDTO.getCategory().getId().equals(categoryId))
