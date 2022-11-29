@@ -159,8 +159,6 @@ public class SocialServiceImpl implements SocialService {
         List<Social> socialList = socialRepository.findAll(); //social list 가져오기
         List<Like> likes = likesRepository.findByUserId(userId); //like list 가져오기
 
-        System.out.println(user.getRegionCodeFromDongCode());
-
         //social 리스트 dto 만들기
         List<SocialShortDTO> socialShortDTOS = socialList.stream()
                 .filter(social -> social.getRegionCode().equals(user.getRegionCodeFromDongCode()))
