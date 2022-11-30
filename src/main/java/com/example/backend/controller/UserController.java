@@ -77,7 +77,7 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "회원 탈퇴", description = "SNS 계정인 경우 errorCode -123가 반환됩니다.")
+    @Operation(summary = "회원 탈퇴", description = "카카오 계정인 경우 errorCode -123가 반환됩니다.")
     @DeleteMapping("/users/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -94,7 +94,7 @@ public class UserController {
         User findUser = userService.getUserById(id);
         UserType userType = findUser.getUserType();
         if(userType != UserType.DEFAULT){
-            throw new UserInvalidInputException(UserInvalidInputExceptionType.CANT_DELETE_SNS_USER);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.CANT_DELETE_KAKAO_USER);
         }
 
         userService.changeToWithdrawnUser(findUser);
