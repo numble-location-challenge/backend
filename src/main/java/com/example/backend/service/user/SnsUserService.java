@@ -19,6 +19,8 @@ public interface SnsUserService {
     @Transactional
     User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO);
 
+    void unlink(UserType userType, String accessToken);
+
     //Test
 //    TestKakaoToken requestToken(String code) throws IOException;
 }

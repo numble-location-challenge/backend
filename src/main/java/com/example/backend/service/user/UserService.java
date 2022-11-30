@@ -8,9 +8,11 @@ public interface UserService {
 
     User createDefaultUser(UserDefaultJoinRequestDTO userDTO); //회원가입
 
-    void changeToWithdrawnUser(Long userId); //회원 탈퇴
+    void changeToWithdrawnUser(User user); //회원 탈퇴
 
-    User getUser(Long userId); //내 프로필 조회
+    User getUserById(Long userId); //내 프로필 조회
+
+    User getUserBySnsId(Long snsId);
 
     User modify(Long userId, UserModifyRequestDTO userModifyRequestDTO);
 

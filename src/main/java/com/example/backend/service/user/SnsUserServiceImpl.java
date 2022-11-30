@@ -31,7 +31,9 @@ import org.springframework.web.client.RestTemplate;
 public class SnsUserServiceImpl implements SnsUserService {
 
     @Value("${sns.kakao.userInfoUri}")
-    private String KAKAO_URL;
+    private String KAKAO_INFO_URI;
+    @Value("${sns.kakao.unlinkUri")
+    private String KAKAO_UNLINK_URI;
 
     private final RestTemplate restTemplate;
     private final UserRepository userRepository;
@@ -44,10 +46,10 @@ public class SnsUserServiceImpl implements SnsUserService {
 
     @Override
     public SnsUserDTO getUserInfo(UserType userType, String accessToken) {
-        log.info(KAKAO_URL);
+        log.info(KAKAO_INFO_URI);
         String requestUrl = null;
         switch(userType){
-            case KAKAO: requestUrl = KAKAO_URL; break;
+            case KAKAO: requestUrl = KAKAO_INFO_URI; break;
             default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
         }
 
@@ -100,6 +102,25 @@ public class SnsUserServiceImpl implements SnsUserService {
             throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
         if(userRepository.existsBySnsIdAndUserType(snsId, userType))
             throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
+    }
+
+    @Override
+    public void unlink(UserType userType, String accessToken) {
+        String requestUrl = null;
+        switch(userType){
+            case KAKAO: requestUrl = KAKAO_UNLINK_URI; break;
+            default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
+        }
+
+        //헤더, 인코딩 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(headers);
+        //요청 보내기
+        ResponseEntity<String> result = restTemplate.exchange(requestUrl, HttpMethod.POST, httpEntity, String.class);
+        log.info(result.getBody());
     }
 
 }

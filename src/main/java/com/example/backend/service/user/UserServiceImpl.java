@@ -76,10 +76,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void changeToWithdrawnUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-
+    public void changeToWithdrawnUser(User user) {
         //DB 에서 삭제하지 않고 상태만 변경
         user.setWithdrawStatus();
         //연결된 소셜링 삭제(참여한 모임)
@@ -95,9 +92,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(Long userId) {
+    public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    }
+
+    @Override
+    public User getUserBySnsId(Long snsId) {
+        return userRepository.findBySnsId(snsId).orElse(null);
     }
 
     @Transactional
@@ -148,6 +150,5 @@ public class UserServiceImpl implements UserService {
         socilaingRepository.deleteByUserIdAndSocialId(droppedUserId, socialId);
         social.minusCurrentNums();//강퇴하고 참여인원-1
     }
-
 
 }

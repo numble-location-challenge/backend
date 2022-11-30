@@ -26,6 +26,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Tag(name = "user", description = "회원 API")
@@ -38,7 +39,6 @@ public class UserController {
     private final AuthTokenProvider authTokenProvider;
     private final ResponseUtils responseUtils;
 
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "회원가입",
             description = "unique field 중복 시 errorCode -101(이메일), -102(닉네임), -103(이메일,닉네임)이 반환됩니다.")
     @PostMapping("/users")
@@ -51,7 +51,6 @@ public class UserController {
         return ResponseUtils.getCreatedUserResponse(uriBuilder, createdUser.getId());
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "sns 회원가입", description = "카카오 userType=KAKAO, 이미 가입된 계정이라면 errorCode -122가 반환됩니다. 회원가입이 완료된 후 자동 로그인 처리됩니다.")
     @PostMapping("/users/{userType}")
     @ApiResponses({
@@ -82,11 +81,21 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteUser(
+            HttpSession session,
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long id){
 
         checkPathResource(user.getUserId(), id);
-        userService.changeToWithdrawnUser(id);
+
+        //TODO: sns 액세스 토큰 세션에 저장해둘 것
+        User findUser = userService.getUserById(id);
+        UserType userType = findUser.getUserType();
+        if(userType != UserType.DEFAULT){
+            snsUserService.unlink(userType, (String)session.getAttribute("sns_access_token"));
+            session.invalidate();
+        }
+
+        userService.changeToWithdrawnUser(findUser);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
 
@@ -124,7 +133,7 @@ public class UserController {
             @PathVariable Long id){
 
         checkPathResource(user.getUserId(), id);
-        final User findUser = userService.getUser(user.getUserId());
+        final User findUser = userService.getUserById(user.getUserId());
         UserProfileDTO userProfileDTO= new UserProfileDTO(findUser);
         return new ResponseDTO<>(userProfileDTO, "프로필 조회 결과");
     }
