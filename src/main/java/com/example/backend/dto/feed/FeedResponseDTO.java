@@ -42,7 +42,6 @@ public class FeedResponseDTO {
     @Schema(description = "피드와 연결된 소셜")
     private FeedSocialDTO social;
 
-
     public FeedResponseDTO(Feed feed) {
         this.postId = feed.getId();
         this.user = toUserDTO(feed.getUser());
