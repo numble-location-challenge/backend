@@ -5,10 +5,12 @@ import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.dto.login.SnsLoginRequestDTO;
 import com.example.backend.global.exception.*;
+import com.example.backend.global.exception.user.UserInvalidInputException;
+import com.example.backend.global.exception.user.UserInvalidInputExceptionType;
 import com.example.backend.global.security.AuthToken;
 import com.example.backend.global.security.AuthTokenProvider;
 import com.example.backend.repository.UserRepository;
-import com.example.backend.service.user.SnsUserService;
+import com.example.backend.service.user.SnsAPIService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +28,7 @@ public class LoginServiceImpl implements LoginService{
     private final AuthTokenProvider authTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final SnsUserService snsUserService;
+    private final SnsAPIService snsAPIService;
 
     @Override
     public User defaultLogin(DefaultLoginRequestDTO loginDTO) {
@@ -35,13 +37,13 @@ public class LoginServiceImpl implements LoginService{
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         if(passwordEncoder.matches(loginDTO.getPassword(), dbUser.getPassword())) return dbUser;
-        else throw new InvalidUserInputException(InvalidUserInputExceptionType.ACCOUNT_NOT_MATCH);
+        else throw new UserInvalidInputException(UserInvalidInputExceptionType.ACCOUNT_NOT_MATCH);
     }
     
     @Override
     public User snsLogin(UserType userType, SnsLoginRequestDTO loginDTO) {
         //AT로 사용자 정보(sns API의 id) 가져옴
-        Long snsId = snsUserService.getSnsId(userType, loginDTO.getAccessToken());
+        Long snsId = snsAPIService.getSnsId(userType, loginDTO.getAccessToken());
         log.info("sns API user id: {}",snsId.toString());
         //1. DB에 있는 회원이면 컨트롤러로 돌아가 인가처리
         //2. 기존회원이 아니면 회원가입 유도

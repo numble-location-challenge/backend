@@ -1,6 +1,6 @@
 package com.example.backend.global.security.jwt;
 
-import com.example.backend.dto.ErrorDTO;
+import com.example.backend.dto.response.ErrorDTO;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

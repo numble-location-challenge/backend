@@ -18,8 +18,6 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-application-jwt.properties
-
 .idea
 *.iws
 *.iml
@@ -27,6 +25,14 @@ application-jwt.properties
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
+# ignore properties
+application-jwt.properties
+application-local.properties
+application-sns.properties
+
+# ignore TestCode
+testCode/
 
 ### NetBeans ###
 /nbproject/private/

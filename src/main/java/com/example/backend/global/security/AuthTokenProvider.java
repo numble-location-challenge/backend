@@ -3,13 +3,14 @@ package com.example.backend.global.security;
 import com.example.backend.domain.User;
 import com.example.backend.global.exception.UnAuthorizedException;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
+import com.example.backend.global.security.jwt.JwtConfig;
 import com.example.backend.global.security.jwt.JwtType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 
@@ -21,11 +22,8 @@ import java.util.Date;
 @Slf4j
 public class AuthTokenProvider {
 
-    @Value("${jwt.access.expiration}")
-    private Long ACCESS_EXP;
-
-    @Value("${jwt.refresh.expiration}")
-    private Long REFRESH_EXP;
+    @Autowired
+    private JwtConfig jwtConfig;
 
     private Key key;
 
@@ -44,7 +42,7 @@ public class AuthTokenProvider {
     public AuthToken issueAccessToken(User user) {
         String subject = getTokenSubjectStr(user, JwtType.ACCESS);
         Date expiryDate = Date.from(
-                Instant.now().plusSeconds(ACCESS_EXP));
+                Instant.now().plusSeconds(jwtConfig.getAccessExpiry()));
 
         AuthToken authToken = createAuthToken(subject, expiryDate);
         log.info("issueAccessToken.AuthToken.getToken(): {} ", authToken.getToken());
@@ -54,7 +52,7 @@ public class AuthTokenProvider {
     public AuthToken issueRefreshToken(User user) {
         String subject = getTokenSubjectStr(user, JwtType.REFRESH);
         Date expiryDate = Date.from(
-                Instant.now().plusSeconds(REFRESH_EXP));
+                Instant.now().plusSeconds(jwtConfig.getRefreshExpiry()));
 
         AuthToken authToken = createAuthToken(subject, expiryDate);
         log.info("issueRefreshToken.AuthToken.getToken(): {} ", authToken.getToken());

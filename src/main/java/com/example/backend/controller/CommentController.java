@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.domain.Comment;
-import com.example.backend.dto.ResponseDTO;
+import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.dto.comment.CommentRequestDTO;
 import com.example.backend.dto.comment.CommentResponseDTO;
 import com.example.backend.dto.comment.MyCommentResponseDTO;

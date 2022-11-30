@@ -1,13 +1,11 @@
 package com.example.backend.controller;
 
 import com.example.backend.domain.post.Social;
-import com.example.backend.dto.ResponseDTO;
+import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.dto.social.SocialCreateRequestDTO;
 import com.example.backend.dto.social.SocialLongDTO;
 import com.example.backend.dto.social.SocialModifyRequestDTO;
 import com.example.backend.dto.social.SocialShortDTO;
-import com.example.backend.global.exception.social.SocialInvalidInputException;
-import com.example.backend.global.exception.social.SocialInvalidInputExceptionType;
 import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.service.social.SocialService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,12 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.websocket.server.PathParam;
 import java.net.URI;
-import java.util.LinkedList;
 import java.util.List;
 
 @Tag(name = "social", description = "모임 게시글 API")

@@ -4,12 +4,17 @@ import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
+import com.example.backend.domain.enumType.UserType;
 import com.example.backend.domain.post.Social;
+import com.example.backend.dto.login.SnsJoinRequestDTO;
+import com.example.backend.dto.user.SnsUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
 import com.example.backend.global.exception.social.SocialInvalidInputException;
 import com.example.backend.global.exception.social.SocialInvalidInputExceptionType;
+import com.example.backend.global.exception.user.UserInvalidInputException;
+import com.example.backend.global.exception.user.UserInvalidInputExceptionType;
 import com.example.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final SocialRepository socialRepository;
     private final SocialingRepository socilaingRepository;
     private final CommentRepository commentRepository;
+    private final SnsAPIService snsAPIService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -42,6 +48,34 @@ public class UserServiceImpl implements UserService {
         user.encodePassword(passwordEncoder);
         user.setDefaultUser();
         return userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO) {
+        //사용자 정보 API에서 받아옴
+        SnsUserDTO userDTO = snsAPIService.getUserInfo(userType, joinDTO.getAccessToken());
+        validateSnsUserDuplicate(userDTO.getEmail(), userDTO.getSnsId(), userType);
+        //중복X -> region 세팅 및 회원가입 처리
+        User user = userDTO.toEntity(
+                userType, joinDTO.getUsername(), joinDTO.getPhoneNumber(),
+                joinDTO.getDongCode(), joinDTO.getDongName());
+
+        switch(userType){
+            case KAKAO: user.setKakaoUser(userDTO.getSnsId()); break;//sns 유저 세팅
+            default: throw new UserInvalidInputException(UserInvalidInputExceptionType.INVALID_USERTYPE);
+        }
+        return userRepository.save(user);
+    }
+
+    private void validateSnsUserDuplicate(String email, Long snsId, UserType userType){
+        //sns 유저 중복 검증
+        // email이 unique이기 때문에 이메일 부터 검증하고,
+        // snsId와 userType 으로는 똑같은 sns계정이 있는지도 체크
+        if(userRepository.existsByEmail(email))
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXISTS_SNS_USER);
+        if(userRepository.existsBySnsIdAndUserType(snsId, userType))
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXISTS_SNS_USER);
     }
 
     @Transactional
@@ -64,22 +98,19 @@ public class UserServiceImpl implements UserService {
     //중복 검증
     private void validateDuplicate(String email, String nickName) {
         if(userRepository.existsByEmailAndNickname(email, nickName)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXIST_EMAIL_AND_NICKNAME);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXIST_EMAIL_AND_NICKNAME);
         }
         else if(userRepository.existsByEmail(email)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_EMAIL);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXISTS_EMAIL);
         }
         else if(userRepository.existsByNickname(nickName)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_NICKNAME);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXISTS_NICKNAME);
         }
     }
 
     @Transactional
     @Override
-    public void changeToWithdrawnUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-
+    public void changeToWithdrawnUser(User user) {
         //DB 에서 삭제하지 않고 상태만 변경
         user.setWithdrawStatus();
         //연결된 소셜링 삭제(참여한 모임)
@@ -87,7 +118,7 @@ public class UserServiceImpl implements UserService {
         //내가 모임장인 소셜 삭제
         socialRepository.deleteAllByUserId(user.getId());
 
-        //작성한 댓글 deleted true로 변경 TODO: test 필요
+        //작성한 댓글 deleted true로 변경
         List<Comment> commentList = commentRepository.findAllByUserId(user.getId());
         if(commentList != null){
             commentList.forEach(Comment::setDeleted);
@@ -95,9 +126,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(Long userId) {
+    public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    }
+
+    @Override
+    public User getUserBySnsId(Long snsId) {
+        return userRepository.findBySnsId(snsId).orElse(null);
     }
 
     @Transactional
@@ -148,6 +184,5 @@ public class UserServiceImpl implements UserService {
         socilaingRepository.deleteByUserIdAndSocialId(droppedUserId, socialId);
         social.minusCurrentNums();//강퇴하고 참여인원-1
     }
-
 
 }

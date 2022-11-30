@@ -1,7 +1,7 @@
 package com.example.backend.global.security.jwt;
 
 import com.example.backend.domain.User;
-import com.example.backend.dto.ResponseDTO;
+import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.global.exception.EntityNotExistsException;
 import com.example.backend.global.exception.EntityNotExistsExceptionType;
 import com.example.backend.global.security.CustomUserDetails;

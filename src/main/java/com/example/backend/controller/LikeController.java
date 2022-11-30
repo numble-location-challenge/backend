@@ -1,8 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.domain.Like;
 import com.example.backend.dto.LikesDTO;
-import com.example.backend.dto.ResponseDTO;
+import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.service.LikeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Tag(name = "Like", description = "게시글 좋아요 API")
 @RestController

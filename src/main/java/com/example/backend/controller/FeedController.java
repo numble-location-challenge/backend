@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.domain.post.Feed;
-import com.example.backend.dto.ResponseDTO;
+import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.dto.feed.FeedHotPreviewDTO;
 import com.example.backend.dto.feed.FeedListResponseDTO;
 import com.example.backend.dto.feed.FeedPagingDTO;
