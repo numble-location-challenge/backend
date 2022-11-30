@@ -69,7 +69,7 @@ public abstract class Post extends TimeAuditingEntity {
         this.likes = likes;
     }
 
-    public void updateLikeCnt(int cnt){
-        this.likes = cnt;
+    public void updateLikes(int likes){
+        this.likes = likes;
     }
 }
