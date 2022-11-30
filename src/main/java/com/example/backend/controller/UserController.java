@@ -93,7 +93,7 @@ public class UserController {
         
         User findUser = userService.getUserById(id);
         UserType userType = findUser.getUserType();
-        if(userType != UserType.DEFAULT){
+        if(userType == UserType.KAKAO){
             throw new UserInvalidInputException(UserInvalidInputExceptionType.CANT_DELETE_KAKAO_USER);
         }
 
