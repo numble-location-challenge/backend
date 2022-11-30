@@ -3,10 +3,13 @@ package com.example.backend.service.user;
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
+import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
+import com.example.backend.global.exception.social.SocialInvalidInputException;
+import com.example.backend.global.exception.social.SocialInvalidInputExceptionType;
 import com.example.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +58,7 @@ public class UserServiceImpl implements UserService {
         if(userDTO.getDongCode() != null && userDTO.getDongName() != null){
             user.updateRegion(userDTO.getDongCode(), userDTO.getDongName());
         }
-        //TODO 만약 region 수정 가능하면 모임장인 social의 region도 수정되어야함(피드는 두는게 나은듯)
+
         return user;
     }
 
@@ -101,7 +104,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void participateSocial(Long userId, Long socialId) {
-        //이미 신청된 유저면 신청안되게 하는건 프론트에서 거르는 거겠지..?
+        //엔티티 조회
         User findUser = userRepository.findReadOnlyById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
@@ -109,12 +112,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
 
         //모임이 꽉찬 상태면 x
-//        if(findSocial.getStatus() != SocialStatus.AVAILABLE) throw new ex
+        if(findSocial.getStatus() == SocialStatus.FULL) throw new SocialInvalidInputException(SocialInvalidInputExceptionType.FULL_STATUS);
         //중복 신청이면 x
+        if(findSocial.getUser().getId().equals(findUser.getId())) throw new SocialInvalidInputException(SocialInvalidInputExceptionType.ALREADY_APPLIED);
 
+        //모임 신청 처리
         Socialing socialing = Socialing.createSocialing(findUser);
         findSocial.addSocialing(socialing);
-
         socilaingRepository.save(socialing);
     }
 
