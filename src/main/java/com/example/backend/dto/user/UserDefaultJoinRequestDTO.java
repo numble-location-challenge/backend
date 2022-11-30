@@ -45,7 +45,7 @@ public class UserDefaultJoinRequestDTO {
     private Long dongCode;
 
     @Schema(description = "행정구역명", defaultValue = "서울특별시 종로구 효자동")
-    @NotNull
+    @NotBlank
     private String dongName;
 
     public User toEntity(){

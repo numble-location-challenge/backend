@@ -3,7 +3,6 @@ package com.example.backend.controller;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.AuthDTO;
-import com.example.backend.dto.login.SnsLoginRequestDTO;
 import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.global.exception.user.UserInvalidInputException;
@@ -64,13 +63,13 @@ public class LoginController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseEntity<?> snsLogin(
-            @PathVariable("userType") String userTypeStr,
-            @RequestBody @Valid final SnsLoginRequestDTO authRequestDTO){
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable("userType") String userTypeStr){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
         if(!userType.equals(UserType.KAKAO)) throw new UserInvalidInputException(UserInvalidInputExceptionType.INVALID_USERTYPE);
 
-        final User loginUser = loginService.snsLogin(userType, authRequestDTO);
+        final User loginUser = loginService.snsLogin(userType, accessToken);
         AuthToken AT = authTokenProvider.issueAccessToken(loginUser);
         AuthToken RT = authTokenProvider.issueRefreshToken(loginUser);
         loginService.updateRefresh(loginUser, RT);

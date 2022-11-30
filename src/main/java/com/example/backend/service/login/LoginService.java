@@ -10,7 +10,7 @@ public interface LoginService {
 
     User defaultLogin(DefaultLoginRequestDTO loginDTO);
 
-    User snsLogin(UserType userType, SnsLoginRequestDTO authRequestDTO);
+    User snsLogin(UserType userType, String accessToken);
 
     AuthToken refresh(Long userId, AuthToken refreshToken);
 

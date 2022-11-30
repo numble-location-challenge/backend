@@ -10,7 +10,7 @@ public interface UserService {
 
     User createDefaultUser(UserDefaultJoinRequestDTO userDTO); //회원가입
 
-    User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO);
+    User createSnsUser(UserType userType, String accessToken, SnsJoinRequestDTO joinDTO);
 
     void changeToWithdrawnUser(User user); //회원 탈퇴
 

@@ -4,7 +4,6 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.response.ResponseDTO;
-import com.example.backend.dto.user.SnsDeleteUserRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
@@ -44,7 +43,7 @@ public class UserController {
     private final CookieProvider cookieProvider;
 
     @Operation(summary = "회원가입",
-            description = "unique field 중복 시 errorCode -101(이메일), -102(닉네임), -103(이메일,닉네임)이 반환됩니다.")
+            description = "unique field 중복 시 errorCode -101(이메일), -102(닉네임), -103(이메일,닉네임)이 반환됩니다. bio만 null availabe 합니다.")
     @PostMapping("/users")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED"),
@@ -63,12 +62,13 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseEntity<?> snsJoin(
+            @RequestHeader("Authorization") String accessToken,
             @PathVariable("userType") String userTypeStr,
             @RequestBody @Valid final SnsJoinRequestDTO joinDTO){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
 
-        final User createdUser = userService.createSnsUser(userType, joinDTO);
+        final User createdUser = userService.createSnsUser(userType, accessToken, joinDTO);
         //회원가입 성공시 SNS 유저는 로그인에 성공한다
         AuthToken AT = authTokenProvider.issueAccessToken(createdUser);
         AuthToken RT = authTokenProvider.issueRefreshToken(createdUser);
@@ -77,7 +77,7 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "회원 탈퇴", description = "SNS 계정인 경우 errorCode -123가 반환됩니다.")
+    @Operation(summary = "회원 탈퇴", description = "카카오 계정인 경우 errorCode -123가 반환됩니다.")
     @DeleteMapping("/users/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -94,7 +94,7 @@ public class UserController {
         User findUser = userService.getUserById(id);
         UserType userType = findUser.getUserType();
         if(userType != UserType.DEFAULT){
-            throw new UserInvalidInputException(UserInvalidInputExceptionType.CANT_DELETE_SNS_USER);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.CANT_DELETE_KAKAO_USER);
         }
 
         userService.changeToWithdrawnUser(findUser);
@@ -111,12 +111,12 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteSnsUser(
+            @RequestHeader("Authorization") String accessToken,
             @PathVariable(value = "userType") String userTypeStr,
-            @RequestBody SnsDeleteUserRequestDTO snsRequestDTO,
             @AuthenticationPrincipal CustomUserDetails user){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
-        Long disConnectedId = snsAPIService.unlink(userType, snsRequestDTO.getAccessToken());
+        Long disConnectedId = snsAPIService.unlink(userType, accessToken);
         User findUser = userService.getUserBySnsId(disConnectedId);
         userService.changeToWithdrawnUser(findUser);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
