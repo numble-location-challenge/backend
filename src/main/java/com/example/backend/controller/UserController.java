@@ -89,8 +89,7 @@ public class UserController {
             @PathVariable Long id){
 
         checkPathResource(user.getUserId(), id);
-
-        //TODO: sns 액세스 토큰 세션에 저장해둘 것
+        
         User findUser = userService.getUserById(id);
         UserType userType = findUser.getUserType();
         if(userType != UserType.DEFAULT){

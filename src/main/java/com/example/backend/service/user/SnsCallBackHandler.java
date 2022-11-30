@@ -1,7 +1,6 @@
 package com.example.backend.service.user;
 
 import com.example.backend.domain.User;
-import com.example.backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

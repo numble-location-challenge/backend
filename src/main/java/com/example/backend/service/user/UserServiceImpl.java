@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
         //내가 모임장인 소셜 삭제
         socialRepository.deleteAllByUserId(user.getId());
 
-        //작성한 댓글 deleted true로 변경 TODO: test 필요
+        //작성한 댓글 deleted true로 변경
         List<Comment> commentList = commentRepository.findAllByUserId(user.getId());
         if(commentList != null){
             commentList.forEach(Comment::setDeleted);
