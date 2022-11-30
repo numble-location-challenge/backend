@@ -14,9 +14,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Schema
 public class SnsJoinRequestDTO {
-    @Schema(description = "정보를 조회할 SNS API의 액세스 토큰")
-    @NotNull
-    String accessToken;
 
     @Schema(description = "이름", defaultValue = "송유진")
     @NotBlank

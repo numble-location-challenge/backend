@@ -4,7 +4,6 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.response.ResponseDTO;
-import com.example.backend.dto.user.SnsDeleteUserRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
@@ -63,12 +62,13 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseEntity<?> snsJoin(
+            @RequestHeader("Authorization") String accessToken,
             @PathVariable("userType") String userTypeStr,
             @RequestBody @Valid final SnsJoinRequestDTO joinDTO){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
 
-        final User createdUser = userService.createSnsUser(userType, joinDTO);
+        final User createdUser = userService.createSnsUser(userType, accessToken, joinDTO);
         //회원가입 성공시 SNS 유저는 로그인에 성공한다
         AuthToken AT = authTokenProvider.issueAccessToken(createdUser);
         AuthToken RT = authTokenProvider.issueRefreshToken(createdUser);
@@ -111,12 +111,12 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteSnsUser(
+            @RequestHeader("Authorization") String accessToken,
             @PathVariable(value = "userType") String userTypeStr,
-            @RequestBody SnsDeleteUserRequestDTO snsRequestDTO,
             @AuthenticationPrincipal CustomUserDetails user){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
-        Long disConnectedId = snsAPIService.unlink(userType, snsRequestDTO.getAccessToken());
+        Long disConnectedId = snsAPIService.unlink(userType, accessToken);
         User findUser = userService.getUserBySnsId(disConnectedId);
         userService.changeToWithdrawnUser(findUser);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");

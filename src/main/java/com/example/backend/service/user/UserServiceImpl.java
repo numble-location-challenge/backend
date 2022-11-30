@@ -52,9 +52,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO) {
+    public User createSnsUser(UserType userType, String accessToken, SnsJoinRequestDTO joinDTO) {
         //사용자 정보 API에서 받아옴
-        SnsUserDTO userDTO = snsAPIService.getUserInfo(userType, joinDTO.getAccessToken());
+        SnsUserDTO userDTO = snsAPIService.getUserInfo(userType, accessToken);
         validateSnsUserDuplicate(userDTO.getEmail(), userDTO.getSnsId(), userType);
         //중복X -> region 세팅 및 회원가입 처리
         User user = userDTO.toEntity(
