@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Entity
 @Table(name = "USERS", uniqueConstraints =
-        {@UniqueConstraint(name = "EMAIL_NICKNAME_UNIQUE", columnNames = {"email","nickname", "sns_id"})})
+        {@UniqueConstraint(name = "EMAIL_NICKNAME_UNIQUE", columnNames = {"email","nickname"})})
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
