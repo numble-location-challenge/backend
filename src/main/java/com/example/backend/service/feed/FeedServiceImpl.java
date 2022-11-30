@@ -18,6 +18,7 @@ import com.example.backend.domain.post.Social;
 import com.example.backend.dto.PostImageDTO;
 import com.example.backend.dto.feed.FeedRequestDTO;
 import com.example.backend.dto.feed.FeedSearch;
+import com.example.backend.dto.feed.FeedUpdateRequestDTO;
 import com.example.backend.global.exception.EntityNotExistsException;
 import com.example.backend.global.exception.EntityNotExistsExceptionType;
 import com.example.backend.global.exception.ForbiddenException;
@@ -136,24 +137,24 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     @Transactional
-    public Feed updateFeed(Long postId, FeedRequestDTO feedRequestDTO, Long userId) {
+    public Feed updateFeed(Long postId, FeedUpdateRequestDTO feedUpdateRequestDTO, Long userId) {
         Feed feed = feedRepository.findById(postId)
             .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_FEED));
         if (hasPermission(feed, userId)) {
             Social social = null;
-            if (feedRequestDTO.getSocialId() != null) {
-                social = socialRepository.findById(feedRequestDTO.getSocialId())
+            if (feedUpdateRequestDTO.getSocialId() != null) {
+                social = socialRepository.findById(feedUpdateRequestDTO.getSocialId())
                     .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
             }
             List<PostImage> postImages = null;
-            if (!feedRequestDTO.getImages().isEmpty()) {
+            if (!feedUpdateRequestDTO.getImages().isEmpty()) {
                 postImageRepository.deleteAllByPostId(feed.getId());
                 postImages = new ArrayList<>();
-                for (PostImageDTO imageDTO : feedRequestDTO.getImages()) {
+                for (PostImageDTO imageDTO : feedUpdateRequestDTO.getImages()) {
                     postImages.add(new PostImage(imageDTO.getImagePath()));
                 }
             }
-            feed.updateFeed(feedRequestDTO.getContents(), social, postImages, feedRequestDTO.getRegion());
+            feed.updateFeed(feedUpdateRequestDTO.getContents(), social, postImages);
         } else {
             throw new ForbiddenException(ForbiddenExceptionType.NOT_AUTHORITY_UPDATE_FEED);
         }
@@ -161,7 +162,7 @@ public class FeedServiceImpl implements FeedService {
     }
 
     private boolean hasPermission(Feed feed, Long userId) {
-        if (feed.getUser().getId() == userId) {
+        if (feed.getUser().getId().equals(userId)) {
             return true;
         }
         return false;
