@@ -4,7 +4,10 @@ import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
+import com.example.backend.domain.enumType.UserType;
 import com.example.backend.domain.post.Social;
+import com.example.backend.dto.login.SnsJoinRequestDTO;
+import com.example.backend.dto.user.SnsUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
@@ -29,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final SocialRepository socialRepository;
     private final SocialingRepository socilaingRepository;
     private final CommentRepository commentRepository;
+    private final SnsAPIService snsAPIService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -42,6 +46,34 @@ public class UserServiceImpl implements UserService {
         user.encodePassword(passwordEncoder);
         user.setDefaultUser();
         return userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO) {
+        //사용자 정보 API에서 받아옴
+        SnsUserDTO userDTO = snsAPIService.getUserInfo(userType, joinDTO.getAccessToken());
+        validateSnsUserDuplicate(userDTO.getEmail(), userDTO.getSnsId(), userType);
+        //중복X -> region 세팅 및 회원가입 처리
+        User user = userDTO.toEntity(
+                userType, joinDTO.getUsername(), joinDTO.getPhoneNumber(),
+                joinDTO.getDongCode(), joinDTO.getDongName());
+
+        switch(userType){
+            case KAKAO: user.setKakaoUser(userDTO.getSnsId()); break;//sns 유저 세팅
+            default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
+        }
+        return userRepository.save(user);
+    }
+
+    private void validateSnsUserDuplicate(String email, Long snsId, UserType userType){
+        //sns 유저 중복 검증
+        // email이 unique이기 때문에 이메일 부터 검증하고,
+        // snsId와 userType 으로는 똑같은 sns계정이 있는지도 체크
+        if(userRepository.existsByEmail(email))
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
+        if(userRepository.existsBySnsIdAndUserType(snsId, userType))
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
     }
 
     @Transactional

@@ -1,12 +1,9 @@
 package com.example.backend.service.user;
 
-import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
-import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.user.SnsUserDTO;
 import com.example.backend.global.exception.InvalidUserInputException;
 import com.example.backend.global.exception.InvalidUserInputExceptionType;
-import com.example.backend.repository.UserRepository;
 import com.example.backend.service.user.userInfo.KakaoUserInfo;
 import com.example.backend.service.user.userInfo.UserInfo;
 import com.example.backend.service.user.userInfo.UserInfoFactory;
@@ -19,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -36,7 +32,6 @@ public class SnsAPIServiceImpl implements SnsAPIService {
     private String KAKAO_UNLINK_URI;
 
     private final RestTemplate restTemplate;
-    private final UserRepository userRepository;
 
     @Override
     public Long getSnsId(UserType userType, String accessToken) {
@@ -74,34 +69,6 @@ public class SnsAPIServiceImpl implements SnsAPIService {
         }
 
         return UserInfoFactory.getUserDTOFromUserInfo(userType, userInfo);
-    }
-
-    @Transactional
-    @Override
-    public User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO) {
-        //사용자 정보 API에서 받아옴
-        SnsUserDTO userDTO = getUserInfo(userType, joinDTO.getAccessToken());
-        validateSnsUserDuplicate(userDTO.getEmail(), userDTO.getSnsId(), userType);
-        //중복X -> region 세팅 및 회원가입 처리
-        User user = userDTO.toEntity(
-                userType, joinDTO.getUsername(), joinDTO.getPhoneNumber(),
-                joinDTO.getDongCode(), joinDTO.getDongName());
-
-        switch(userType){
-            case KAKAO: user.setKakaoUser(userDTO.getSnsId()); break;//sns 유저 세팅
-            default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
-        }
-        return userRepository.save(user);
-    }
-
-    private void validateSnsUserDuplicate(String email, Long snsId, UserType userType){
-        //sns 유저 중복 검증
-        // email이 unique이기 때문에 이메일 부터 검증하고,
-        // snsId와 userType 으로는 똑같은 sns계정이 있는지도 체크
-        if(userRepository.existsByEmail(email))
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
-        if(userRepository.existsBySnsIdAndUserType(snsId, userType))
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
     }
 
     @Override

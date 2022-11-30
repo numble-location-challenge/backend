@@ -66,7 +66,7 @@ public class UserController {
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
 
-        final User createdUser = snsAPIService.createSnsUser(userType, joinDTO);
+        final User createdUser = userService.createSnsUser(userType, joinDTO);
         //회원가입 성공시 SNS 유저는 로그인에 성공한다
         AuthToken AT = authTokenProvider.issueAccessToken(createdUser);
         AuthToken RT = authTokenProvider.issueRefreshToken(createdUser);
