@@ -1,9 +1,7 @@
 package com.example.backend.dto.feed;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import com.example.backend.domain.Comment;
 import com.example.backend.domain.post.Feed;
 import com.example.backend.dto.PostImageDTO;
 import com.example.backend.dto.comment.CommentPreviewDTO;
@@ -50,21 +48,12 @@ public class FeedListResponseDTO {
         if (feed.getSocial() != null) {
             this.social = FeedSocialDTO.toFeedSocialDTO(feed.getSocial());
         }
-        this.comment = findCommentPreview(feed.getComments());
+        this.comment = CommentPreviewDTO.findCommentPreview(feed.getComments());
         this.regions = feed.getRegionCode();
         this.regionName = feed.getDongName();
         this.isLiked = feed.isLiked();
         this.createTime = feed.getCreateDate();
         this.likes = feed.getLikes();
         this.comments_cnt = feed.getCommentCount();
-    }
-
-    private CommentPreviewDTO findCommentPreview(List<Comment> comments){
-            for (int i = comments.size()-1; i >= 0; i--) {
-                if (!comments.get(i).getDeleted() && comments.get(i).getParentNum() == 0L) {
-                    return CommentPreviewDTO.createCommentPreviewDTO(comments.get(i));
-                }
-            }
-        return null;
     }
 }
