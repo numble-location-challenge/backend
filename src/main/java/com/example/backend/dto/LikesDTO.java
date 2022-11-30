@@ -22,11 +22,18 @@ public class LikesDTO {
     @Schema(description = "좋아요 누른 게시글 아이디")
     private Long post; //좋아요 단 글
 
+    @Schema(description = "좋아요 선택/해제 여부")
+    private boolean orElse = false;
+
     @Builder
     public LikesDTO(Like like){
         this.id = like.getId();
         this.user = like.getUser().getId();
         this.post = like.getPost().getId();
+    }
+
+    public void updateOrElse(boolean orElse){
+        this.orElse = orElse;
     }
 
 }
