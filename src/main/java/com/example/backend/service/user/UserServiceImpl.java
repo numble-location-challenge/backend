@@ -13,6 +13,8 @@ import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
 import com.example.backend.global.exception.social.SocialInvalidInputException;
 import com.example.backend.global.exception.social.SocialInvalidInputExceptionType;
+import com.example.backend.global.exception.user.UserInvalidInputException;
+import com.example.backend.global.exception.user.UserInvalidInputExceptionType;
 import com.example.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
         switch(userType){
             case KAKAO: user.setKakaoUser(userDTO.getSnsId()); break;//sns 유저 세팅
-            default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
+            default: throw new UserInvalidInputException(UserInvalidInputExceptionType.INVALID_USERTYPE);
         }
         return userRepository.save(user);
     }
@@ -71,9 +73,9 @@ public class UserServiceImpl implements UserService {
         // email이 unique이기 때문에 이메일 부터 검증하고,
         // snsId와 userType 으로는 똑같은 sns계정이 있는지도 체크
         if(userRepository.existsByEmail(email))
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXISTS_SNS_USER);
         if(userRepository.existsBySnsIdAndUserType(snsId, userType))
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXISTS_SNS_USER);
     }
 
     @Transactional
@@ -96,13 +98,13 @@ public class UserServiceImpl implements UserService {
     //중복 검증
     private void validateDuplicate(String email, String nickName) {
         if(userRepository.existsByEmailAndNickname(email, nickName)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXIST_EMAIL_AND_NICKNAME);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXIST_EMAIL_AND_NICKNAME);
         }
         else if(userRepository.existsByEmail(email)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_EMAIL);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXISTS_EMAIL);
         }
         else if(userRepository.existsByNickname(nickName)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_NICKNAME);
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.ALREADY_EXISTS_NICKNAME);
         }
     }
 

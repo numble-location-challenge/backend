@@ -6,8 +6,8 @@ import com.example.backend.dto.login.AuthDTO;
 import com.example.backend.dto.login.SnsLoginRequestDTO;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
-import com.example.backend.global.exception.InvalidUserInputException;
-import com.example.backend.global.exception.InvalidUserInputExceptionType;
+import com.example.backend.global.exception.user.UserInvalidInputException;
+import com.example.backend.global.exception.user.UserInvalidInputExceptionType;
 import com.example.backend.global.exception.UnAuthorizedException;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import com.example.backend.global.security.AuthToken;
@@ -68,7 +68,7 @@ public class LoginController {
             @RequestBody @Valid final SnsLoginRequestDTO authRequestDTO){
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
-        if(!userType.equals(UserType.KAKAO)) throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
+        if(!userType.equals(UserType.KAKAO)) throw new UserInvalidInputException(UserInvalidInputExceptionType.INVALID_USERTYPE);
 
         final User loginUser = loginService.snsLogin(userType, authRequestDTO);
         AuthToken AT = authTokenProvider.issueAccessToken(loginUser);

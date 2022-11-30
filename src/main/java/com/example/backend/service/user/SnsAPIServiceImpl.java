@@ -2,8 +2,8 @@ package com.example.backend.service.user;
 
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.user.SnsUserDTO;
-import com.example.backend.global.exception.InvalidUserInputException;
-import com.example.backend.global.exception.InvalidUserInputExceptionType;
+import com.example.backend.global.exception.user.UserInvalidInputException;
+import com.example.backend.global.exception.user.UserInvalidInputExceptionType;
 import com.example.backend.service.user.userInfo.KakaoUserInfo;
 import com.example.backend.service.user.userInfo.UserInfo;
 import com.example.backend.service.user.userInfo.UserInfoFactory;
@@ -45,7 +45,7 @@ public class SnsAPIServiceImpl implements SnsAPIService {
         String requestUrl = null;
         switch(userType){
             case KAKAO: requestUrl = KAKAO_INFO_URI; break;
-            default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
+            default: throw new UserInvalidInputException(UserInvalidInputExceptionType.INVALID_USERTYPE);
         }
 
         //헤더, 인코딩 설정
@@ -76,7 +76,7 @@ public class SnsAPIServiceImpl implements SnsAPIService {
         String requestUrl = null;
         switch(userType){
             case KAKAO: requestUrl = KAKAO_UNLINK_URI; break;
-            default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
+            default: throw new UserInvalidInputException(UserInvalidInputExceptionType.INVALID_USERTYPE);
         }
 
         //헤더, 인코딩 설정

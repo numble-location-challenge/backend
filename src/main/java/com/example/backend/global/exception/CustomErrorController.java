@@ -6,6 +6,7 @@ import com.example.backend.global.exception.comment.CommentInvalidInputException
 import com.example.backend.global.exception.feed.FeedInvalidInputException;
 import com.example.backend.global.exception.social.SocialInvalidInputException;
 
+import com.example.backend.global.exception.user.UserInvalidInputException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
@@ -33,13 +34,13 @@ public class CustomErrorController implements ErrorController {
         sb.append("validation 에러 입니다.");
 
         return ErrorDTO.builder()
-                .errorCode(-1) //validation errorCode?
+                .errorCode(-1)
                 .errorMessage(sb.toString())
                 .build();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST) //400
-    @ExceptionHandler(value = {InvalidUserInputException.class, CommentInvalidInputException.class,
+    @ExceptionHandler(value = {UserInvalidInputException.class, CommentInvalidInputException.class,
             SocialInvalidInputException.class, FeedInvalidInputException.class})
     public ErrorDTO handleBadRequest(CustomException ex){
         return ErrorDTO.builder()

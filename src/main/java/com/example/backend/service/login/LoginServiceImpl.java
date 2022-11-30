@@ -5,6 +5,8 @@ import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.dto.login.SnsLoginRequestDTO;
 import com.example.backend.global.exception.*;
+import com.example.backend.global.exception.user.UserInvalidInputException;
+import com.example.backend.global.exception.user.UserInvalidInputExceptionType;
 import com.example.backend.global.security.AuthToken;
 import com.example.backend.global.security.AuthTokenProvider;
 import com.example.backend.repository.UserRepository;
@@ -35,7 +37,7 @@ public class LoginServiceImpl implements LoginService{
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
         if(passwordEncoder.matches(loginDTO.getPassword(), dbUser.getPassword())) return dbUser;
-        else throw new InvalidUserInputException(InvalidUserInputExceptionType.ACCOUNT_NOT_MATCH);
+        else throw new UserInvalidInputException(UserInvalidInputExceptionType.ACCOUNT_NOT_MATCH);
     }
     
     @Override
