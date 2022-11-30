@@ -80,6 +80,6 @@ public class Feed extends Post {
     }
 
     public boolean isLiked() {
-        return liked;
+        return this.liked;
     }
 }
