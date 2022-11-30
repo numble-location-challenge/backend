@@ -4,7 +4,7 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.AuthDTO;
 import com.example.backend.dto.login.SnsLoginRequestDTO;
-import com.example.backend.dto.ResponseDTO;
+import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
 import com.example.backend.global.exception.user.UserInvalidInputException;
 import com.example.backend.global.exception.user.UserInvalidInputExceptionType;

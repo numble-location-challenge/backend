@@ -1,6 +1,6 @@
 package com.example.backend.global.exception;
 
-import com.example.backend.dto.ErrorDTO;
+import com.example.backend.dto.response.ErrorDTO;
 import com.example.backend.global.exception.base.CustomException;
 import com.example.backend.global.exception.comment.CommentInvalidInputException;
 import com.example.backend.global.exception.feed.FeedInvalidInputException;
