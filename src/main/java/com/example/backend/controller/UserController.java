@@ -43,7 +43,7 @@ public class UserController {
     private final CookieProvider cookieProvider;
 
     @Operation(summary = "회원가입",
-            description = "unique field 중복 시 errorCode -101(이메일), -102(닉네임), -103(이메일,닉네임)이 반환됩니다.")
+            description = "unique field 중복 시 errorCode -101(이메일), -102(닉네임), -103(이메일,닉네임)이 반환됩니다. bio만 null availabe 합니다.")
     @PostMapping("/users")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED"),

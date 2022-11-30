@@ -1,10 +1,10 @@
 package com.example.backend.service.user;
 
-//import com.example.backend.controller.TestKakaoToken;
+import com.example.backend.controller.testCode.TestKakaoToken;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.user.SnsUserDTO;
 
-//import java.io.IOException;
+import java.io.IOException;
 
 
 public interface SnsAPIService {
@@ -16,5 +16,5 @@ public interface SnsAPIService {
     Long unlink(UserType userType, String accessToken);
 
     //Test
-//    TestKakaoToken requestToken(String code) throws IOException;
+    TestKakaoToken requestToken(String code) throws IOException;
 }
