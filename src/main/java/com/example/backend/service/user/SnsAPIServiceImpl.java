@@ -2,6 +2,8 @@ package com.example.backend.service.user;
 
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.user.SnsUserDTO;
+import com.example.backend.global.exception.UnAuthorizedException;
+import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import com.example.backend.global.exception.user.UserInvalidInputException;
 import com.example.backend.global.exception.user.UserInvalidInputExceptionType;
 import com.example.backend.service.user.userInfo.KakaoUserInfo;
@@ -88,6 +90,20 @@ public class SnsAPIServiceImpl implements SnsAPIService {
         //요청 보내기
         ResponseEntity<String> result = restTemplate.exchange(requestUrl, HttpMethod.POST, httpEntity, String.class);
         log.info(result.getBody());
+
+        //json parser
+        ObjectMapper objectMapper = new ObjectMapper();
+        UserInfo userInfo = UserInfoFactory.getOAuth2UserInfo(userType);
+        try{
+            userInfo = objectMapper.readValue(result.getBody(), KakaoUserInfo.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        SnsUserDTO snsUserDTO = UserInfoFactory.getUserDTOFromUserInfo(userType, userInfo);
+        if(snsUserDTO.getSnsId() == null) throw new UnAuthorizedException(UnAuthorizedExceptionType.API_REQUEST_FAIL);
+
+        log.info("탈퇴된 sns회원의 snsId: {}", snsUserDTO.getSnsId());
+
     }
 
 }
