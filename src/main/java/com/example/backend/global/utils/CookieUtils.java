@@ -13,6 +13,8 @@ public class CookieUtils {
     private String REFRESH_COOKIE = "refreshToken";
 
     public ResponseCookie createRefreshTokenCookie(String refreshToken){
+        deleteRefreshTokenCookie();
+
         return ResponseCookie.from(REFRESH_COOKIE, refreshToken)
                 .httpOnly(true)
                 .secure(false) //TODO SSL 인증서 필요해서 나중에
@@ -22,5 +24,9 @@ public class CookieUtils {
                 .build();
     }
 
-    //TODO 쿠키 삭제
+    public void deleteRefreshTokenCookie(){
+        ResponseCookie.from(REFRESH_COOKIE, "")
+                .maxAge(1)
+                .build();
+    }
 }
