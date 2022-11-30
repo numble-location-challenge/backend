@@ -1,7 +1,9 @@
 package com.example.backend.controller;
 
+import com.example.backend.domain.Like;
 import com.example.backend.dto.LikesDTO;
 import com.example.backend.dto.ResponseDTO;
+import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.service.LikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Tag(name = "Like", description = "게시글 좋아요 API")
 @RestController
@@ -24,48 +27,19 @@ public class LikeController {
     private final LikeService likeService;
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "좋아요 리스트 출력", description = "해당 사용자가 누른 좋아요만 제공")
-    @GetMapping("/like")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND")
-    })
-    public ResponseDTO<?> getLikeList(@AuthenticationPrincipal String email){
-        List<LikesDTO> likesDTOList = likeService.getLikes(email);
-
-        return new ResponseDTO<>(likesDTOList,"좋아요 리스트 출력");
-//        return ResponseDTO.<LikesDTO>builder().success(true).message("좋아요 리스트 출력")
-//                .data(likesDTOs).build();
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "좋아요 선택", description = "사용자가 좋아요 누를 시")
+    @Operation(summary = "좋아요 클릭", description = "사용자가 좋아요 누를 시")
     @PostMapping("/like/{postId}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
-    public ResponseDTO<LikesDTO> onLike(@AuthenticationPrincipal String email, @Parameter(required = true) @PathVariable Long postId){
-        LikesDTO likesDTO = likeService.onLike(email, postId);
+    public ResponseDTO<?> setLike(@AuthenticationPrincipal CustomUserDetails user, @Parameter(required = true) @PathVariable Long postId){
 
-        return new ResponseDTO<>(likesDTO,"좋아요 on");
-//        return ResponseDTO.<LikesDTO>builder().success(true).message("좋아요 on")
-//                .data(likesDTOs).build();
+        LikesDTO likesDTO = likeService.likeOnAndOff(user.getUserId(),postId);
+        String message = likesDTO.isOrElse() ? "좋아요 등록" : "좋아요 해제";
+
+        return new ResponseDTO<>(likesDTO,message);
     }
 
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "좋아요 해제", description = "사용자가 좋아요한 게시글을 누를 시")
-    @DeleteMapping("/like/{postId}")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND")
-    })
-    public ResponseDTO<?> offLike(@AuthenticationPrincipal String email, @Parameter(required = true) @PathVariable Long postId){
-        likeService.offLike(email, postId);
-        return new ResponseDTO<>(null,"좋아요 off");
-//        return ResponseDTO.builder().success(true).message("좋아요 off").build();
-    }
 }

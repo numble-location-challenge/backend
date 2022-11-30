@@ -25,50 +25,34 @@ public class LikeServiceImpl implements LikeService{
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    @Override
-    public List<LikesDTO> getLikes(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        List<LikesDTO> likes = likesRepository.findByUserId(user.getId())
-                .stream()
-                .map(LikesDTO::new)
-                .collect(Collectors.toList());
-        return likes;
-    }
-
-    @Override
-    public LikesDTO onLike(String email, Long postId) {
+    public LikesDTO likeOnAndOff(Long userId, Long postId){
         //user id, post id 검증
-        User user = userRepository.findByEmail(email).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        User user = userRepository.findById(userId).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         Post post = postRepository.findById(postId).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
-        //좋아요가 이미 있는지 확인
-        Optional<Like> existentLike = likesRepository.findById(user.getId(),post.getId());
-        if(existentLike.isEmpty()){
-            //좋아요 저장
-            Like like = Like.createLike(user, post);
-            likesRepository.save(like);
-            //좋아요 개수 카운터
-            int likeCnt = post.getLikes();
-            post.updateLikeCnt(likeCnt+1);
+        int likeCnt = post.getLikes(); //좋아요 개수
 
-            LikesDTO likesDTO = new LikesDTO(like);
-            return likesDTO;
-        }else{
-            offLike(email,postId);
-            return null;
+        //좋아요가 이미 있는지 확인
+        Optional<LikesDTO> existentLike = likesRepository.findById(user.getId(),post.getId()).map(LikesDTO::new);
+        LikesDTO likesDTO = null;
+
+        if(existentLike.isEmpty()){//좋아요가 없다면 좋아요 등록
+            Like like = Like.createLike(user,post);
+            likesRepository.save(like);
+            likesDTO = new LikesDTO(like);
+            likeCnt++;
+            likesDTO.updateOrElse(true);
+        }else{//좋아요가 있다면 좋아요 해제
+            likesDTO = existentLike.get();
+            likesRepository.deleteById(user.getId(),post.getId());
+            likeCnt--;
+            likesDTO.updateOrElse(false);
         }
 
+        post.updateLikes(likeCnt);
+        postRepository.save(post);
+
+        return likesDTO;
+
     }
 
-    @Override
-    public void offLike(String email, Long postId) {
-        User user = userRepository.findByEmail(email).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        Post post = postRepository.findById(postId).orElseThrow( () -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
-        //likes에서 삭제
-        likesRepository.deleteById(user.getId(),post.getId());
-        //post에서 likes-1
-        int likeCnt = post.getLikes();
-        post.updateLikeCnt(likeCnt-1);
-
-//        return null;
-    }
 }
