@@ -3,10 +3,13 @@ package com.example.backend.service.user;
 import com.example.backend.domain.Comment;
 import com.example.backend.domain.Socialing;
 import com.example.backend.domain.User;
+import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.post.Social;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.global.exception.*;
+import com.example.backend.global.exception.social.SocialInvalidInputException;
+import com.example.backend.global.exception.social.SocialInvalidInputExceptionType;
 import com.example.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +29,6 @@ public class UserServiceImpl implements UserService {
     private final SocialRepository socialRepository;
     private final SocialingRepository socilaingRepository;
     private final CommentRepository commentRepository;
-    private final SnsUserService snsUserService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserService {
         if(userDTO.getDongCode() != null && userDTO.getDongName() != null){
             user.updateRegion(userDTO.getDongCode(), userDTO.getDongName());
         }
-        //TODO 만약 region 수정 가능하면 모임장인 social의 region도 수정되어야함(피드는 두는게 나은듯)
+
         return user;
     }
 
@@ -101,7 +103,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void participateSocial(Long userId, Long socialId) {
-        //이미 신청된 유저면 신청안되게 하는건 프론트에서 거르는 거겠지..?
+        //엔티티 조회
         User findUser = userRepository.findReadOnlyById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
@@ -109,12 +111,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
 
         //모임이 꽉찬 상태면 x
-//        if(findSocial.getStatus() != SocialStatus.AVAILABLE) throw new ex
+        if(findSocial.getStatus() == SocialStatus.FULL) throw new SocialInvalidInputException(SocialInvalidInputExceptionType.FULL_STATUS);
         //중복 신청이면 x
+        if(findSocial.getUser().getId().equals(findUser.getId())) throw new SocialInvalidInputException(SocialInvalidInputExceptionType.ALREADY_APPLIED);
 
+        //신청 처리
+        findSocial.addCurrentNums(); // 참여인원 +1
         Socialing socialing = Socialing.createSocialing(findUser);
         findSocial.addSocialing(socialing);
-
         socilaingRepository.save(socialing);
     }
 
@@ -124,6 +128,10 @@ public class UserServiceImpl implements UserService {
         User findUser = userRepository.findReadOnlyById(userId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
 
+        Social findSocial = socialRepository.findById(socialId)
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+        //모임 취소처리
+        findSocial.minusCurrentNums(); //참여인원-1
         socilaingRepository.deleteByUserIdAndSocialId(findUser.getId(), socialId);
     }
 
@@ -131,14 +139,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void kickOutUserFromSocial(Long userId, Long socialId, Long droppedUserId) {
         //엔티티 조회
-        Social social = socialRepository.findReadOnlyById(socialId)
+        Social social = socialRepository.findById(socialId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
         User socialOwner = social.getUser(); //모임장
         //모임장인지 확인
         if(!userId.equals(socialOwner.getId())) throw new ForbiddenException(ForbiddenExceptionType.USER_UN_AUTHORIZED);
-        //강퇴하고 숫자-1
+        //강퇴 처리
         socilaingRepository.deleteByUserIdAndSocialId(droppedUserId, socialId);
-        social.minusCurrentNums();
+        social.minusCurrentNums();//강퇴하고 참여인원-1
     }
 
 

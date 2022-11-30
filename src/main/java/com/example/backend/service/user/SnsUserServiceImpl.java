@@ -11,7 +11,6 @@ import com.example.backend.service.user.userInfo.KakaoUserInfo;
 import com.example.backend.service.user.userInfo.UserInfo;
 import com.example.backend.service.user.userInfo.UserInfoFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,7 @@ public class SnsUserServiceImpl implements SnsUserService {
     @Override
     public Long getSnsId(UserType userType, String accessToken) {
         SnsUserDTO userInfo = getUserInfo(userType, accessToken);
-        return userInfo.getId();
+        return userInfo.getSnsId();
     }
 
     @Override
@@ -68,8 +67,6 @@ public class SnsUserServiceImpl implements SnsUserService {
         UserInfo userInfo = UserInfoFactory.getOAuth2UserInfo(userType);
         try{
             userInfo = objectMapper.readValue(result.getBody(), KakaoUserInfo.class);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -82,23 +79,27 @@ public class SnsUserServiceImpl implements SnsUserService {
     public User createSnsUser(UserType userType, SnsJoinRequestDTO joinDTO) {
         //사용자 정보 API에서 받아옴
         SnsUserDTO userDTO = getUserInfo(userType, joinDTO.getAccessToken());
-        validateSocialUserDuplicate(userDTO.getEmail());
+        validateSnsUserDuplicate(userDTO.getEmail(), userDTO.getSnsId(), userType);
         //중복X -> region 세팅 및 회원가입 처리
         User user = userDTO.toEntity(
                 userType, joinDTO.getUsername(), joinDTO.getPhoneNumber(),
                 joinDTO.getDongCode(), joinDTO.getDongName());
 
         switch(userType){
-            case KAKAO: user.setKakaoUser(userDTO.getId()); break;//sns 유저 세팅
+            case KAKAO: user.setKakaoUser(userDTO.getSnsId()); break;//sns 유저 세팅
             default: throw new InvalidUserInputException(InvalidUserInputExceptionType.INVALID_USERTYPE);
         }
         return userRepository.save(user);
     }
 
-    private void validateSocialUserDuplicate(String email){
-        if(userRepository.existsByEmail(email)){
-            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_KAKAO_USER);
-        }
+    private void validateSnsUserDuplicate(String email, Long snsId, UserType userType){
+        //sns 유저 중복 검증
+        // email이 unique이기 때문에 이메일 부터 검증하고,
+        // snsId와 userType 으로는 똑같은 sns계정이 있는지도 체크
+        if(userRepository.existsByEmail(email))
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
+        if(userRepository.existsBySnsIdAndUserType(snsId, userType))
+            throw new InvalidUserInputException(InvalidUserInputExceptionType.ALREADY_EXISTS_SNS_USER);
     }
 
 }

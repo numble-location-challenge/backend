@@ -23,7 +23,7 @@ public class UserInfoFactory {
 
     private static SnsUserDTO getKakaoDTO(KakaoUserInfo userInfo){
         return SnsUserDTO.builder()
-                .id(userInfo.getId())
+                .snsId(userInfo.getId())
                 .email(userInfo.getKakao_account().getEmail())
                 .nickname(userInfo.getProperties().getNickname())
                 .profile(userInfo.getProperties().getProfile_image())
