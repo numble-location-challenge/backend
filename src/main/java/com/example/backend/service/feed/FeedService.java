@@ -7,6 +7,7 @@ import org.springframework.data.domain.Slice;
 import com.example.backend.domain.post.Feed;
 import com.example.backend.dto.feed.FeedRequestDTO;
 import com.example.backend.dto.feed.FeedSearch;
+import com.example.backend.dto.feed.FeedUpdateRequestDTO;
 
 public interface FeedService {
 
@@ -20,7 +21,7 @@ public interface FeedService {
 
     void deleteFeed(Long id, Long userId);
 
-    Feed updateFeed(Long postId, FeedRequestDTO feedRequestDTO, Long userId);
+    Feed updateFeed(Long postId, FeedUpdateRequestDTO feedUpdateRequestDTO, Long userId);
 
     List<Feed> getMyFeeds(Long userId);
 
