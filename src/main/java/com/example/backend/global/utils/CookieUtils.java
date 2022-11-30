@@ -18,7 +18,7 @@ public class CookieUtils {
                 .secure(false) //TODO SSL 인증서 필요해서 나중에
                 .sameSite("None")
                 .maxAge(REFRESH_EXP)
-                .path("/refresh")
+                .path("/")
                 .build();
     }
 
