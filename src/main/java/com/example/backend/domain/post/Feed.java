@@ -34,7 +34,7 @@ public class Feed extends Post {
     private boolean liked;
 
     @Builder
-    public Feed(User user, List<PostImage> images, List<Comment> comments,
+    private Feed(User user, List<PostImage> images, List<Comment> comments,
         String contents, Integer region, int likes, Social social) {
         super(user, images, comments, contents, likes);
         this.social = social;
