@@ -1,14 +1,15 @@
 package com.example.backend.global.utils;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.backend.global.security.jwt.JwtConfig;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class CookieUtils {
 
-    @Value("${jwt.refresh.expiration}")
-    private Long REFRESH_EXP;
+    private final JwtConfig jwtConfig;
 
     private String REFRESH_COOKIE = "refreshToken";
 
@@ -19,7 +20,7 @@ public class CookieUtils {
                 .httpOnly(true)
                 .secure(false) //TODO SSL 인증서 필요해서 나중에
                 .sameSite("None")
-                .maxAge(REFRESH_EXP)
+                .maxAge(jwtConfig.getRefreshExpiry())
                 .path("/")
                 .build();
     }

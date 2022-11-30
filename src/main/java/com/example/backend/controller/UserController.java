@@ -12,6 +12,7 @@ import com.example.backend.global.exception.ForbiddenExceptionType;
 import com.example.backend.global.security.AuthToken;
 import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.global.security.AuthTokenProvider;
+import com.example.backend.global.utils.CookieUtils;
 import com.example.backend.global.utils.ResponseUtils;
 import com.example.backend.service.user.SnsUserService;
 import com.example.backend.service.user.UserService;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +39,8 @@ public class UserController {
     private final UserService userService;
     private final SnsUserService snsUserService;
     private final AuthTokenProvider authTokenProvider;
-    private final ResponseUtils responseUtils;
+//    private final ResponseUtils responseUtils;
+    private final CookieUtils cookieUtils;
 
     @Operation(summary = "회원가입",
             description = "unique field 중복 시 errorCode -101(이메일), -102(닉네임), -103(이메일,닉네임)이 반환됩니다.")
@@ -68,7 +71,8 @@ public class UserController {
         //회원가입 성공시 SNS 유저는 로그인에 성공한다
         AuthToken AT = authTokenProvider.issueAccessToken(createdUser);
         AuthToken RT = authTokenProvider.issueRefreshToken(createdUser);
-        return responseUtils.getLoginSuccessResponse(createdUser.getId(), AT, RT, userTypeStr + " 로그인에 성공했습니다.");
+        ResponseCookie RTcookie = cookieUtils.createRefreshTokenCookie(RT.getToken());
+        return ResponseUtils.getLoginSuccessResponse(createdUser.getId(), AT, RTcookie, userTypeStr + " 로그인에 성공했습니다.");
     }
 
     @ResponseStatus(HttpStatus.OK)

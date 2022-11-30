@@ -3,31 +3,23 @@ package com.example.backend.global.utils;
 import com.example.backend.dto.ResponseDTO;
 import com.example.backend.dto.login.AuthDTO;
 import com.example.backend.global.security.AuthToken;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-@Component
-@RequiredArgsConstructor
 public class ResponseUtils {
 
-    private final CookieUtils cookieUtils;
-
-    public ResponseEntity<?> getLoginSuccessResponse(Long userId, AuthToken AT, AuthToken RT, String message) {
-        //refresh token을 http only 쿠키에 담음
-        ResponseCookie cookie = cookieUtils.createRefreshTokenCookie(RT.getToken());
+    public static ResponseEntity<?> getLoginSuccessResponse(Long userId, AuthToken AT, ResponseCookie RTCookie , String message) {
         //set response
         AuthDTO authDTO = new AuthDTO(userId);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, HttpHeaders.AUTHORIZATION)
                 .header(HttpHeaders.AUTHORIZATION, AT.getToken())
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, RTCookie.toString())
                 .body(new ResponseDTO<>(authDTO, message));
     }
 
