@@ -136,13 +136,17 @@ public class SocialServiceImpl implements SocialService {
      */
     @Override
     public SocialLongDTO getSocialDetail(Long userId, Long postId) {
+        //게시글 찾기
         Social social = socialRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+
+        //dto만들기
         SocialLongDTO socialLongDTO = new SocialLongDTO(social);
 
+        //좋아요 여부 체크해서 반영하기
         socialLongDTO.updateLikeOrElse(likesRepository.existsByUserIdAndPostId(userId, postId));
 
-        return new SocialLongDTO(social);
+        return socialLongDTO;
     }
 
     /**
