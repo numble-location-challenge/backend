@@ -28,7 +28,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SnsUserServiceImpl implements SnsUserService {
+public class SnsAPIServiceImpl implements SnsAPIService {
 
     @Value("${sns.kakao.userInfoUri}")
     private String KAKAO_INFO_URI;

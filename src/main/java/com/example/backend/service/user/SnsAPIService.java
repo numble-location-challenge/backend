@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 //import java.io.IOException;
 
 
-public interface SnsUserService {
+public interface SnsAPIService {
 
     Long getSnsId(UserType userType, String accessToken);
 

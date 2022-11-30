@@ -14,7 +14,7 @@ import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.global.security.AuthTokenProvider;
 import com.example.backend.global.security.CookieProvider;
 import com.example.backend.global.utils.ResponseUtils;
-import com.example.backend.service.user.SnsUserService;
+import com.example.backend.service.user.SnsAPIService;
 import com.example.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,7 +37,7 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final SnsUserService snsUserService;
+    private final SnsAPIService snsAPIService;
     private final AuthTokenProvider authTokenProvider;
     private final CookieProvider cookieProvider;
 
@@ -66,7 +66,7 @@ public class UserController {
 
         UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
 
-        final User createdUser = snsUserService.createSnsUser(userType, joinDTO);
+        final User createdUser = snsAPIService.createSnsUser(userType, joinDTO);
         //회원가입 성공시 SNS 유저는 로그인에 성공한다
         AuthToken AT = authTokenProvider.issueAccessToken(createdUser);
         AuthToken RT = authTokenProvider.issueRefreshToken(createdUser);
@@ -94,7 +94,7 @@ public class UserController {
         User findUser = userService.getUserById(id);
         UserType userType = findUser.getUserType();
         if(userType != UserType.DEFAULT){
-            snsUserService.unlink(userType, (String)session.getAttribute("sns_access_token"));
+            snsAPIService.unlink(userType, (String)session.getAttribute("sns_access_token"));
             session.invalidate();
         }
 
