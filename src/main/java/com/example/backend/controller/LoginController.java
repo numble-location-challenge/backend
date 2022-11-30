@@ -12,7 +12,7 @@ import com.example.backend.global.exception.UnAuthorizedException;
 import com.example.backend.global.exception.UnAuthorizedExceptionType;
 import com.example.backend.global.security.AuthToken;
 import com.example.backend.global.security.AuthTokenProvider;
-import com.example.backend.global.utils.CookieUtils;
+import com.example.backend.global.security.CookieProvider;
 import com.example.backend.global.utils.ResponseUtils;
 import com.example.backend.service.login.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,8 +37,7 @@ public class LoginController {
 
     private final LoginService loginService;
     private final AuthTokenProvider authTokenProvider;
-//    private final ResponseUtils responseUtils;
-    private final CookieUtils cookieUtils;
+    private final CookieProvider cookieProvider;
 
     @Operation(summary = "기본 로그인", description = "AccessToken은 헤더로, RefreshToken은 쿠키로 반환합니다.")
     @PostMapping("/login")
@@ -53,7 +52,7 @@ public class LoginController {
         AuthToken AT = authTokenProvider.issueAccessToken(loginUser);
         AuthToken RT = authTokenProvider.issueRefreshToken(loginUser);
         loginService.updateRefresh(loginUser, RT);
-        ResponseCookie RTcookie = cookieUtils.createRefreshTokenCookie(RT.getToken());
+        ResponseCookie RTcookie = cookieProvider.createRefreshTokenCookie(RT.getToken());
         return ResponseUtils.getLoginSuccessResponse(loginUser.getId(), AT, RTcookie,"로그인에 성공했습니다.");
     }
 
@@ -75,7 +74,7 @@ public class LoginController {
         AuthToken AT = authTokenProvider.issueAccessToken(loginUser);
         AuthToken RT = authTokenProvider.issueRefreshToken(loginUser);
         loginService.updateRefresh(loginUser, RT);
-        ResponseCookie RTcookie = cookieUtils.createRefreshTokenCookie(RT.getToken());
+        ResponseCookie RTcookie = cookieProvider.createRefreshTokenCookie(RT.getToken());
         return ResponseUtils.getLoginSuccessResponse(loginUser.getId(), AT, RTcookie, "카카오 로그인에 성공했습니다.");
     }
 

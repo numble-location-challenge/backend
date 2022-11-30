@@ -1,4 +1,4 @@
-package com.example.backend.global.utils;
+package com.example.backend.global.security;
 
 import com.example.backend.global.security.jwt.JwtConfig;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CookieUtils {
+public class CookieProvider {
 
     private final JwtConfig jwtConfig;
 
