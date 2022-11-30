@@ -4,11 +4,14 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.SnsJoinRequestDTO;
 import com.example.backend.dto.response.ResponseDTO;
+import com.example.backend.dto.user.SnsDeleteUserRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 import com.example.backend.dto.user.UserProfileDTO;
 import com.example.backend.global.exception.ForbiddenException;
 import com.example.backend.global.exception.ForbiddenExceptionType;
+import com.example.backend.global.exception.user.UserInvalidInputException;
+import com.example.backend.global.exception.user.UserInvalidInputExceptionType;
 import com.example.backend.global.security.AuthToken;
 import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.global.security.AuthTokenProvider;
@@ -28,7 +31,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Tag(name = "user", description = "회원 API")
@@ -53,7 +55,7 @@ public class UserController {
         return ResponseUtils.getCreatedUserResponse(uriBuilder, createdUser.getId());
     }
 
-    @Operation(summary = "sns 회원가입", description = "카카오 userType=KAKAO, 이미 가입된 계정이라면 errorCode -122가 반환됩니다. 회원가입이 완료된 후 자동 로그인 처리됩니다.")
+    @Operation(summary = "SNS 회원가입", description = "카카오 userType=KAKAO, 이미 가입된 계정이라면 errorCode -122가 반환됩니다. 회원가입이 완료된 후 자동 로그인 처리됩니다.")
     @PostMapping("/users/{userType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -75,7 +77,7 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "회원 탈퇴")
+    @Operation(summary = "회원 탈퇴", description = "SNS 계정인 경우 errorCode -123가 반환됩니다.")
     @DeleteMapping("/users/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -84,7 +86,6 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")
     })
     public ResponseDTO<?> deleteUser(
-            HttpSession session,
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long id){
 
@@ -93,10 +94,30 @@ public class UserController {
         User findUser = userService.getUserById(id);
         UserType userType = findUser.getUserType();
         if(userType != UserType.DEFAULT){
-            snsAPIService.unlink(userType, (String)session.getAttribute("sns_access_token"));
-            session.invalidate();
+            throw new UserInvalidInputException(UserInvalidInputExceptionType.CANT_DELETE_SNS_USER);
         }
 
+        userService.changeToWithdrawnUser(findUser);
+        return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "SNS 회원 탈퇴")
+    @DeleteMapping("/users/{userType}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND")
+    })
+    public ResponseDTO<?> deleteSnsUser(
+            @PathVariable(value = "userType") String userTypeStr,
+            @RequestBody SnsDeleteUserRequestDTO snsRequestDTO,
+            @AuthenticationPrincipal CustomUserDetails user){
+
+        UserType userType = UserType.valueOf(userTypeStr.toUpperCase());
+        Long disConnectedId = snsAPIService.unlink(userType, snsRequestDTO.getAccessToken());
+        User findUser = userService.getUserBySnsId(disConnectedId);
         userService.changeToWithdrawnUser(findUser);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }

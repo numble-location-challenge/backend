@@ -13,7 +13,7 @@ public interface SnsAPIService {
 
     SnsUserDTO getUserInfo(UserType userType, String accessToken);
 
-    void unlink(UserType userType, String accessToken);
+    Long unlink(UserType userType, String accessToken);
 
     //Test
 //    TestKakaoToken requestToken(String code) throws IOException;

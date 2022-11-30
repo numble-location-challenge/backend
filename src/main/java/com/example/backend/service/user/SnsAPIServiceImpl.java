@@ -74,7 +74,7 @@ public class SnsAPIServiceImpl implements SnsAPIService {
     }
 
     @Override
-    public void unlink(UserType userType, String accessToken) {
+    public Long unlink(UserType userType, String accessToken) {
         String requestUrl = null;
         switch(userType){
             case KAKAO: requestUrl = KAKAO_UNLINK_URI; break;
@@ -103,7 +103,7 @@ public class SnsAPIServiceImpl implements SnsAPIService {
         if(snsUserDTO.getSnsId() == null) throw new UnAuthorizedException(UnAuthorizedExceptionType.API_REQUEST_FAIL);
 
         log.info("탈퇴된 sns회원의 snsId: {}", snsUserDTO.getSnsId());
-
+        return snsUserDTO.getSnsId();
     }
 
 }
