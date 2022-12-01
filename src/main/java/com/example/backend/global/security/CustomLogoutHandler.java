@@ -1,4 +1,4 @@
-package com.example.backend.global.security.jwt;
+package com.example.backend.global.security;
 
 import com.example.backend.domain.User;
 import com.example.backend.dto.response.ResponseDTO;
@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtLogoutHandler implements LogoutHandler {
+public class CustomLogoutHandler implements LogoutHandler {
 
     private final UserRepository userRepository;
 

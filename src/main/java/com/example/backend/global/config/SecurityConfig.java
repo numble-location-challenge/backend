@@ -2,7 +2,7 @@ package com.example.backend.global.config;
 
 import com.example.backend.global.security.jwt.JwtAuthorizationFilter;
 import com.example.backend.global.security.jwt.JwtExceptionEntryPoint;
-import com.example.backend.global.security.jwt.JwtLogoutHandler;
+import com.example.backend.global.security.CustomLogoutHandler;
 import com.example.backend.global.security.jwt.authToken.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     private String REFRESH_COOKIE = "refreshToken";
 
-    private final JwtLogoutHandler jwtLogoutHandler;
+    private final CustomLogoutHandler customLogoutHandler;
     private final AuthTokenProvider authTokenProvider;
 
     @Bean
@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .logout().permitAll()
                 .logoutUrl("/logout")
                 .deleteCookies(REFRESH_COOKIE) //로그아웃 후 쿠키 삭제
-                .addLogoutHandler(jwtLogoutHandler) //DB에서 RT 삭제
+                .addLogoutHandler(customLogoutHandler) //DB에서 RT 삭제
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
 
         http
