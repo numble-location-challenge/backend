@@ -90,7 +90,7 @@ public class UserController {
             @PathVariable Long id){
 
         checkPathResource(user.getUserId(), id);
-        
+
         User findUser = userService.getUserById(id);
         UserType userType = findUser.getUserType();
         if(userType == UserType.KAKAO){
@@ -103,7 +103,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "SNS 회원 탈퇴")
-    @DeleteMapping("/users/{userType}")
+    @DeleteMapping("/users/sns/{userType}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED"),
