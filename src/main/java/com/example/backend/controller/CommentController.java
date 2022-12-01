@@ -41,9 +41,7 @@ public class CommentController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "댓글 조회", description = "게시물의 ID를 이용하여 해당 게시물의 댓글을 조회합니다.")
     @ApiResponses(
-        {@ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST")
-        ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
+        {@ApiResponse(responseCode = "200", description = "OK")})
     @GetMapping("/comment/{postId}")
     public ResponseDTO<?> getComments(@PathVariable Long postId) {
         List<Comment> comments = commentService.getComments(postId);
@@ -91,7 +89,7 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PostMapping("/comment/{postId}/{commentId}")
-    public ResponseDTO createReply(@PathVariable Long postId, @PathVariable Long commentId,
+    public ResponseDTO<?> createReply(@PathVariable Long postId, @PathVariable Long commentId,
         @Valid @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
         commentService.createReply(postId, user.getUserId(), commentId, commentRequestDTO);
         return new ResponseDTO<>(null,"대댓글 작성 성공");
@@ -105,7 +103,7 @@ public class CommentController {
             , @ApiResponse(responseCode = "403", description = "FORBIDDEN")
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @DeleteMapping("/comment/{commentId}")
-    public ResponseDTO deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseDTO<?> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal CustomUserDetails user) {
         commentService.deleteComment(commentId, user.getUserId());
         return new ResponseDTO<>(null,"댓글 삭제 성공");
     }
@@ -118,7 +116,8 @@ public class CommentController {
             , @ApiResponse(responseCode = "403", description = "FORBIDDEN")
         ,@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @PutMapping("/comment/{commentId}")
-    public ResponseDTO updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseDTO<?> updateComment(@PathVariable Long commentId, @Valid @RequestBody CommentRequestDTO commentRequestDTO,
+        @AuthenticationPrincipal CustomUserDetails user) {
         Comment comment = commentService.updateComment(commentId, user.getUserId(), commentRequestDTO);
         CommentResponseDTO result = new CommentResponseDTO(comment);
         return new ResponseDTO<>(result,"댓글 수정 성공");
