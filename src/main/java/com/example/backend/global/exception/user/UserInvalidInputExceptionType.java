@@ -12,7 +12,7 @@ public enum UserInvalidInputExceptionType implements CustomExceptionType {
     ALREADY_EXISTS_SNS_USER(-122, "이미 존재하는 sns 계정 입니다."),
     ACCOUNT_NOT_MATCH(-104,"'email'(body)또는 'password'(body)가 매칭되지 않습니다."),
     INVALID_USERTYPE(-120, "잘못된 login/join user type 입니다."),
-    CANT_DELETE_KAKAO_USER(-123, "'kakao' 계정의 삭제는'/users/{userType}' POST 로 다시 요청하십시오.");
+    CANT_DELETE_KAKAO_USER(-123, "'kakao' 계정의 삭제는'/users/sns/{userType}' DELETE 로 다시 요청하십시오.");
 
     private int errorCode;
     private String errorMessage;

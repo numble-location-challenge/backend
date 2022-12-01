@@ -1,6 +1,6 @@
 package com.example.backend.global.security.jwt;
 
-import com.example.backend.global.security.AuthTokenProvider;
+import com.example.backend.global.security.jwt.authToken.AuthTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

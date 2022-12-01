@@ -1,5 +1,6 @@
-package com.example.backend.global.security;
+package com.example.backend.global.security.jwt.authToken;
 
+import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.global.security.jwt.JwtType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -2,7 +2,7 @@ package com.example.backend.service.user;
 
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
-import com.example.backend.dto.login.SnsJoinRequestDTO;
+import com.example.backend.dto.user.SnsJoinRequestDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
 

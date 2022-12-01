@@ -1,7 +1,7 @@
 package com.example.backend.global.security.jwt;
 
-import com.example.backend.global.security.AuthToken;
-import com.example.backend.global.security.AuthTokenProvider;
+import com.example.backend.global.security.jwt.authToken.AuthToken;
+import com.example.backend.global.security.jwt.authToken.AuthTokenProvider;
 import com.example.backend.global.security.CustomUserDetails;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
