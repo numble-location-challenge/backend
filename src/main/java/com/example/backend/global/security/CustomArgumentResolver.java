@@ -13,7 +13,8 @@ public class CustomArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
 //        Class<?> parameterType = parameter.getParameterType();
-        return true;
+//        return true;
+        return parameter.getParameterType().equals(CustomUserDetails.class);
     }
 
     @Override
