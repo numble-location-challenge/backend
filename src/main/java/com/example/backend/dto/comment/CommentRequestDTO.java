@@ -4,9 +4,7 @@ import javax.validation.constraints.NotBlank;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import lombok.Setter;
 
-@Setter
 @Getter
 @Schema(description = "댓글 입력, 수정 DTO")
 public class CommentRequestDTO {
