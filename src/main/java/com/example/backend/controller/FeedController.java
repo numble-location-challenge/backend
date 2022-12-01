@@ -19,15 +19,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.domain.post.Feed;
-import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.dto.feed.FeedHotPreviewDTO;
 import com.example.backend.dto.feed.FeedListResponseDTO;
 import com.example.backend.dto.feed.FeedPagingDTO;
 import com.example.backend.dto.feed.FeedRequestDTO;
 import com.example.backend.dto.feed.FeedResponseDTO;
 import com.example.backend.dto.feed.FeedSearch;
-import com.example.backend.dto.feed.FeedUpdateRequestDTO;
 import com.example.backend.dto.feed.MyFeedResponseDTO;
+import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.service.feed.FeedService;
 
@@ -130,8 +129,8 @@ public class FeedController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "403", description = "Forbidden")})
     @PutMapping("/posts/{postId}")
-    public ResponseDTO<?> updateFeed(@PathVariable Long postId, @Valid @RequestBody FeedUpdateRequestDTO feedUpdateRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
-        Feed feed = feedService.updateFeed(postId, feedUpdateRequestDTO, user.getUserId());
+    public ResponseDTO<?> updateFeed(@PathVariable Long postId, @Valid @RequestBody FeedRequestDTO feedRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
+        Feed feed = feedService.updateFeed(postId, feedRequestDTO, user.getUserId());
         FeedResponseDTO result = new FeedResponseDTO(feed);
         return new ResponseDTO<>(result, "피드 수정 성공");
     }

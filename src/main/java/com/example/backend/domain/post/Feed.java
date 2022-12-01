@@ -35,20 +35,19 @@ public class Feed extends Post {
 
     @Builder
     private Feed(User user, List<PostImage> images, List<Comment> comments,
-        String contents, Integer region, int likes, Social social) {
+        String contents, int likes, Social social) {
         super(user, images, comments, contents, likes);
         this.social = social;
     }
 
     public static Feed createFeed(User user, List<PostImage> feedImages,
-        String contents, Integer region, Social social){
+        String contents, Social social){
 
         Feed feed = Feed.builder()
             .contents(contents)
             .user(user)
             .likes(0)
             .social(social)
-            .region(region)
             .build();
         feed.setImages(feedImages);
 
