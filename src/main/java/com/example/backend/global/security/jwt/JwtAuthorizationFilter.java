@@ -4,16 +4,15 @@ import com.example.backend.global.security.AuthToken;
 import com.example.backend.global.security.AuthTokenProvider;
 import com.example.backend.global.security.CustomUserDetails;
 import io.jsonwebtoken.*;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.security.sasl.AuthenticationException;
 import javax.servlet.FilterChain;
@@ -21,39 +20,25 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 /**
  *  antMatchers 경로 제외하고 인증 필요한 모든 요청 여기로 들어옴
  * 검증에는 Access Token 만 필요
  */
 @Slf4j
-@Component
-@RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private String TOKEN_PREFIX = "Bearer ";
 
-    private List<String> NOT_CHECK_URL = List.of("/login", "/refresh", "/swagger-ui");
+    private AuthTokenProvider authTokenProvider;
 
-    private final AuthTokenProvider authTokenProvider;
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        for(String notUrl : NOT_CHECK_URL){
-            if(path.startsWith(notUrl)) return true;
-        }
-        if(path.equals("/users")) return true;
-        return false;
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, AuthTokenProvider authTokenProvider) {
+        super(authenticationManager);
+        this.authTokenProvider = authTokenProvider;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        if(shouldNotFilter(request)){
-            filterChain.doFilter(request,response);
-            return;
-        }
 
         log.info("JWT Filter is running...");
         // 요청에서 토큰 가져오기

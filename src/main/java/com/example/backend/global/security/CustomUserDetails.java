@@ -1,5 +1,6 @@
 package com.example.backend.global.security;
 
+import com.example.backend.domain.enumType.UserType;
 import com.example.backend.global.security.jwt.JwtType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +22,7 @@ import java.util.Collection;
 public class CustomUserDetails implements UserDetails {
     private Long userId; //pk
     private String email; //로그인 아이디
+    private UserType userType;
     private JwtType jwtType;
 
     public static CustomUserDetails createUserDetails(String subject) throws JsonProcessingException {

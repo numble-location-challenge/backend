@@ -21,7 +21,7 @@ public class CookieProvider {
                 .secure(false) //TODO SSL 인증서 필요해서 나중에
                 .sameSite("None")
                 .maxAge(jwtConfig.getRefreshExpiry())
-                .path("/")
+                .path("/refresh")
                 .build();
     }
 
