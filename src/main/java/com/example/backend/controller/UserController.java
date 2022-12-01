@@ -91,12 +91,11 @@ public class UserController {
 
         checkPathResource(user.getUserId(), id);
 
-        User findUser = userService.getUserById(id);
-        UserType userType = findUser.getUserType();
-        if(userType == UserType.KAKAO){
+        if(user.getUserType() == UserType.KAKAO){
             throw new UserInvalidInputException(UserInvalidInputExceptionType.CANT_DELETE_KAKAO_USER);
         }
 
+        User findUser = userService.getUserById(id);
         userService.changeToWithdrawnUser(findUser);
         return new ResponseDTO<>(null, "정상 탈퇴되었습니다");
     }
