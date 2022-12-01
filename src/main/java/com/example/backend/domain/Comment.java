@@ -31,15 +31,12 @@ public class Comment extends TimeAuditingEntity{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user; //작성자
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post; // 댓글이 달린 글
-
     @NotNull
     private String contents;
     @Column(name = "c_group")
@@ -50,10 +47,11 @@ public class Comment extends TimeAuditingEntity{
     @Column(name = "parent_num")
     private Long parentNum; // 부모 댓글의 ID
     private Boolean deleted = false; //삭제되었는지 여부
+    private String regionName;
 
     @Builder
     private Comment(User user, Post post, String contents, int cGroup, int level, int refOrder,
-        Long parentNum) {
+        Long parentNum, String regionName) {
         this.user = user;
         this.post = post;
         this.contents = contents;
@@ -61,6 +59,7 @@ public class Comment extends TimeAuditingEntity{
         this.level = level;
         this.refOrder = refOrder;
         this.parentNum = parentNum;
+        this.regionName = regionName;
     }
 
     public static Comment createComment(String contents, int cGroup, int level, int refOrder,
@@ -72,6 +71,7 @@ public class Comment extends TimeAuditingEntity{
             .level(level)
             .refOrder(refOrder)
             .parentNum(parentNum)
+            .regionName(user.getDongName())
             .build();
         comment.setPost(post);
         comment.setUser(user);

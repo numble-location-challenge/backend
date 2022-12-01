@@ -29,6 +29,8 @@ public class CommentResponseDTO {
     private LocalDateTime createDate;
     @Schema(description = "해당 댓글의 삭제 여부", defaultValue = "false")
     private Boolean deleted;
+    @Schema(description = "댓글의 지역 이름", defaultValue = "서울특별시 종로구 효자동")
+    private String regionName;
 
     public CommentResponseDTO(Comment comment) {
         this.commentId = comment.getId();
@@ -43,6 +45,7 @@ public class CommentResponseDTO {
             this.user = FeedUserDTO.toUserDTO(comment.getUser());
             this.createDate = comment.getCreateDate();
         }
+        this.regionName = comment.getRegionName();
         deleted = comment.getDeleted();
     }
 }

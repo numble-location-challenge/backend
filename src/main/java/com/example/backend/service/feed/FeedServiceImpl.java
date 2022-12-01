@@ -18,7 +18,6 @@ import com.example.backend.domain.post.Social;
 import com.example.backend.dto.PostImageDTO;
 import com.example.backend.dto.feed.FeedRequestDTO;
 import com.example.backend.dto.feed.FeedSearch;
-import com.example.backend.dto.feed.FeedUpdateRequestDTO;
 import com.example.backend.global.exception.EntityNotExistsException;
 import com.example.backend.global.exception.EntityNotExistsExceptionType;
 import com.example.backend.global.exception.ForbiddenException;
@@ -114,8 +113,7 @@ public class FeedServiceImpl implements FeedService {
         List<PostImage> postImages = feedRequestDTO.getImages()
             .stream().map(images -> new PostImage(images.getImagePath()))
             .collect(Collectors.toList());
-        Feed feed = Feed.createFeed(user, postImages, feedRequestDTO.getContents(),
-            feedRequestDTO.getRegion(), social);
+        Feed feed = Feed.createFeed(user, postImages, feedRequestDTO.getContents(),social);
         feedRepository.save(feed);
     }
 
@@ -137,24 +135,24 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     @Transactional
-    public Feed updateFeed(Long postId, FeedUpdateRequestDTO feedUpdateRequestDTO, Long userId) {
+    public Feed updateFeed(Long postId, FeedRequestDTO feedRequestDTO, Long userId) {
         Feed feed = feedRepository.findById(postId)
             .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_FEED));
         if (hasPermission(feed, userId)) {
             Social social = null;
-            if (feedUpdateRequestDTO.getSocialId() != null) {
-                social = socialRepository.findById(feedUpdateRequestDTO.getSocialId())
+            if (feedRequestDTO.getSocialId() != null) {
+                social = socialRepository.findById(feedRequestDTO.getSocialId())
                     .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
             }
             List<PostImage> postImages = null;
-            if (!feedUpdateRequestDTO.getImages().isEmpty()) {
+            if (!feedRequestDTO.getImages().isEmpty()) {
                 postImageRepository.deleteAllByPostId(feed.getId());
                 postImages = new ArrayList<>();
-                for (PostImageDTO imageDTO : feedUpdateRequestDTO.getImages()) {
+                for (PostImageDTO imageDTO : feedRequestDTO.getImages()) {
                     postImages.add(new PostImage(imageDTO.getImagePath()));
                 }
             }
-            feed.updateFeed(feedUpdateRequestDTO.getContents(), social, postImages);
+            feed.updateFeed(feedRequestDTO.getContents(), social, postImages);
         } else {
             throw new ForbiddenException(ForbiddenExceptionType.NOT_AUTHORITY_UPDATE_FEED);
         }
