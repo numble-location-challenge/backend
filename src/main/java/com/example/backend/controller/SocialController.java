@@ -42,9 +42,6 @@ public class SocialController {
         List<SocialShortDTO> socialShortDTOList = socialService.getSocialList(user.getUserId());
 
         return new ResponseDTO<>(socialShortDTOList, "모임 리스트 출력");
-
-//        return ResponseDTO.<SocialShortDTO>builder().success(true).message("모임 리스트 출력")
-//                .data(socialShortDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -59,8 +56,6 @@ public class SocialController {
         SocialLongDTO socialLongDTO = socialService.getSocialDetail(user.getUserId(),socialId);
 
         return new ResponseDTO<>(socialLongDTO, "모임 상세 정보 출력");
-//        return ResponseDTO.<SocialLongDTO>builder().success(true).message("모임 상세 정보 출력")
-//                .data(socialLongDTOList).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
