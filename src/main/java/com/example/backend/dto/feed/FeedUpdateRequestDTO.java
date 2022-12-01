@@ -12,8 +12,7 @@ import lombok.Data;
 
 @Schema(description = "피드 작성 DTO")
 @Data
-public class FeedRequestDTO {
-
+public class FeedUpdateRequestDTO {
     @Schema(description = "피드 본문", defaultValue = "본문입니다.")
     @NotBlank
     private String contents;
@@ -22,6 +21,4 @@ public class FeedRequestDTO {
     @Schema(description = "피드의 이미지 리스트")
     @Size(min = 1, max = 3)
     private List<PostImageDTO> images;
-    @Schema(description = "피드의 지역", defaultValue = "3")
-    private Integer region;
 }

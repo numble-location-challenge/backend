@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.annotations.BatchSize;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.backend.domain.Like;
 import com.example.backend.domain.PostImage;
 import com.example.backend.domain.User;
 import com.example.backend.domain.post.Feed;
@@ -18,6 +18,7 @@ import com.example.backend.domain.post.Social;
 import com.example.backend.dto.PostImageDTO;
 import com.example.backend.dto.feed.FeedRequestDTO;
 import com.example.backend.dto.feed.FeedSearch;
+import com.example.backend.dto.feed.FeedUpdateRequestDTO;
 import com.example.backend.global.exception.EntityNotExistsException;
 import com.example.backend.global.exception.EntityNotExistsExceptionType;
 import com.example.backend.global.exception.ForbiddenException;
@@ -47,29 +48,30 @@ public class FeedServiceImpl implements FeedService {
     private final LikesRepository likesRepository;
 
     @Override
-    public Feed getFeed(Long feedId, String userEmail){
-        Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_FEED));
+    @Transactional(readOnly = true)
+    public Feed getFeed(Long feedId, Long userId) {
+        Feed feed = feedRepository.findById(feedId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_FEED));
+        boolean isLiked = likesRepository.existsByUserIdAndPostId(userId, feedId);
+        feed.setLiked(isLiked);
         return feed;
     }
 
-    @Transactional(readOnly = true)
-    @BatchSize(size = 100)
     @Override
-    public Slice<Feed> getFeeds(FeedSearch feedSearch, String userName){
-        User user = userRepository.findByEmail(userName)
+    @Transactional(readOnly = true)
+    public Slice<Feed> getFeeds(FeedSearch feedSearch, Long userId) {
+        User user = userRepository.findReadOnlyById(userId)
             .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        Integer regionCode = user.getRegionCodeFromDongCode();
-        log.info("getPage {} , getSize {}, cond {}", feedSearch.getPage(),feedSearch.getSize(),feedSearch.getFilter());
-        int pageNum = (feedSearch.getPage() == 0) ? 0 : (feedSearch.getPage()-1);
+        int pageNum = (feedSearch.getPage() == 0) ? 0 : (feedSearch.getPage() - 1);
         Pageable pageable = PageRequest.of(pageNum, feedSearch.getSize());
-
+        List<Like> likes = likesRepository.findByUserId(user.getId());
         if (feedSearch.getFilter().equals("LATEST")) {
-            log.info("최신순");
-            Slice<Feed> feeds = feedRepository.findAllFeedsLATEST(regionCode, pageable);
+            Slice<Feed> feeds = feedRepository.findAllFeedsLATEST(user.getRegionCodeFromDongCode(), pageable);
+            checkLike(feeds, likes);
             return feeds;
-        } else if (feedSearch.getFilter().equals("HOT")){
-            log.info("인기순");
-            Slice<Feed> feeds = feedRepository.findAllFeedsHOT(regionCode, pageable);
+        } else if (feedSearch.getFilter().equals("HOT")) {
+            Slice<Feed> feeds = feedRepository.findAllFeedsHOT(user.getRegionCodeFromDongCode(), pageable);
+            checkLike(feeds, likes);
             return feeds;
         } else {
             throw new FeedInvalidInputException(FeedInvalidInputExceptionType.INVALID_INPUT_FILTER);
@@ -77,47 +79,56 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public List<Feed> getMyFeeds(String userEmail) {
-        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    @Transactional(readOnly = true)
+    public List<Feed> getMyFeeds(Long userId) {
+        User user = userRepository.findReadOnlyById(userId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         List<Feed> feeds = feedRepository.findAllMyFeeds(user.getId());
         return feeds;
     }
+
     @Override
-    public List<Feed> getHotPreviewFeeds(String userEmail){
-        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+    @Transactional(readOnly = true)
+    public List<Feed> getHotPreviewFeeds(Long userId) {
+        User user = userRepository.findReadOnlyById(userId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        likesRepository.findByUserId(user.getId());
         int regionCode = user.getRegionCodeFromDongCode();
-        Pageable limit = PageRequest.of(0,10);
-        List<Feed> hotFeeds = feedRepository.findHotFeeds(regionCode,limit);
+        Pageable limit = PageRequest.of(0, 10);
+        List<Feed> hotFeeds = feedRepository.findHotFeeds(regionCode, limit);
+        List<Like> likes = likesRepository.findByUserId(user.getId());
+        checkLike(hotFeeds, likes);
         return hotFeeds;
     }
 
     @Override
     @Transactional
-    public void createFeed(FeedRequestDTO feedRequestDTO, String userEmail) {
-        User user = userRepository.findByEmail(userEmail).orElseThrow();
+    public void createFeed(FeedRequestDTO feedRequestDTO, Long userId) {
+        User user = userRepository.findReadOnlyById(userId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         Social social = null;
-        if (feedRequestDTO.getSocialId() != null){
-            social = socialRepository.findById(feedRequestDTO.getSocialId()).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
-    }
+        if (feedRequestDTO.getSocialId() != null) {
+            social = socialRepository.findById(feedRequestDTO.getSocialId())
+                .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
+        }
         List<PostImage> postImages = feedRequestDTO.getImages()
             .stream().map(images -> new PostImage(images.getImagePath()))
             .collect(Collectors.toList());
-
         Feed feed = Feed.createFeed(user, postImages, feedRequestDTO.getContents(),
             feedRequestDTO.getRegion(), social);
-
         feedRepository.save(feed);
     }
 
     @Override
     @Transactional
-    public void deleteFeed(Long postId, String userEmail) {
-        User user = userRepository.findByEmail(userEmail)
+    public void deleteFeed(Long postId, Long userId) {
+        User user = userRepository.findReadOnlyById(userId)
             .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         Feed feed = feedRepository.findById(postId)
             .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_FEED));
-        if (hasPermission(feed,user.getEmail())){
+        if (hasPermission(feed, user.getId())) {
             commentRepository.deleteByPostId(feed.getId());
+            likesRepository.deleteById(userId,postId);
             feedRepository.deleteById(feed.getId());
         } else {
             throw new ForbiddenException(ForbiddenExceptionType.NOT_AUTHORITY_DELETE_FEED);
@@ -126,41 +137,56 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     @Transactional
-    public Feed updateFeed(Long postId, FeedRequestDTO feedRequestDTO, String userEmail) {
-        Feed feed = feedRepository.findById(postId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_FEED));
-        if (hasPermission(feed,userEmail)) {
+    public Feed updateFeed(Long postId, FeedUpdateRequestDTO feedUpdateRequestDTO, Long userId) {
+        Feed feed = feedRepository.findById(postId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_FEED));
+        if (hasPermission(feed, userId)) {
             Social social = null;
-            if (feedRequestDTO.getSocialId() != null) {
-                social = socialRepository.findById(feedRequestDTO.getSocialId())
+            if (feedUpdateRequestDTO.getSocialId() != null) {
+                social = socialRepository.findById(feedUpdateRequestDTO.getSocialId())
                     .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_SOCIAL));
             }
             List<PostImage> postImages = null;
-            if (!feedRequestDTO.getImages().isEmpty()) {
+            if (!feedUpdateRequestDTO.getImages().isEmpty()) {
                 postImageRepository.deleteAllByPostId(feed.getId());
                 postImages = new ArrayList<>();
-                for (PostImageDTO imageDTO : feedRequestDTO.getImages()) {
+                for (PostImageDTO imageDTO : feedUpdateRequestDTO.getImages()) {
                     postImages.add(new PostImage(imageDTO.getImagePath()));
                 }
             }
-            feed.updateFeed(feedRequestDTO.getContents(), social, postImages, feedRequestDTO.getRegion());
+            feed.updateFeed(feedUpdateRequestDTO.getContents(), social, postImages);
         } else {
             throw new ForbiddenException(ForbiddenExceptionType.NOT_AUTHORITY_UPDATE_FEED);
         }
         return feed;
     }
 
-    @Override
-    public boolean checkLike(Long postId, String userEmail){
-        User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
-        return likesRepository.existsByUserIdAndPostId(user.getId(), postId);
+    private boolean hasPermission(Feed feed, Long userId) {
+        if (feed.getUser().getId().equals(userId)) {
+            return true;
+        }
+        return false;
     }
 
-    private boolean hasPermission(Feed feed, String userEmail) {
-        if (feed.getUser().getEmail().equals(userEmail)) {
-            return true;
-        } else {
-            return false;
+    private void checkLike(List<Feed> feeds, List<Like> likes) {
+        for (Feed feed : feeds) {
+            for (Like like : likes) {
+                if (like.getPost().getId().equals(feed.getId())) {
+                    feed.setLiked(true);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void checkLike(Slice<Feed> feeds, List<Like> likes) {
+        for (Feed feed : feeds) {
+            for (Like like : likes) {
+                if (like.getPost().getId().equals(feed.getId())) {
+                    feed.setLiked(true);
+                    break;
+                }
+            }
         }
     }
 }

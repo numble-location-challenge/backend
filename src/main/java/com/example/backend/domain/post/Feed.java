@@ -34,16 +34,14 @@ public class Feed extends Post {
     private boolean liked;
 
     @Builder
-    public Feed(User user, List<PostImage> images, List<Comment> comments,
-        String contents, Integer region, int likes,
-        Social social) {
+    private Feed(User user, List<PostImage> images, List<Comment> comments,
+        String contents, Integer region, int likes, Social social) {
         super(user, images, comments, contents, likes);
         this.social = social;
     }
 
     public static Feed createFeed(User user, List<PostImage> feedImages,
-        String contents, Integer region,
-        Social social){
+        String contents, Integer region, Social social){
 
         Feed feed = Feed.builder()
             .contents(contents)
@@ -68,11 +66,10 @@ public class Feed extends Post {
         this.images = postImages;
     }
 
-    public void updateFeed(String contents, Social social, List<PostImage> images, Integer region){
+    public void updateFeed(String contents, Social social, List<PostImage> images){
         this.setImages(images);
         this.contents = contents;
         this.social = social;
-        this.regionCode = region;
     }
 
     public void setLiked(boolean liked){
@@ -80,6 +77,6 @@ public class Feed extends Post {
     }
 
     public boolean isLiked() {
-        return liked;
+        return this.liked;
     }
 }

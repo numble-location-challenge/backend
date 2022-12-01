@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import com.example.backend.global.security.CustomUserDetails;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,7 +26,9 @@ import com.example.backend.dto.feed.FeedPagingDTO;
 import com.example.backend.dto.feed.FeedRequestDTO;
 import com.example.backend.dto.feed.FeedResponseDTO;
 import com.example.backend.dto.feed.FeedSearch;
+import com.example.backend.dto.feed.FeedUpdateRequestDTO;
 import com.example.backend.dto.feed.MyFeedResponseDTO;
+import com.example.backend.global.security.CustomUserDetails;
 import com.example.backend.service.feed.FeedService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,10 +53,8 @@ public class FeedController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/posts/{postId}")
     public ResponseDTO<?> getFeed(@PathVariable("postId") Long postId, @AuthenticationPrincipal CustomUserDetails user) {
-        Feed feed = feedService.getFeed(postId, user.getEmail());
+        Feed feed = feedService.getFeed(postId, user.getUserId());
         FeedResponseDTO result = new FeedResponseDTO(feed);
-        // boolean isLiked = feedService.checkLike(postId, userEmail);
-        // result.setLiked(isLiked);
         return new ResponseDTO<>(result,"피드 단건 조회 성공");
     }
 
@@ -67,11 +66,10 @@ public class FeedController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/posts")
     public FeedPagingDTO<?> getFeeds(@Valid @ModelAttribute FeedSearch feedSearch, @AuthenticationPrincipal CustomUserDetails user) {
-        Slice<Feed> feeds = feedService.getFeeds(feedSearch, user.getEmail());
+        Slice<Feed> feeds = feedService.getFeeds(feedSearch, user.getUserId());
         List<FeedListResponseDTO> result = feeds.stream()
             .map(feed -> new FeedListResponseDTO(feed))
             .collect(Collectors.toList());
-        log.info("size = {}", result.size());
         return new FeedPagingDTO<>(result,"피드 리스트 조회 성공",feeds.hasNext());
     }
     @ResponseStatus(HttpStatus.OK)
@@ -81,7 +79,7 @@ public class FeedController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/posts/me")
     public ResponseDTO<?> getMyFeeds(@AuthenticationPrincipal CustomUserDetails user){
-        List<Feed> feeds = feedService.getMyFeeds(user.getEmail());
+        List<Feed> feeds = feedService.getMyFeeds(user.getUserId());
         List<MyFeedResponseDTO> result = feeds.stream()
             .map(feed -> new MyFeedResponseDTO(feed))
             .collect(Collectors.toList());
@@ -94,7 +92,7 @@ public class FeedController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @GetMapping("/posts/hot")
     public ResponseDTO<?> getHotPreviewFeeds(@AuthenticationPrincipal CustomUserDetails user){
-        List<Feed> feeds = feedService.getHotPreviewFeeds(user.getEmail());
+        List<Feed> feeds = feedService.getHotPreviewFeeds(user.getUserId());
         List<FeedHotPreviewDTO> result = feeds.stream().map(feed -> new FeedHotPreviewDTO(feed))
             .collect(Collectors.toList());
 
@@ -108,7 +106,7 @@ public class FeedController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     @PostMapping("/posts")
     public ResponseDTO<?> createFeed(@Valid @RequestBody FeedRequestDTO feedRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
-        feedService.createFeed(feedRequestDTO, user.getEmail());
+        feedService.createFeed(feedRequestDTO,user.getUserId());
         return new ResponseDTO<>(null,"피드 생성 성공");
 
     }
@@ -121,7 +119,7 @@ public class FeedController {
             @ApiResponse(responseCode = "403", description = "Forbidden")})
     @DeleteMapping("/posts/{postId}")
     public ResponseDTO<?> deleteFeed(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails user) {
-        feedService.deleteFeed(postId, user.getEmail());
+        feedService.deleteFeed(postId, user.getUserId());
         return new ResponseDTO<>(null,"피드 삭제 성공");
     }
 
@@ -132,8 +130,8 @@ public class FeedController {
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "403", description = "Forbidden")})
     @PutMapping("/posts/{postId}")
-    public ResponseDTO<?> updateFeed(@PathVariable Long postId, @Valid @RequestBody FeedRequestDTO feedRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
-        Feed feed = feedService.updateFeed(postId, feedRequestDTO, user.getEmail());
+    public ResponseDTO<?> updateFeed(@PathVariable Long postId, @Valid @RequestBody FeedUpdateRequestDTO feedUpdateRequestDTO, @AuthenticationPrincipal CustomUserDetails user) {
+        Feed feed = feedService.updateFeed(postId, feedUpdateRequestDTO, user.getUserId());
         FeedResponseDTO result = new FeedResponseDTO(feed);
         return new ResponseDTO<>(result, "피드 수정 성공");
     }

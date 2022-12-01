@@ -28,7 +28,7 @@ public class FeedSocialDTO {
     private LocalDateTime startDate;
 
     @Builder
-    public FeedSocialDTO(Long id, PostImageDTO thumbnail, String title, Integer region, String regionName,
+    private FeedSocialDTO(Long id, PostImageDTO thumbnail, String title, Integer region, String regionName,
         LocalDateTime startDate) {
         this.id = id;
         this.thumbnail = thumbnail;

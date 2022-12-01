@@ -7,22 +7,22 @@ import org.springframework.data.domain.Slice;
 import com.example.backend.domain.post.Feed;
 import com.example.backend.dto.feed.FeedRequestDTO;
 import com.example.backend.dto.feed.FeedSearch;
+import com.example.backend.dto.feed.FeedUpdateRequestDTO;
 
 public interface FeedService {
 
-    Feed getFeed(Long feedId, String userEmail);
+    Feed getFeed(Long feedId, Long userId);
 
-    Slice<Feed> getFeeds(FeedSearch feedSearch, String userEmail);
+    Slice<Feed> getFeeds(FeedSearch feedSearch, Long userId);
 
-    List<Feed> getHotPreviewFeeds(String userEmail);
+    List<Feed> getHotPreviewFeeds(Long userId);
 
-    void createFeed(FeedRequestDTO feedRequestDTO, String userEmail);
+    void createFeed(FeedRequestDTO feedRequestDTO, Long userId);
 
-    void deleteFeed(Long id, String userEmail);
+    void deleteFeed(Long id, Long userId);
 
-    Feed updateFeed(Long postId, FeedRequestDTO feedRequestDTO, String userEmail);
+    Feed updateFeed(Long postId, FeedUpdateRequestDTO feedUpdateRequestDTO, Long userId);
 
-    List<Feed> getMyFeeds(String userEmail);
+    List<Feed> getMyFeeds(Long userId);
 
-    boolean checkLike(Long PostId, String userEmail);
 }
