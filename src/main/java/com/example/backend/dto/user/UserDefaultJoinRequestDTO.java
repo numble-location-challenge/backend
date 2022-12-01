@@ -19,7 +19,7 @@ public class UserDefaultJoinRequestDTO {
 
     @Schema(description = "이메일(아이디)", defaultValue = "hello@numble.com")
     @NotBlank
-    private String email; // 아이디
+    private String email;
 
     @Schema(description = "비밀번호", defaultValue = "testPw")
     @NotBlank
@@ -40,7 +40,7 @@ public class UserDefaultJoinRequestDTO {
     @Schema(description = "짧은 소개글", defaultValue = "파리&제주스냅 셔터프레소📷\n 청춘스냅 잘하기로 소문난 집")
     private String bio;
 
-    @Schema(description = "지역 번호 8자리", defaultValue = "1111010400")
+    @Schema(description = "지역 번호", defaultValue = "1111010400")
     @NotNull
     private Long dongCode;
 
