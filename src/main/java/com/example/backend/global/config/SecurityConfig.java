@@ -1,9 +1,9 @@
 package com.example.backend.global.config;
 
-import com.example.backend.global.security.*;
 import com.example.backend.global.security.jwt.JwtAuthorizationFilter;
 import com.example.backend.global.security.jwt.JwtExceptionEntryPoint;
 import com.example.backend.global.security.jwt.JwtLogoutHandler;
+import com.example.backend.global.security.jwt.authToken.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

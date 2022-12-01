@@ -2,7 +2,7 @@ package com.example.backend.global.utils;
 
 import com.example.backend.dto.response.ResponseDTO;
 import com.example.backend.dto.login.AuthDTO;
-import com.example.backend.global.security.AuthToken;
+import com.example.backend.global.security.jwt.authToken.AuthToken;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;

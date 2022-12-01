@@ -3,7 +3,7 @@ package com.example.backend.service.login;
 import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.dto.login.DefaultLoginRequestDTO;
-import com.example.backend.global.security.AuthToken;
+import com.example.backend.global.security.jwt.authToken.AuthToken;
 
 public interface LoginService {
 
