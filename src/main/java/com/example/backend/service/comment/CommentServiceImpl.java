@@ -42,7 +42,8 @@ public class CommentServiceImpl implements CommentService{
     @Override
     @Transactional(readOnly = true)
     public List<Comment> getMyComments(Long userId) {
-        User user = userRepository.findReadOnlyById(userId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        User user = userRepository.findReadOnlyById(userId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
         List<Comment> comments = commentRepository.findAllByUserIdAndDeletedIsFalse(user.getId());
         return comments;
     }
@@ -50,9 +51,10 @@ public class CommentServiceImpl implements CommentService{
     @Transactional
     @Override
     public void createComment(Long postId, Long userId, CommentRequestDTO commentRequestDTO) {
-        User user = userRepository.findReadOnlyById(userId).orElseThrow(()-> new EntityNotExistsException(
-            EntityNotExistsExceptionType.NOT_FOUND_USER));
-        Post post = postRepository.findById(postId).orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
+        User user = userRepository.findReadOnlyById(userId)
+            .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        Post post = postRepository.findById(postId)
+            .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
         Integer newCommentGroup = commentRepository.findByMaxCommentGroup() + 1;
         //댓글 그룹 번호 NULL이면 0, 아니면 최댓값
         Comment comment = Comment.createComment(commentRequestDTO.getContents(),
@@ -63,10 +65,13 @@ public class CommentServiceImpl implements CommentService{
     @Transactional
     @Override
     public void createReply(Long postId, Long userId, Long commentId, CommentRequestDTO commentRequestDTO) {
-        User user = userRepository.findReadOnlyById(userId).orElseThrow(()-> new EntityNotExistsException(
-            EntityNotExistsExceptionType.NOT_FOUND_USER));
-        Post post = postRepository.findById(postId).orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
-        Comment parent_comment = commentRepository.findByIdAndPostIdAndDeletedIsFalse(commentId, postId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT)); // 부모 댓글의 정보
+        User user = userRepository.findReadOnlyById(userId)
+            .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_USER));
+        Post post = postRepository.findById(postId)
+            .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
+        Comment parent_comment = commentRepository.findByIdAndPostIdAndDeletedIsFalse(commentId, postId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT)); // 부모 댓글의 정보
+
         if (isComment(parent_comment)) {
             int parentLevel = parent_comment.getLevel(); // 부모 댓글의 레벨
             int parentCGroup = parent_comment.getCGroup(); // 부모 댓글의 그룹
@@ -82,7 +87,8 @@ public class CommentServiceImpl implements CommentService{
     @Transactional
     @Override
     public void deleteComment(Long commentId, Long userId) {
-        Comment comment = commentRepository.findByIdAndDeletedIsFalse(commentId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
+        Comment comment = commentRepository.findByIdAndDeletedIsFalse(commentId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
         Long countCommentByCGroup = commentRepository.countBycGroup(comment.getCGroup());
         if (hasPermission(comment, userId)) { //유저가 권한을 가지고 있고
             if (isComment(comment)) { // 대댓글이 아닌 댓글이면서
@@ -101,7 +107,8 @@ public class CommentServiceImpl implements CommentService{
 
     @Transactional
     public Comment updateComment(Long commentId, Long userId, CommentRequestDTO commentRequestDTO) {
-        Comment comment = commentRepository.findByIdAndDeletedIsFalse(commentId).orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
+        Comment comment = commentRepository.findByIdAndDeletedIsFalse(commentId)
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
         if (hasPermission(comment, userId)) {
             comment.updateComment(commentRequestDTO.getContents());
         } else {
