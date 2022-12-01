@@ -6,7 +6,7 @@ import com.example.backend.domain.User;
 import com.example.backend.domain.enumType.SocialStatus;
 import com.example.backend.domain.enumType.UserType;
 import com.example.backend.domain.post.Social;
-import com.example.backend.dto.login.SnsJoinRequestDTO;
+import com.example.backend.dto.user.SnsJoinRequestDTO;
 import com.example.backend.dto.user.SnsUserDTO;
 import com.example.backend.dto.user.UserDefaultJoinRequestDTO;
 import com.example.backend.dto.user.UserModifyRequestDTO;
