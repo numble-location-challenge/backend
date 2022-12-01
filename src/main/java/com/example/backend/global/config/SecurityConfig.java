@@ -1,7 +1,7 @@
 package com.example.backend.global.config;
 
 import com.example.backend.global.security.*;
-import com.example.backend.global.security.jwt.JwtAuthenticationFilter;
+import com.example.backend.global.security.jwt.JwtAuthorizationFilter;
 import com.example.backend.global.security.jwt.JwtExceptionEntryPoint;
 import com.example.backend.global.security.jwt.JwtLogoutHandler;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +71,7 @@ public class SecurityConfig {
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
             http
-                    .addFilterAfter(new JwtAuthenticationFilter(authenticationManager, authTokenProvider), CorsFilter.class);
+                    .addFilterAfter(new JwtAuthorizationFilter(authenticationManager, authTokenProvider), CorsFilter.class);
         }
     }
 }

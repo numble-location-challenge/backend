@@ -26,13 +26,13 @@ import java.io.IOException;
  * 검증에는 Access Token 만 필요
  */
 @Slf4j
-public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
+public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private String TOKEN_PREFIX = "Bearer ";
 
     private AuthTokenProvider authTokenProvider;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, AuthTokenProvider authTokenProvider) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, AuthTokenProvider authTokenProvider) {
         super(authenticationManager);
         this.authTokenProvider = authTokenProvider;
     }
