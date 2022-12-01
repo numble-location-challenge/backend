@@ -56,7 +56,6 @@ public class CommentServiceImpl implements CommentService{
         Post post = postRepository.findById(postId)
             .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
         Integer newCommentGroup = commentRepository.findByMaxCommentGroup() + 1;
-        //댓글 그룹 번호 NULL이면 0, 아니면 최댓값
         Comment comment = Comment.createComment(commentRequestDTO.getContents(),
             newCommentGroup, 0, 0, 0L, post, user);
         commentRepository.save(comment);
@@ -70,11 +69,11 @@ public class CommentServiceImpl implements CommentService{
         Post post = postRepository.findById(postId)
             .orElseThrow(()-> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_POST));
         Comment parent_comment = commentRepository.findByIdAndPostIdAndDeletedIsFalse(commentId, postId)
-            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT)); // 부모 댓글의 정보
+            .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
 
         if (isComment(parent_comment)) {
-            int parentLevel = parent_comment.getLevel(); // 부모 댓글의 레벨
-            int parentCGroup = parent_comment.getCGroup(); // 부모 댓글의 그룹
+            int parentLevel = parent_comment.getLevel();
+            int parentCGroup = parent_comment.getCGroup();
             int lastRefOrder = commentRepository.findLastRefOrderInGroup(parentCGroup, postId);
             Comment comment = Comment.createComment(commentRequestDTO.getContents(), parentCGroup,
                 parentLevel + 1, lastRefOrder + 1, parent_comment.getId(), post, user);
@@ -90,11 +89,11 @@ public class CommentServiceImpl implements CommentService{
         Comment comment = commentRepository.findByIdAndDeletedIsFalse(commentId)
             .orElseThrow(() -> new EntityNotExistsException(EntityNotExistsExceptionType.NOT_FOUND_COMMENT));
         Long countCommentByCGroup = commentRepository.countBycGroup(comment.getCGroup());
-        if (hasPermission(comment, userId)) { //유저가 권한을 가지고 있고
-            if (isComment(comment)) { // 대댓글이 아닌 댓글이면서
-                if (countCommentByCGroup > 1){ // 대댓글을 가지면
-                    comment.setDeleted(); //deleted = true 로 변경
-                } else{ //아니면 삭제
+        if (hasPermission(comment, userId)) {
+            if (isComment(comment)) {
+                if (countCommentByCGroup > 1){
+                    comment.setDeleted();
+                } else{
                     commentRepository.delete(comment);
                 }
             } else {
