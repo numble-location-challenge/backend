@@ -52,7 +52,7 @@ public class Comment extends TimeAuditingEntity{
     private Boolean deleted = false; //삭제되었는지 여부
 
     @Builder
-    public Comment(User user, Post post, String contents, int cGroup, int level, int refOrder,
+    private Comment(User user, Post post, String contents, int cGroup, int level, int refOrder,
         Long parentNum) {
         this.user = user;
         this.post = post;
@@ -86,7 +86,7 @@ public class Comment extends TimeAuditingEntity{
     }
 
     public void setDeleted(){
-        deleted = true;
+        this.deleted = true;
     }
 
     public void updateComment(String contents){

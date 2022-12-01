@@ -7,11 +7,9 @@ import com.example.backend.dto.feed.FeedUserDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Schema(description = "댓글 조회 DTO 삭제된 댓글일 시 deleted= true, user = null, content = 삭제된 댓글입니다.")
 @Getter
-@NoArgsConstructor
 public class CommentResponseDTO {
     @Schema(description = "댓글의 아이디")
     private Long commentId;
@@ -31,7 +29,6 @@ public class CommentResponseDTO {
     private LocalDateTime createDate;
     @Schema(description = "해당 댓글의 삭제 여부", defaultValue = "false")
     private Boolean deleted;
-
 
     public CommentResponseDTO(Comment comment) {
         this.commentId = comment.getId();
