@@ -1,11 +1,11 @@
-# backend
+# WEET 🙋‍♀️
 <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=Java&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat&logo=SpringBoot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=SpringSecurity&logoColor=white"/> <img src="https://img.shields.io/badge/MySQL 8-4479A1?style=flat&logo=MySQL&logoColor=white"/> <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=Jenkins&logoColor=white"/> <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=Swagger&logoColor=white"/>
 
 **Numble [나만의 지역 커뮤니티 만들기] 챌린지**
 
 **2022-11-29 ~ 2022-12-01 진행**
 
-지역주민과 취미생활을 함께하고 소통할 수 있도록 도와주는 지역 기반 모임 서비스입니다. 6km 거리 안의 동네친구들만 참여할 수 있는 모임을 만들거나 참여할 수 있어요. 피드를 통해 친구들에게 일상을 공유해보세요.
+지역주민과 취미생활을 함께하고 소통할 수 있도록 도와주는 지역 기반 모임 서비스 WEET 입니다. 6km 거리 안의 동네친구들만 참여할 수 있는 모임을 만들거나 참여할 수 있어요. 피드를 통해 친구들에게 일상을 공유해보세요.
 
 ## 사용 기술
 
