@@ -1,7 +1,7 @@
 # WEET 🙋‍♀️
 <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=Java&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat&logo=SpringBoot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=SpringSecurity&logoColor=white"/> <img src="https://img.shields.io/badge/MySQL 8-4479A1?style=flat&logo=MySQL&logoColor=white"/> <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=Jenkins&logoColor=white"/> <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=Swagger&logoColor=white"/>
 
-**Numble [나만의 지역 커뮤니티 만들기] 챌린지**
+**[Numble 나만의 지역 커뮤니티 만들기](https://www.numble.it/e3d67139-f040-47cd-80a7-12e063ef1f36) 챌린지**
 
 **2022-11-29 ~ 2022-12-01 진행**
 
@@ -31,12 +31,12 @@
   - Swagger API 설정 및 적용
 - **신윤상**
   - 피드 CRUD
-   - 조건 필터링(최신순, 좋아요 누른 글)
+    - 조건 필터링(최신순, 좋아요 누른 글)
   - 댓글 & 대댓글 CRUD 및 필터링(내 댓글)
   - Public Cloud 관리 및 Jenkins를 사용한 CI/CD
 - **홍수희**
   - 모임 RD
-   - 조건 필터링(최신순, 인기순, 마감임박순, 내가 쓴 글, 좋아요 누른 글)
+    - 조건 필터링(최신순, 인기순, 마감임박순, 내가 쓴 글, 좋아요 누른 글)
   - 좋아요 CD
 
 
