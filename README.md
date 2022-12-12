@@ -1,4 +1,109 @@
 # backend
+<img src="https://img.shields.io/badge/Java-007396?style=flat&logo=Java&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat&logo=SpringBoot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=SpringSecurity&logoColor=white"/> <img src="https://img.shields.io/badge/MySQL 8-4479A1?style=flat&logo=MySQL&logoColor=white"/> <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=Jenkins&logoColor=white"/> <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=Swagger&logoColor=white"/>
+
+**Numble [나만의 지역 커뮤니티 만들기] 챌린지**
+
+**2022-11-29 ~ 2022-12-01 진행**
+
+지역주민과 취미생활을 함께하고 소통할 수 있도록 도와주는 지역 기반 모임 서비스입니다. 6km 거리 안의 동네친구들만 참여할 수 있는 모임을 만들거나 참여할 수 있어요. 피드를 통해 친구들에게 일상을 공유해보세요.
+
+## 사용 기술
+
+- Spring Boot 2.7.5
+- Spring Data JPA
+- Spring security & JWT
+- Java 11
+- Build Tool: gradle
+- DB: MySQL8
+- CI/CD:  Jenkins 2.361.3
+- Infra(PaaS): Naver Cloud Server
+- Log: Slf4j
+- API Docs:  Swagger3
+  - springdoc-openapi v1.6.12
+
+## 기능 및 역할분담
+
+- **송유진**
+  - 자체 회원가입 & 로그인 & 로그아웃 + 카카오 소셜 로그인
+  - 회원 RUD
+  - 모임 신청, 신청 취소, 강퇴 (회원—모임 연결 기능)
+  - 모임 CU
+  - Swagger API 설정 및 적용
+- **신윤상**
+  - 피드 CRUD
+   - 조건 필터링(최신순, 좋아요 누른 글)
+  - 댓글 & 대댓글 CRUD 및 필터링(내 댓글)
+  - Public Cloud 관리 및 Jenkins를 사용한 CI/CD
+- **홍수희**
+  - 모임 RD
+   - 조건 필터링(최신순, 인기순, 마감임박순, 내가 쓴 글, 좋아요 누른 글)
+  - 좋아요 CD
+
+
+## 산출 문서
+
+- [Numble 측에서 제공한 기본 기획서](https://www.notion.so/51fb74d918234fb8b6692e473c842b65)
+
+- [요구사항 정리](https://github.com/numble-location-challenge/backend/wiki/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EC%A0%95%EB%A6%AC)
+
+- [DB 및 ERD 설계](https://www.notion.so/DB-d0656ed726384bd0832a0304510a911f)
+
+- [API 초기설계](https://www.notion.so/9794dcbdba3241c0bc8db52c0c33a172)
+
+- [Swagger-UI API 문서](http://101.101.211.186:3100/swagger-ui/index.html)
+
+- Demo 영상
+
+![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/43891587/206953622-ccf2a1e7-60d3-4b1c-b3f5-442cf3a47a6c.gif)
+
+
+## 패키지 구조
+```
+└─src
+    ├─main
+    │  ├─generated
+    │  ├─java
+    │  │  └─com
+    │  │      └─example
+    │  │          └─backend
+    │  │              ├─controller
+    │  │              │  └─testCode
+    │  │              ├─domain
+    │  │              │  ├─enumType
+    │  │              │  ├─post
+    │  │              │  └─tag
+    │  │              ├─dto
+    │  │              │  ├─comment
+    │  │              │  ├─feed
+    │  │              │  ├─login
+    │  │              │  ├─response
+    │  │              │  ├─social
+    │  │              │  └─user
+    │  │              ├─global
+    │  │              │  ├─config
+    │  │              │  ├─exception
+    │  │              │  │  ├─base
+    │  │              │  │  ├─comment
+    │  │              │  │  ├─feed
+    │  │              │  │  ├─social
+    │  │              │  │  └─user
+    │  │              │  ├─security
+    │  │              │  │  └─jwt
+    │  │              │  │      └─authToken
+    │  │              │  └─utils
+    │  │              ├─repository
+    │  │              └─service
+    │  │                  ├─comment
+    │  │                  ├─feed
+    │  │                  ├─login
+    │  │                  ├─social
+    │  │                  └─user
+    │  │                      └─userInfo
+    │  └─resources
+    └─test
+```
+
+## 서비스 컨셉 디자인
 
 ![image](https://user-images.githubusercontent.com/51091854/206086860-d1154cb7-537c-457c-831e-a6fa5b62275b.png)
 ![image](https://user-images.githubusercontent.com/51091854/206086916-e30d05fa-8443-4f7d-a74d-aa5eb1c7c7b3.png)
