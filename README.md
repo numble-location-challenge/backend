@@ -54,7 +54,7 @@
 
 - Demo 영상
 
-![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/43891587/206953622-ccf2a1e7-60d3-4b1c-b3f5-442cf3a47a6c.gif)
+![ezgif com-gif-maker (2)](https://user-images.githubusercontent.com/43891587/206969296-af2f2431-9b54-488d-972a-3a2321c18b8d.gif)
 
 
 ## 패키지 구조
