@@ -42,7 +42,7 @@
 
 ## 산출 문서
 
-- [Numble 측에서 제공한 기본 기획서](https://www.notion.so/51fb74d918234fb8b6692e473c842b65)
+- Numble 측에서 제공한 기본 기획서(노출 금지)
 
 - [요구사항 정리](https://github.com/numble-location-challenge/backend/wiki/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EC%A0%95%EB%A6%AC)
 
